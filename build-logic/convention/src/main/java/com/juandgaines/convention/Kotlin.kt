@@ -8,6 +8,7 @@ import org.gradle.internal.impldep.com.jcraft.jsch.ConfigRepository.defaultConfi
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
 
 internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension<*, *, *, *,*,*>
@@ -24,7 +25,9 @@ internal fun Project.configureKotlinAndroid(
 
     }
 
+    configureKotlin()
     dependencies {
+        //Dates in lower versions of android
         "coreLibraryDesugaring"(libs.findLibrary("desugar.jdk.libs").get())
     }
 

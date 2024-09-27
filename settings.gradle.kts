@@ -1,13 +1,7 @@
 pluginManagement {
-    include("build-logic")
+    includeBuild("build-logic")
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -32,4 +26,3 @@ include(":auth:presentation")
 include(":task:domain")
 include(":task:data")
 include(":task:presentation")
-include(":build-logic:convention")
