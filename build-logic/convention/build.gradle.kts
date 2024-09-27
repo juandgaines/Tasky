@@ -18,5 +18,20 @@ gradlePlugin{
             id = "tasky.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+
+        register("androidApplicationCompose") {
+            id = "tasky.android.application.compose"
+            implementationClass = "AndroidApplicationComposeConventionPlugin"
+        }
+
+        register("androidLibrary") {
+            id = "tasky.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
+
+        register("androidLibraryCompose") {
+            id = "tasky.android.library.compose"
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
     }
 }

@@ -5,6 +5,7 @@ import org.gradle.api.JavaVersion.VERSION_17
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.internal.impldep.com.jcraft.jsch.ConfigRepository.defaultConfig
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
@@ -42,8 +43,8 @@ internal fun Project.configureKotlinJvm(){
 
 private fun Project.configureKotlin(){
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = VERSION_17.toString()
+        compilerOptions {
+            jvmTarget.set(JVM_17)
         }
     }
 }
