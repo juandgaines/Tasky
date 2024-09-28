@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.tasky.android.application)
+    alias(libs.plugins.tasky.android.application.compose)
 }
 
 android {
