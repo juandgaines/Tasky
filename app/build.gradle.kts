@@ -5,6 +5,18 @@ plugins {
 
 android {
     namespace = "com.juandgaines.tasky"
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
@@ -29,7 +41,7 @@ dependencies {
     implementation(projects.auth.domain)
     implementation(projects.auth.data)
     implementation(projects.auth.presentation)
-    
+
     implementation(projects.task.domain)
     implementation(projects.task.data)
     implementation(projects.task.presentation)
