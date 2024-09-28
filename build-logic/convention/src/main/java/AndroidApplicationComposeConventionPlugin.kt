@@ -15,7 +15,7 @@ class AndroidApplicationComposeConventionPlugin:Plugin<Project> {
             configureAndroidCompose(extension)
 
             dependencies {
-                "implementation"(libs.findLibrary("androidx.navigation.compose").get())
+                "implementation"(libs.findLibrary("dagger.hilt.navigation.compose").get())
                 "implementation"(libs.findLibrary("dagger.hilt").get())
                 "ksp"(libs.findLibrary("dagger.hilt.compiler").get())
             }
