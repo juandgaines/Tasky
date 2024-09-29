@@ -1,4 +1,5 @@
-import com.juandgaines.convention.libs
+package com.juandgaines.convention
+
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.project

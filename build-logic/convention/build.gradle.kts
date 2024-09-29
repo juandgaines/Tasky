@@ -37,5 +37,20 @@ gradlePlugin{
             id = "tasky.android.feature.ui"
             implementationClass = "AndroidFeatureUiConventionPlugin"
         }
+
+        register("androidRoom"){
+            id = "tasky.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
+        }
+
+        register("jvmLibrary") {
+            id = "tasky.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
+
+        register("jvmRetrofit") {
+            id = "tasky.jvm.retrofit"
+            implementationClass = "RetrofitConventionPlugin"
+        }
     }
 }

@@ -14,6 +14,10 @@ appcompat = "1.7.0"
 material = "1.12.0"
 coilCompose = "2.6.0"
 room = "2.6.1"
+retrofit = "2.11.0"
+kotlinxSerializationConverter = "1.0.0"
+datastore = "1.1.1"
+okhttp = "4.12.0"
 hilt = "2.51.1"
 ksp = "2.0.0-1.0.22"
 navigationCompose = "2.8.1"
@@ -57,13 +61,25 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 dagger-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "navigationComposeHilt" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
+
 # Room
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+
+#DataStore
+datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+
+#Network
+retrofit-library = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "kotlinxSerializationConverter" }
+okhttp3-library = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+
 #hilt
 dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt"}
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt"}
+
 #Testing
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -80,6 +96,7 @@ room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", vers
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 room = { id = "androidx.room", version.ref = "room" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -87,14 +104,17 @@ dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 
+
 tasky-android-application = { id = "tasky.android.application", version = "unspecified" }
 tasky-android-application-compose = { id = "tasky.android.application.compose", version = "unspecified" }
 tasky-android-library = { id = "tasky.android.library", version = "unspecified" }
 tasky-android-library-compose = { id = "tasky.android.library.compose", version = "unspecified" }
 tasky-android-feature-ui = { id = "tasky.android.feature.ui", version = "unspecified" }
+tasky-android-room = { id = "tasky.android.room", version = "unspecified" }
+tasky-jvm-library = { id = "tasky.jvm.library", version = "unspecified" }
+tasky-jvm-retrofit = { id = "tasky.jvm.retrofit", version = "unspecified" }
 
 [bundles]
-
 compose = [
     "androidx-activity-compose",
     "androidx-lifecycle-runtime-compose",
@@ -108,4 +128,11 @@ compose = [
 compose-debug = [
     "androidx-ui-tooling",
     "androidx-ui-test-manifest"
+]
+
+retrofit = [
+    "retrofit-library",
+    "retrofit-kotlinx-serialization-converter",
+    "okhttp3-library",
+    "okhttp3-logging-interceptor"
 ]
