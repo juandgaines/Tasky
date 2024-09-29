@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.juandgaines.task.data"
+    namespace = "com.juandgaines.agenda.data"
 }
 
 dependencies {
-    implementation(projects.task.domain)
+    implementation(projects.agenda.domain)
     implementation(projects.core.domain)
     implementation(projects.core.data)
 }
