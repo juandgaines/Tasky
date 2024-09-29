@@ -1,7 +1,9 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.juandgaines.convention.configureAndroidCompose
+import com.juandgaines.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
 class AndroidApplicationComposeConventionPlugin:Plugin<Project> {
@@ -11,6 +13,10 @@ class AndroidApplicationComposeConventionPlugin:Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
             val extension = extensions.getByType<ApplicationExtension>()
             configureAndroidCompose(extension)
+
+            dependencies {
+                "implementation"(libs.findLibrary("dagger.hilt.navigation.compose").get())
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.tasky.android.library)
+    alias(libs.plugins.tasky.jvm.retrofit)
 }
 android {
     namespace = "com.juandgaines.auth.data"

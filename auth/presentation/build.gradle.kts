@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.tasky.android.library.compose)
+    alias(libs.plugins.tasky.android.feature.ui)
 }
 
 android {

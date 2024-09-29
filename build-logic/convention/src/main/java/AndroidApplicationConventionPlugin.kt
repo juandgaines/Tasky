@@ -1,5 +1,4 @@
 import com.android.build.api.dsl.ApplicationExtension
-import com.android.tools.r8.internal.th
 import com.juandgaines.convention.ExtensionType
 import com.juandgaines.convention.configureBuildTypes
 import com.juandgaines.convention.configureKotlinAndroid
@@ -7,7 +6,7 @@ import com.juandgaines.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
-
+import org.gradle.kotlin.dsl.dependencies
 
 class AndroidApplicationConventionPlugin :Plugin<Project> {
     override fun apply(target: Project) {
@@ -15,6 +14,8 @@ class AndroidApplicationConventionPlugin :Plugin<Project> {
             pluginManager.run {
                 apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
+                apply("com.google.dagger.hilt.android")
+                apply("com.google.devtools.ksp")
             }
 
             extensions.configure<ApplicationExtension>(){
@@ -27,6 +28,11 @@ class AndroidApplicationConventionPlugin :Plugin<Project> {
                 }
                 configureKotlinAndroid(this)
                 configureBuildTypes(this, ExtensionType.APPLICATION)
+            }
+
+            dependencies{
+                "implementation"(libs.findLibrary("dagger.hilt").get())
+                "ksp"(libs.findLibrary("dagger.hilt.compiler").get())
             }
         }
     }

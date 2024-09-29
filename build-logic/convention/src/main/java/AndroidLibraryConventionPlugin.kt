@@ -2,6 +2,7 @@ import com.android.build.api.dsl.LibraryExtension
 import com.juandgaines.convention.ExtensionType
 import com.juandgaines.convention.configureBuildTypes
 import com.juandgaines.convention.configureKotlinAndroid
+import com.juandgaines.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -15,6 +16,8 @@ class AndroidLibraryConventionPlugin:Plugin<Project>{
             pluginManager.run {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.android")
+                apply("com.google.dagger.hilt.android")
+                apply("com.google.devtools.ksp")
             }
 
             extensions.configure<LibraryExtension> {
@@ -32,6 +35,8 @@ class AndroidLibraryConventionPlugin:Plugin<Project>{
             }
 
             dependencies {
+                "implementation"(libs.findLibrary("dagger.hilt").get())
+                "ksp"(libs.findLibrary("dagger.hilt.compiler").get())
                 "testImplementation"(kotlin("test"))
             }
         }
