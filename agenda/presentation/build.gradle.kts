@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.juandgaines.task.presentation"
+    namespace = "com.juandgaines.agenda.presentation"
 }
 
 dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.activity.compose)
 
-    implementation(projects.task.domain)
+    implementation(projects.agenda.domain)
     implementation(projects.core.domain)
 }

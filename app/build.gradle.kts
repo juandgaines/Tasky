@@ -42,11 +42,9 @@ dependencies {
     implementation(projects.auth.data)
     implementation(projects.auth.presentation)
 
-    implementation(projects.task.domain)
-    implementation(projects.task.data)
-    implementation(projects.task.presentation)
-
-
+    implementation(projects.agenda.domain)
+    implementation(projects.agenda.data)
+    implementation(projects.agenda.presentation)
 
 
     testImplementation(libs.junit)
