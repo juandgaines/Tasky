@@ -11,12 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        installSplashScreen()
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
         setContent {
             TaskyTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

@@ -10,6 +10,7 @@ lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.2"
 androidTools = "31.6.1"
 composeBom = "2024.09.02"
+materialIconsExtended = "1.7.2"
 appcompat = "1.7.0"
 material = "1.12.0"
 coilCompose = "2.6.0"
@@ -24,10 +25,10 @@ navigationCompose = "2.8.1"
 navigationComposeHilt = "1.2.0"
 coroutines = "1.9.0"
 jetbrainsKotlinJvm = "1.9.0"
-desugar_jdk_libs = "2.0.4"
+desugar_jdk_libs = "2.1.2"
 
 # Project versions
-projectApplicationId = "com.juandgaines.runique"
+projectApplicationId = "com.juandgaines.tasky"
 projectVersionName = "1.0"
 projectMinSdkVersion = "26"
 projectTargetSdkVersion = "35"
@@ -57,6 +58,8 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 #Navigation
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 dagger-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "navigationComposeHilt" }
@@ -115,6 +118,7 @@ tasky-jvm-library = { id = "tasky.jvm.library", version = "unspecified" }
 tasky-jvm-retrofit = { id = "tasky.jvm.retrofit", version = "unspecified" }
 
 [bundles]
+
 compose = [
     "androidx-activity-compose",
     "androidx-lifecycle-runtime-compose",
