@@ -1,7 +1,6 @@
 package com.juandgaines.auth.data.network.di
 
-import com.juandgaines.auth.data.network.signin.LoginApi
-import com.juandgaines.auth.data.network.signup.SignUpApi
+import com.juandgaines.auth.data.network.auth.AuthApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,13 +12,8 @@ import retrofit2.Retrofit
 class AuthModule {
 
     @Provides
-    fun provideLoginApi(retrofit: Retrofit): LoginApi {
-        return retrofit.create(LoginApi::class.java)
-    }
-
-    @Provides
-    fun provideSignUpApi(retrofit: Retrofit): SignUpApi {
-        return retrofit.create(SignUpApi::class.java)
+    fun provideLoginApi(retrofit: Retrofit): AuthApi {
+        return retrofit.create(AuthApi::class.java)
     }
 
 }
