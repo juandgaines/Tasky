@@ -9,6 +9,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.kotlinx.serialization.json)
     implementation(projects.core.domain)
     implementation(libs.datastore.preferences)
 }
