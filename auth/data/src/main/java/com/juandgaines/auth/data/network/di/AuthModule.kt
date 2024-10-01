@@ -1,6 +1,6 @@
 package com.juandgaines.auth.data.network.di
 
-import com.juandgaines.auth.data.network.auth.AuthApi
+import com.juandgaines.auth.data.network.AuthApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

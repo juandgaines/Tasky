@@ -1,4 +1,4 @@
-package com.juandgaines.auth.data.network.auth.signin
+package com.juandgaines.auth.data.network.login
 
 import kotlinx.serialization.Serializable
 
