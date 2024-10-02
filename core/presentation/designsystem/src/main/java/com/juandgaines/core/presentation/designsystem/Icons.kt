@@ -19,3 +19,7 @@ val EyeOpenedIcon: ImageVector
 val BackIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.ic_back)
+
+val AddIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.ic_add)
