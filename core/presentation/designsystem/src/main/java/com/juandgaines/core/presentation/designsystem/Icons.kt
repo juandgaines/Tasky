@@ -23,3 +23,11 @@ val BackIcon: ImageVector
 val AddIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.ic_add)
+
+val EditIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.ic_edit)
+
+val CloseIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.ic_close)
