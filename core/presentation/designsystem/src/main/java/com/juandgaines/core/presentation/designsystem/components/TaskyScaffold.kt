@@ -63,7 +63,8 @@ fun TaskyScaffold(
                             bottomStart = 0.dp,
                             bottomEnd = 0.dp
                         )
-                    ),
+                    )
+                    .padding(16.dp),
             ) {
                 content(paddingValues)
             }
@@ -106,8 +107,6 @@ fun TaskyScaffoldPreview() {
                 Column (
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(padding)
-                        .padding(top = 56.dp)
                 ){
                     Text(
                         text = "Hello World",
