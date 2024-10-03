@@ -117,7 +117,7 @@ fun TaskyScaffoldPreview() {
                     )
                 }
             },
-            fabPosition = androidx.compose.material3.FabPosition.Start,
+            fabPosition = FabPosition.Start,
             floatingActionButton = {
                 TaskyFAB(
                     onClick = {},
