@@ -139,5 +139,6 @@ retrofit = [
     "retrofit-library",
     "retrofit-kotlinx-serialization-converter",
     "okhttp3-library",
-    "okhttp3-logging-interceptor"
+    "okhttp3-logging-interceptor",
+    "kotlinx-serialization-json"
 ]

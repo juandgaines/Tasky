@@ -43,13 +43,12 @@ fun TaskyTextField(
     modifier: Modifier = Modifier,
     state: TextFieldState,
     endIcon: ImageVector?,
+    isFocused: Boolean = false,
+    onFocusChanged: (Boolean) -> Unit = {},
     hint: String,
     error: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {
-    var isFocused by remember {
-        mutableStateOf(false)
-    }
 
     Column(
         modifier = modifier
@@ -81,7 +80,7 @@ fun TaskyTextField(
                 .height(64.dp)
                 .padding(12.dp)
                 .onFocusChanged {
-                    isFocused = it.isFocused
+                    onFocusChanged(it.isFocused)
                 },
             decorator = { innerBox ->
                 Row(
@@ -127,9 +126,15 @@ fun TaskyTextField(
 @Composable
 fun TaskyTextFieldPreview() {
     TaskyTheme {
+        var isFocused by remember { mutableStateOf(false) }
+
         TaskyTextField(
             state = rememberTextFieldState(),
             hint = "example@email.com",
+            isFocused = isFocused,
+            onFocusChanged = {
+                isFocused = it
+            },
             error = false,
             endIcon = CheckIcon,
             modifier = Modifier.fillMaxWidth()

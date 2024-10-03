@@ -43,15 +43,14 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 fun TaskyPasswordEditTextField(
     modifier: Modifier = Modifier,
     state: TextFieldState,
+    isFocused: Boolean = false,
+    onFocusChanged: (Boolean) -> Unit = {},
     isPasswordVisible: Boolean,
     onTogglePasswordVisibility: () -> Unit,
     hint: String,
     error: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {
-    var isFocused by remember {
-        mutableStateOf(false)
-    }
     Column(
         modifier = modifier
     ) {
@@ -85,7 +84,7 @@ fun TaskyPasswordEditTextField(
                 .height(64.dp)
                 .padding(horizontal = 12.dp)
                 .onFocusChanged {
-                    isFocused = it.isFocused
+                    onFocusChanged(it.isFocused)
                 },
             decorator = { innerBox ->
                 Row(
@@ -133,10 +132,18 @@ fun TaskyPasswordEditTextFieldPreview() {
         var isPasswordVisible by remember {
             mutableStateOf(false)
         }
+        var isFocused by remember {
+            mutableStateOf(false)
+        }
+
         TaskyPasswordEditTextField(
             state = rememberTextFieldState(),
             hint = "Password",
             error = false,
+            isFocused = isFocused,
+            onFocusChanged = {
+                isFocused = it
+            },
             isPasswordVisible = isPasswordVisible,
             onTogglePasswordVisibility = {
                 isPasswordVisible = !isPasswordVisible
