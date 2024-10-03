@@ -5,13 +5,8 @@ package com.juandgaines.core.presentation.designsystem.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,25 +27,16 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 @Composable
 fun TaskyToolbar(
     modifier: Modifier = Modifier,
-    startContent: (@Composable () -> Unit)? = null,
-    centerContent: (@Composable () -> Unit)? = null,
-    endContent: (@Composable () -> Unit)? = null,
+    content: @Composable () -> Unit,
+    backNavigation: @Composable () -> Unit = {} ,
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
 ) {
     TopAppBar(
         title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding(horizontal = 16.dp).fillMaxSize()
-            ) {
-                startContent?.invoke()
-                Spacer(modifier = Modifier.weight(1f))
-                centerContent?.invoke()
-                Spacer(modifier = Modifier.weight(1f))
-                endContent?.invoke()
-
-            }
+            content()
+        },
+        navigationIcon = {
+            backNavigation()
         },
         modifier = modifier,
         scrollBehavior = scrollBehavior,
@@ -65,28 +51,35 @@ fun TaskyToolbar(
 fun TaskyToolbarPreview() {
     TaskyTheme {
         TaskyToolbar(
-            startContent = {
+            backNavigation = {
                 Icon(
                     imageVector = CloseIcon,
                     contentDescription = "Back",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .offset(x = 16.dp)
                 )
             },
-            centerContent = {
-               Text(
-                   text = "01 MARCH 2022",
-                   style = MaterialTheme.typography.titleSmall,
-                   fontWeight = FontWeight.SemiBold,
-                   color = MaterialTheme.colorScheme.onSurface
-               )
+            content = {
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ){
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = "01 MARCH 2022",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        imageVector = EditIcon,
+                        contentDescription = "Back",
+                        modifier = Modifier.size(25.dp),
+                    )
+                }
             },
-            endContent = {
-                Icon(
-                    imageVector = EditIcon,
-                    contentDescription = "Back",
-                    modifier = Modifier.size(25.dp),
-                )
-            }
         )
     }
 }
