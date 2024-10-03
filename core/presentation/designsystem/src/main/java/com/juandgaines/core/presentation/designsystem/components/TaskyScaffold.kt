@@ -112,7 +112,7 @@ fun TaskyScaffoldPreview() {
                         text = "Hello World",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             },
