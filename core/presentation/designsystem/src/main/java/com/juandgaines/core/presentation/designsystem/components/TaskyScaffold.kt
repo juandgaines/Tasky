@@ -30,7 +30,7 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 @Composable
 fun TaskyScaffold(
     modifier: Modifier = Modifier,
-    fabPosition: FabPosition = androidx.compose.material3.FabPosition.End,
+    fabPosition: FabPosition = FabPosition.End,
     topAppBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
     content : @Composable (PaddingValues) -> Unit,
