@@ -47,6 +47,12 @@ class SharedPreferencesSessionManager(
         }
     }
 
+    override suspend fun getToken(): String {
+        return withContext(Dispatchers.IO){
+            get()?.accessToken ?: ""
+        }
+    }
+
     override suspend fun refresh(): Result<AuthData?, Network> =
         withContext(Dispatchers.IO){
             val authData = get() ?: return@withContext Success(null)
@@ -61,6 +67,8 @@ class SharedPreferencesSessionManager(
                 }.map {
                     val newAuthData = AuthData(
                         accessToken = it.accessToken,
+                        fullName = authData.fullName,
+                        accessTokenExpirationTimestamp = it.expirationTimestamp,
                         refreshToken = authData.refreshToken,
                         userId = authData.userId
                     )

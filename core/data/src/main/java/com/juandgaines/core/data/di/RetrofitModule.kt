@@ -2,10 +2,12 @@ package com.juandgaines.core.data.di
 
 import com.juandgaines.core.data.BuildConfig
 import com.juandgaines.core.data.auth.TokenApi
+import com.juandgaines.core.domain.auth.SessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -48,10 +50,21 @@ class RetrofitModule {
     @Provides
     @Singleton
     fun provideAuthInterceptor(
-
+        sessionManager: SessionManager
     ): Interceptor {
+
+        val token = runBlocking {
+            val authData = sessionManager.get()
+            if (authData != null) {
+                val isTokenStillValid = authData.refreshToken
+            } else {
+                ""
+            }
+        }
+
         return Interceptor { chain ->
             val request = chain.request().newBuilder()
+                .addHeader("Authorization", "Bearer ${token}")
                 .addHeader("x-api-key", BuildConfig.API_KEY)
                 .build()
             chain.proceed(request)

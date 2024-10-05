@@ -21,9 +21,11 @@ class RemoteAuthDataSourceImpl @Inject constructor(
             authApi.login(LoginRequest(email, password))
         }.map {
             AuthData(
-                it.accessToken,
-                it.refreshToken,
-                it.userId
+                accessToken =  it.accessToken,
+                refreshToken =  it.refreshToken,
+                userId =  it.userId,
+                accessTokenExpirationTimestamp =  it.accessTokenExpirationTimestamp,
+                fullName =  it.fullName
             )
         }
     }

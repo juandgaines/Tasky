@@ -6,7 +6,9 @@ fun AuthDataDto.toAuthData(): AuthData {
     return AuthData(
         accessToken = accessToken,
         refreshToken = refreshToken,
-        userId = userId
+        userId = userId,
+        accessTokenExpirationTimestamp = accessTokenExpirationTimestamp,
+        fullName = fullName
     )
 }
 
@@ -14,6 +16,8 @@ fun AuthData.toAuthDataDto(): AuthDataDto {
     return AuthDataDto(
         accessToken = accessToken,
         refreshToken = refreshToken,
-        userId = userId
+        userId = userId,
+        accessTokenExpirationTimestamp = accessTokenExpirationTimestamp,
+        fullName = fullName
     )
 }

@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RefreshTokenResponse(
     val accessToken: String,
-    val expirationTime: Long
+    val expirationTimestamp: Long
 )
