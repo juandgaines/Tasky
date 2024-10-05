@@ -43,10 +43,4 @@ class RemoteAuthDataSourceImpl @Inject constructor(
             )
         }
     }
-
-    override suspend fun logout(): Result<Unit, Network> {
-        return safeCall {
-            authApi.logout()
-        }
-    }
 }
