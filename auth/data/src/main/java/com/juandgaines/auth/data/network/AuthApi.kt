@@ -13,4 +13,7 @@ interface AuthApi {
 
     @POST("/register")
     suspend fun register(@Body registrationRequest: RegistrationRequest): Response<Unit>
+
+    @POST("/logout")
+    suspend fun logout(): Response<Unit>
 }

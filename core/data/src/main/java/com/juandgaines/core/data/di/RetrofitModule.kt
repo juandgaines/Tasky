@@ -1,6 +1,7 @@
 package com.juandgaines.core.data.di
 
 import com.juandgaines.core.data.BuildConfig
+import com.juandgaines.core.data.auth.TokenApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -66,6 +67,12 @@ class RetrofitModule {
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
         return builder.build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTokenApi(retrofit: Retrofit): TokenApi {
+        return retrofit.create(TokenApi::class.java)
     }
 
 }
