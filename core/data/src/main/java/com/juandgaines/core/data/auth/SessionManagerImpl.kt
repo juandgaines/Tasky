@@ -5,17 +5,18 @@ import com.juandgaines.core.data.auth.refresh_token.RefreshTokenRequest
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.AuthData
 import com.juandgaines.core.domain.auth.SessionManager
-import com.juandgaines.core.domain.auth.SessionManager.CheckAuthType
-import com.juandgaines.core.domain.util.DataError.Network.UNAUTHORIZED
-import com.juandgaines.core.domain.util.Result.Error
+import com.juandgaines.core.domain.util.DataError.Network
+import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.domain.util.map
+import com.juandgaines.core.domain.util.onError
+import com.juandgaines.core.domain.util.onSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class SessionManagerImpl(
+class SharedPreferencesSessionManager(
     private val sharedPreferences: SharedPreferences,
     private val tokenApi: TokenApi
 ):SessionManager {
@@ -46,11 +47,11 @@ class SessionManagerImpl(
         }
     }
 
-    override suspend fun refresh(): AuthData? =
+    override suspend fun refresh(): Result<AuthData?, Network> =
         withContext(Dispatchers.IO){
-            val authData = get()
-             authData?.let {
-                val response = safeCall {
+            val authData = get() ?: return@withContext Success(null)
+            authData.let {
+                safeCall {
                     tokenApi.refreshToken(
                         RefreshTokenRequest(
                             it.refreshToken,
@@ -63,32 +64,18 @@ class SessionManagerImpl(
                         refreshToken = authData.refreshToken,
                         userId = authData.userId
                     )
-                    set(newAuthData)
                     newAuthData
-                }
-
-                when (response){
-                    is Success -> response.data
-                    is Error -> null
+                }.onSuccess { data->
+                    set(data)
+                }.onError {
+                    set(null)
                 }
             }
         }
 
-    override suspend fun checkAuth(): CheckAuthType = withContext(Dispatchers.IO){
-        val response = safeCall {
+    override suspend fun checkAuth(): Result<Unit,Network> = withContext(Dispatchers.IO){
+        safeCall {
             tokenApi.checkAuth()
-        }
-        when (response){
-            is Success -> {
-                CheckAuthType.Valid
-            }
-
-            is Error -> {
-                when(response.error){
-                    UNAUTHORIZED -> CheckAuthType.Invalid
-                    else -> CheckAuthType.Error
-                }
-            }
         }
     }
 
