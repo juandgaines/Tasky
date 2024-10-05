@@ -39,6 +39,9 @@ dependencies {
     //Splash
     implementation(libs.androidx.core.splashscreen)
 
+    //Crypto
+    implementation(libs.androidx.security.crypto.ktx)
+
     //Navigation
     implementation(libs.androidx.navigation.compose)
 

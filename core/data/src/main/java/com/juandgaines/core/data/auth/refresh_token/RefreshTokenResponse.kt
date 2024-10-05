@@ -1,4 +1,4 @@
-package com.juandgaines.auth.data.network.refresh_token
+package com.juandgaines.core.data.auth.refresh_token
 
 import kotlinx.serialization.Serializable
 
