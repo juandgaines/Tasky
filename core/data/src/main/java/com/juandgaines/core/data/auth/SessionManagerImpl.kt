@@ -79,6 +79,12 @@ class SharedPreferencesSessionManager(
         }
     }
 
+    override suspend fun logout(): Result<Unit, Network> = withContext(Dispatchers.IO){
+        safeCall {
+            tokenApi.logout()
+        }
+    }
+
     companion object{
         const val KEY_AUTH_DATA = "KEY_AUTH_DATA"
     }
