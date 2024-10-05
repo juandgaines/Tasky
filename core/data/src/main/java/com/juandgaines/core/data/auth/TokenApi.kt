@@ -12,4 +12,7 @@ interface TokenApi {
 
     @POST("/authenticate")
     suspend fun checkAuth(): Response<Unit>
+
+    @POST("/logout")
+    suspend fun logout(): Response<Unit>
 }

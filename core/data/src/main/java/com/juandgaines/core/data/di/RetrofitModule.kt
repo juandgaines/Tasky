@@ -47,7 +47,9 @@ class RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(): Interceptor {
+    fun provideAuthInterceptor(
+
+    ): Interceptor {
         return Interceptor { chain ->
             val request = chain.request().newBuilder()
                 .addHeader("x-api-key", BuildConfig.API_KEY)
