@@ -13,4 +13,13 @@ interface AuthApi {
 
     @POST("/register")
     suspend fun register(@Body registrationRequest: RegistrationRequest): Response<Unit>
+
+    @POST("/accessToken")
+    suspend fun refreshToken(): Response<Unit>
+
+    @POST("/authenticate")
+    suspend fun checkAuth(): Response<Unit>
+
+    @POST("/logout")
+    suspend fun logout(): Response<Unit>
 }
