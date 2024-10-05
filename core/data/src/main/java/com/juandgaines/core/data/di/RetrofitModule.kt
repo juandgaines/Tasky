@@ -4,8 +4,8 @@ import com.juandgaines.core.data.BuildConfig
 import com.juandgaines.core.data.auth.TokenApi
 import com.juandgaines.core.domain.auth.SessionManager
 import com.juandgaines.core.domain.util.DataError.Network.UNAUTHORIZED
-import com.juandgaines.core.domain.util.Result.Error
-import com.juandgaines.core.domain.util.Result.Success
+import com.juandgaines.core.domain.util.onError
+import com.juandgaines.core.domain.util.onSuccess
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,27 +60,35 @@ class RetrofitModule {
         runBlocking {
             val authData = sessionManager.get()
             if (authData != null) {
-                val shouldValidateToken = authData.accessTokenExpirationTimestamp > System.currentTimeMillis()
+                val shouldValidateToken = authData.accessTokenExpirationTimestamp - System.currentTimeMillis() < 0
+
                 if (shouldValidateToken) {
-                    when (val responseAuth = sessionManager.checkAuth()) {
-                        is Error -> {
-                            when (responseAuth.error) {
-                                UNAUTHORIZED ->{
-                                    when (val responseRefresh = sessionManager.refresh()) {
-                                        is Success -> {
-                                            responseRefresh.data?.accessToken ?: ""
+                    sessionManager
+                        .checkAuth()
+                        .onSuccess {
+                            requestBuilder.addHeader("Authorization", "Bearer $authData.accessToken")
+                        }
+                        .onError { error->
+                            when (error) {
+                                UNAUTHORIZED -> {
+                                    sessionManager
+                                        .refresh()
+                                        .onSuccess { tokenRefreshed ->
+                                            tokenRefreshed?.let {
+                                                requestBuilder.addHeader(
+                                                    "Authorization", "Bearer ${it.accessToken}"
+                                                )
+                                            }?: run {
+                                                sessionManager.set(null)
+                                            }
                                         }
-                                        is Error -> Unit
-                                    }
                                 }
+
                                 else -> Unit
                             }
                         }
-                        is Success ->{
-                            requestBuilder.addHeader("Authorization", "Bearer ${authData.accessToken}")
-                        }
-                    }
-                } else {
+                }
+                else {
                     requestBuilder.addHeader("Authorization", "Bearer ${authData.accessToken}")
                 }
             }
