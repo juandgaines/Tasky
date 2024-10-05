@@ -3,6 +3,9 @@ package com.juandgaines.core.data.di
 import com.juandgaines.core.data.BuildConfig
 import com.juandgaines.core.data.auth.TokenApi
 import com.juandgaines.core.domain.auth.SessionManager
+import com.juandgaines.core.domain.util.DataError.Network.UNAUTHORIZED
+import com.juandgaines.core.domain.util.Result.Error
+import com.juandgaines.core.domain.util.Result.Success
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +18,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
-
 import javax.inject.Singleton
 
 @Module
@@ -51,24 +53,39 @@ class RetrofitModule {
     @Singleton
     fun provideAuthInterceptor(
         sessionManager: SessionManager
-    ): Interceptor {
+    ): Interceptor = Interceptor { chain ->
+        val requestBuilder = chain.request().newBuilder()
+            .addHeader("x-api-key", BuildConfig.API_KEY)
 
-        val token = runBlocking {
+        runBlocking {
             val authData = sessionManager.get()
             if (authData != null) {
-                val isTokenStillValid = authData.refreshToken
-            } else {
-                ""
+                val shouldValidateToken = authData.accessTokenExpirationTimestamp > System.currentTimeMillis()
+                if (shouldValidateToken) {
+                    when (val responseAuth = sessionManager.checkAuth()) {
+                        is Error -> {
+                            when (responseAuth.error) {
+                                UNAUTHORIZED ->{
+                                    when (val responseRefresh = sessionManager.refresh()) {
+                                        is Success -> {
+                                            responseRefresh.data?.accessToken ?: ""
+                                        }
+                                        is Error -> Unit
+                                    }
+                                }
+                                else -> Unit
+                            }
+                        }
+                        is Success ->{
+                            requestBuilder.addHeader("Authorization", "Bearer ${authData.accessToken}")
+                        }
+                    }
+                } else {
+                    requestBuilder.addHeader("Authorization", "Bearer ${authData.accessToken}")
+                }
             }
         }
-
-        return Interceptor { chain ->
-            val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer ${token}")
-                .addHeader("x-api-key", BuildConfig.API_KEY)
-                .build()
-            chain.proceed(request)
-        }
+        chain.proceed(requestBuilder.build())
     }
 
     @Provides
@@ -89,5 +106,4 @@ class RetrofitModule {
     fun provideTokenApi(retrofit: Retrofit): TokenApi {
         return retrofit.create(TokenApi::class.java)
     }
-
 }
