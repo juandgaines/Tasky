@@ -1,6 +1,8 @@
 package com.juandgaines.auth.data.network.di
 
 import com.juandgaines.auth.data.network.AuthApi
+import com.juandgaines.auth.data.network.RemoteAuthDataSourceImpl
+import com.juandgaines.auth.domain.RemoteAuthDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,5 +17,11 @@ class AuthModule {
     fun provideAuthApi(retrofit: Retrofit): AuthApi {
         return retrofit.create(AuthApi::class.java)
     }
+
+    @Provides
+    fun provideRemoteAuthDataSource(authApi: AuthApi): RemoteAuthDataSource {
+        return RemoteAuthDataSourceImpl(authApi)
+    }
+
 
 }

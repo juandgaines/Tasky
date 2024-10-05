@@ -34,12 +34,13 @@ class RemoteAuthDataSourceImpl @Inject constructor(
         password: String,
     ): Result<Unit, Network> {
         return safeCall {
-            authApi.register(RegistrationRequest(
-                fullName = fullName,
-                email = email,
-                password = password,
-
-            ))
+            authApi.register(
+                RegistrationRequest(
+                    fullName = fullName,
+                    email = email,
+                    password = password,
+                )
+            )
         }
     }
 
