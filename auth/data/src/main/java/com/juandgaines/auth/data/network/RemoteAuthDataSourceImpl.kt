@@ -49,16 +49,4 @@ class RemoteAuthDataSourceImpl @Inject constructor(
             authApi.logout()
         }
     }
-
-    override suspend fun refreshToken(): Result<Unit, Network> {
-        return safeCall {
-            authApi.refreshToken()
-        }
-    }
-
-    override suspend fun checkAuth(): Result<Unit, Network> {
-        return safeCall {
-            authApi.checkAuth()
-        }
-    }
 }
