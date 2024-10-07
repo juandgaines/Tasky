@@ -35,7 +35,7 @@ class LoginViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun onAction(event: LoginEvents) {
+    fun onAction(event: LoginAction) {
 
     }
 }

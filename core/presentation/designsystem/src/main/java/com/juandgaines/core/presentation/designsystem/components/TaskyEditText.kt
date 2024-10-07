@@ -42,7 +42,7 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 fun TaskyTextField(
     modifier: Modifier = Modifier,
     state: TextFieldState,
-    endIcon: ImageVector?,
+    endIcon: ImageVector? = null,
     isFocused: Boolean = false,
     onFocusChanged: (Boolean) -> Unit = {},
     hint: String,

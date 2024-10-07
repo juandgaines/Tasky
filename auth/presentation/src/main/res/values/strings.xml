@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="login_title">Welcome Back!</string>
+  <string name="email_hint">Email address</string>
+  <string name="password_hint">Password</string>
+  <string name="login_button">LOGIN</string>
 </resources>

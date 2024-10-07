@@ -3,13 +3,12 @@
 package com.juandgaines.auth.presentation.login
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,7 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
+import com.juandgaines.core.presentation.designsystem.components.TaskyActionButton
+import com.juandgaines.core.presentation.designsystem.components.TaskyPasswordEditTextField
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
+import com.juandgaines.core.presentation.designsystem.components.TaskyTextField
 import com.juandgaines.core.presentation.designsystem.components.TaskyToolbar
 import com.juandgaines.presentation.R
 
@@ -41,7 +43,7 @@ fun LoginScreenRoot(
 @Composable
 fun LoginScreen(
     state: LoginState,
-    onAction: (LoginEvents) -> Unit
+    onAction: (LoginAction) -> Unit
 ) {
     TaskyScaffold(
         topAppBar = {
@@ -65,9 +67,42 @@ fun LoginScreen(
                 modifier  = Modifier
                     .height(120.dp)
             )
-        }
-    ) {
+        },
 
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+            TaskyTextField(
+                state = state.email,
+                endIcon = null,
+                hint = stringResource(R.string.email_hint),
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+
+            TaskyPasswordEditTextField(
+                state = state.password,
+                hint = stringResource(R.string.password_hint),
+                isPasswordVisible = state.isPasswordVisible,
+                onTogglePasswordVisibility = {
+                    onAction(LoginAction.OnTogglePasswordVisibility)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+
+            TaskyActionButton(
+                text = stringResource(R.string.login_button),
+                isLoading = state.isLoggingIn,
+            ) {
+                onAction(LoginAction.OnLoginClick)
+            }
+        }
     }
 }
 
