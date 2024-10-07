@@ -47,6 +47,17 @@ class SharedPreferencesSessionManager(
         }
     }
 
+    override suspend fun getToken(): String {
+        return withContext(Dispatchers.IO){
+            get()?.accessToken ?: ""
+        }
+    }
+
+    override suspend fun isTokenExpired(): Boolean {
+        val authData = get() ?: return false
+        return System.currentTimeMillis() >= authData.accessTokenExpirationTimestamp
+    }
+
     override suspend fun refresh(): Result<AuthData?, Network> =
         withContext(Dispatchers.IO){
             val authData = get() ?: return@withContext Success(null)
@@ -61,6 +72,8 @@ class SharedPreferencesSessionManager(
                 }.map {
                     val newAuthData = AuthData(
                         accessToken = it.accessToken,
+                        fullName = authData.fullName,
+                        accessTokenExpirationTimestamp = it.expirationTimestamp,
                         refreshToken = authData.refreshToken,
                         userId = authData.userId
                     )
@@ -73,11 +86,15 @@ class SharedPreferencesSessionManager(
             }
         }
 
-    override suspend fun checkAuth(): Result<Unit,Network> = withContext(Dispatchers.IO){
-        safeCall {
-            tokenApi.checkAuth()
-        }
+    override suspend fun checkAuth(): Result<Unit,Network> = safeCall {
+        tokenApi.checkAuth()
     }
+
+
+    override suspend fun logout(): Result<Unit, Network> = safeCall {
+        tokenApi.logout()
+    }
+
 
     companion object{
         const val KEY_AUTH_DATA = "KEY_AUTH_DATA"
