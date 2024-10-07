@@ -2,6 +2,7 @@ package com.juandgaines.core.data.network
 
 import com.juandgaines.core.data.BuildConfig
 import com.juandgaines.core.domain.auth.SessionManager
+import com.juandgaines.core.domain.auth.refresh_token.RemoteTokenDataSource
 import com.juandgaines.core.domain.util.DataError.Network.UNAUTHORIZED
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
@@ -12,7 +13,8 @@ import okhttp3.Response
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val remoteTokenDataSource: RemoteTokenDataSource
 ): Interceptor {
     override fun intercept(chain: Chain): Response {
         val requestBuilder = chain.request().newBuilder()
@@ -23,7 +25,7 @@ class AuthInterceptor @Inject constructor(
                 val isTokenExpired = sessionManager.isTokenExpired()
 
                 if (isTokenExpired) {
-                    sessionManager
+                    remoteTokenDataSource
                         .checkAuth()
                         .onSuccess {
                             requestBuilder.addHeader("Authorization", "Bearer $authData.accessToken")
@@ -31,16 +33,21 @@ class AuthInterceptor @Inject constructor(
                         .onError { error->
                             when (error) {
                                 UNAUTHORIZED -> {
-                                    sessionManager
-                                        .refresh()
-                                        .onSuccess { tokenRefreshed ->
-                                            tokenRefreshed?.let {
-                                                requestBuilder.addHeader(
-                                                    "Authorization", "Bearer ${it.accessToken}"
-                                                )
-                                            }?: run {
+                                    remoteTokenDataSource
+                                        .refreshToken(
+                                            authData
+                                        )
+                                        .onSuccess { newAuth ->
+                                            remoteTokenDataSource.refreshToken(
+                                                newAuth
+                                            ).onSuccess { data->
+                                                sessionManager.set(data)
+                                            }.onError {
                                                 sessionManager.set(null)
                                             }
+                                            requestBuilder.addHeader(
+                                                "Authorization", "Bearer ${newAuth.accessToken}"
+                                            )
                                         }
                                 }
                                 else -> Unit

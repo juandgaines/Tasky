@@ -1,17 +1,13 @@
 package com.juandgaines.core.data.di
 
 import com.juandgaines.core.data.BuildConfig
-import com.juandgaines.core.data.auth.TokenApi
 import com.juandgaines.core.data.network.AuthInterceptor
 import com.juandgaines.core.domain.auth.SessionManager
-import com.juandgaines.core.domain.util.DataError.Network.UNAUTHORIZED
-import com.juandgaines.core.domain.util.onError
-import com.juandgaines.core.domain.util.onSuccess
+import com.juandgaines.core.domain.auth.refresh_token.RemoteTokenDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -53,8 +49,9 @@ class RetrofitModule {
     @Provides
     @Singleton
     fun provideAuthInterceptor(
-        sessionManager: SessionManager
-    ): Interceptor = AuthInterceptor(sessionManager)
+        sessionManager: SessionManager,
+        remoteTokenDataSource: RemoteTokenDataSource
+    ): Interceptor = AuthInterceptor(sessionManager, remoteTokenDataSource)
 
     @Provides
     @Singleton
@@ -67,11 +64,5 @@ class RetrofitModule {
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
         return builder.build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideTokenApi(retrofit: Retrofit): TokenApi {
-        return retrofit.create(TokenApi::class.java)
     }
 }

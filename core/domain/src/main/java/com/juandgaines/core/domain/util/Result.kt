@@ -31,3 +31,12 @@ inline fun <T, E: Error> Result<T, E>.onError(action: (E) -> Unit): Result<T, E>
         is Result.Success -> this
     }
 }
+
+fun <T, E:Error> Result<T,E>.asEmptyDataResult(): Result<Unit, E> {
+    return map {
+        when (this) {
+            is Result.Success -> Unit
+            is Result.Error -> error
+        }
+    }
+}
