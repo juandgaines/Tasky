@@ -1,4 +1,4 @@
-package com.juandgaines.presentation.register
+package com.juandgaines.auth.presentation.register
 
 sealed interface RegisterAction {
     data object OnTogglePassWordVisibilityClick : RegisterAction

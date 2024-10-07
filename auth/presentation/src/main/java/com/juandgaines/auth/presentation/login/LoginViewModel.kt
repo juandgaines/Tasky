@@ -1,4 +1,4 @@
-package com.juandgaines.presentation.login
+package com.juandgaines.auth.presentation.login
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,4 +35,7 @@ class LoginViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    fun onAction(event: LoginEvents) {
+
+    }
 }

@@ -2,11 +2,14 @@ package com.juandgaines.tasky
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.juandgaines.auth.presentation.login.LoginScreenRoot
+import com.juandgaines.auth.presentation.login.LoginViewModel
 
 @Composable
 fun NavigationRoot(
@@ -32,9 +35,10 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 text = "Register"
             )
         }
+
         composable(route = "login") {
-            Text(
-                text = "Login"
+            LoginScreenRoot(
+                viewModel = hiltViewModel<LoginViewModel>()
             )
         }
     }
