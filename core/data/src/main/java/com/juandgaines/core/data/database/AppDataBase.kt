@@ -1,4 +1,4 @@
-package com.juandgaines.core.data.di
+package com.juandgaines.core.data.database
 
 import androidx.room.Database
 import androidx.room.Entity

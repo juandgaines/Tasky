@@ -2,6 +2,7 @@ package com.juandgaines.core.data.di
 
 import com.juandgaines.core.data.BuildConfig
 import com.juandgaines.core.data.auth.TokenApi
+import com.juandgaines.core.data.network.AuthInterceptor
 import com.juandgaines.core.domain.auth.SessionManager
 import com.juandgaines.core.domain.util.DataError.Network.UNAUTHORIZED
 import com.juandgaines.core.domain.util.onError
@@ -53,47 +54,7 @@ class RetrofitModule {
     @Singleton
     fun provideAuthInterceptor(
         sessionManager: SessionManager
-    ): Interceptor = Interceptor { chain ->
-        val requestBuilder = chain.request().newBuilder()
-            .addHeader("x-api-key", BuildConfig.API_KEY)
-
-        runBlocking {
-            val authData = sessionManager.get()
-            if (authData != null) {
-                val shouldValidateToken = authData.accessTokenExpirationTimestamp - System.currentTimeMillis() < 0
-
-                if (shouldValidateToken) {
-                    sessionManager
-                        .checkAuth()
-                        .onSuccess {
-                            requestBuilder.addHeader("Authorization", "Bearer $authData.accessToken")
-                        }
-                        .onError { error->
-                            when (error) {
-                                UNAUTHORIZED -> {
-                                    sessionManager
-                                        .refresh()
-                                        .onSuccess { tokenRefreshed ->
-                                            tokenRefreshed?.let {
-                                                requestBuilder.addHeader(
-                                                    "Authorization", "Bearer ${it.accessToken}"
-                                                )
-                                            }?: run {
-                                                sessionManager.set(null)
-                                            }
-                                        }
-                                }
-                                else -> Unit
-                            }
-                        }
-                }
-                else {
-                    requestBuilder.addHeader("Authorization", "Bearer ${authData.accessToken}")
-                }
-            }
-        }
-        chain.proceed(requestBuilder.build())
-    }
+    ): Interceptor = AuthInterceptor(sessionManager)
 
     @Provides
     @Singleton

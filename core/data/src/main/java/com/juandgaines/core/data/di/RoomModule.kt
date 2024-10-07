@@ -3,6 +3,7 @@ package com.juandgaines.core.data.di
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.juandgaines.core.data.database.TaskyDataBase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
