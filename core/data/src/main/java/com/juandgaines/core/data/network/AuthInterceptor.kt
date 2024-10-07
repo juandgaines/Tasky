@@ -38,7 +38,6 @@ class AuthInterceptor @Inject constructor(
                                             authData
                                         )
                                         .onSuccess { newAuth ->
-
                                             remoteTokenDataSource.refreshToken(
                                                 newAuth
                                             ).onSuccess { data->
