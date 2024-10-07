@@ -1,7 +1,6 @@
 package com.juandgaines.core.data.network
 
 import com.juandgaines.core.data.BuildConfig
-import com.juandgaines.core.data.auth.SharedPreferencesSessionManager
 import com.juandgaines.core.domain.auth.SessionManager
 import com.juandgaines.core.domain.util.DataError.Network.UNAUTHORIZED
 import com.juandgaines.core.domain.util.onError
