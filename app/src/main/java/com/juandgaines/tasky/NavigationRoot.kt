@@ -24,7 +24,7 @@ fun NavigationRoot(
 
 private fun NavGraphBuilder.authGraph(navController: NavHostController) {
     navigation(
-        startDestination = "intro",
+        startDestination = "login",
         route = "auth"
     ) {
         composable(route = "register") {
