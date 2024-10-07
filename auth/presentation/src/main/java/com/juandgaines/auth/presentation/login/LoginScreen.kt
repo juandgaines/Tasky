@@ -32,6 +32,7 @@ fun LoginScreenRoot(
 ) {
     val state = viewModel.state
     val events = viewModel.events
+
     LoginScreen(
         state = state,
         onAction = { event ->
