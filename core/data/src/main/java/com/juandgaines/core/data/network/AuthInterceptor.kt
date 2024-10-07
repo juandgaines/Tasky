@@ -20,9 +20,9 @@ class AuthInterceptor @Inject constructor(
         runBlocking {
             val authData = sessionManager.get()
             if (authData != null) {
-                val shouldValidateToken = authData.accessTokenExpirationTimestamp - System.currentTimeMillis() < 0
+                val isTokenExpired = sessionManager.isTokenExpired()
 
-                if (shouldValidateToken) {
+                if (isTokenExpired) {
                     sessionManager
                         .checkAuth()
                         .onSuccess {

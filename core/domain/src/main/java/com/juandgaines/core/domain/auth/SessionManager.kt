@@ -8,6 +8,7 @@ interface SessionManager {
     suspend fun get(): AuthData?
     suspend fun set(data: AuthData?)
     suspend fun getToken(): String
+    suspend fun isTokenExpired(): Boolean
     suspend fun refresh(): Result<AuthData?, Network>
     suspend fun checkAuth():Result<Unit,Network>
     suspend fun logout():Result<Unit,Network>

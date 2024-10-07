@@ -53,6 +53,11 @@ class SharedPreferencesSessionManager(
         }
     }
 
+    override suspend fun isTokenExpired(): Boolean {
+        val authData = get() ?: return false
+        return System.currentTimeMillis() >= authData.accessTokenExpirationTimestamp
+    }
+
     override suspend fun refresh(): Result<AuthData?, Network> =
         withContext(Dispatchers.IO){
             val authData = get() ?: return@withContext Success(null)
