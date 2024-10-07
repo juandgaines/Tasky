@@ -6,8 +6,9 @@ import com.juandgaines.core.domain.auth.SessionManager
 import com.juandgaines.core.domain.util.DataError.Network
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.asEmptyDataResult
+import javax.inject.Inject
 
-class AuthRepositoryImpl(
+class AuthRepositoryImpl @Inject constructor(
     private val remoteAuthDataSource: RemoteAuthDataSource,
     private val sessionStorage: SessionManager
 ):AuthRepository {
