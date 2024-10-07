@@ -15,7 +15,7 @@ fun NavigationRoot(
 ) {
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) "agenda" else "auth"
+        startDestination = if (isLoggedIn) "home" else "auth"
     ) {
         authGraph(navController)
         agendaGraph(navController)
@@ -43,7 +43,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
 private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
     navigation(
         startDestination = "agenda",
-        route = "agenda"
+        route = "home"
     ) {
         composable(route = "agenda") {
             Text(
