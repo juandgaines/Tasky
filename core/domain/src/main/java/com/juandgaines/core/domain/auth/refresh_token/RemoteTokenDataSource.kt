@@ -8,6 +8,4 @@ interface RemoteTokenDataSource {
     suspend fun refreshToken(
         authData: AuthData
     ): Result<AuthData, Network>
-    suspend fun checkAuth(): Result<Unit, Network>
-    suspend fun logOut(): Result<Unit, Network>
 }

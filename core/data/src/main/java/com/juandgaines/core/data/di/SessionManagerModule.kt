@@ -4,14 +4,12 @@ import android.content.SharedPreferences
 import com.juandgaines.core.data.auth.SharedPreferencesSessionManager
 import com.juandgaines.core.data.auth.TokenApi
 import com.juandgaines.core.data.auth.refresh_token.RemoteTokenDataSourceImpl
-import com.juandgaines.core.data.network.AuthInterceptor
 import com.juandgaines.core.domain.auth.SessionManager
 import com.juandgaines.core.domain.auth.refresh_token.RemoteTokenDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Interceptor
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -28,13 +26,6 @@ class SessionManagerModule {
             sharedPreferences = sharedPreferences,
         )
     }
-
-    @Provides
-    @Singleton
-    fun providesAuthInterceptor(
-        sessionManager: SessionManager,
-        remoteTokenDataSource: RemoteTokenDataSource
-    ): Interceptor = AuthInterceptor(sessionManager,remoteTokenDataSource)
 
     @Provides
     @Singleton

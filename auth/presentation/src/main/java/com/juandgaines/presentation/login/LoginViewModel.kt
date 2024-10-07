@@ -12,9 +12,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.receiveAsFlow
+import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel(
+class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ):ViewModel() {
     var state by mutableStateOf(LoginState())
