@@ -122,7 +122,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(24.dp))
             TaskyTextField(
                 state = state.fullName,
-                endIcon = if (state.isEmailValid) CheckIcon else null,
+                endIcon = if (state.isNameValid) CheckIcon else null,
                 hint = stringResource(R.string.name_hint),
                 modifier = Modifier
                     .fillMaxWidth()
