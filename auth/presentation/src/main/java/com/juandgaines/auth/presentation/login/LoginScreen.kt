@@ -65,7 +65,6 @@ fun LoginScreenRoot(
             }
         }
     }
-
     LoginScreen(
         state = state,
         onAction = { action ->
@@ -77,7 +76,6 @@ fun LoginScreenRoot(
         }
     )
 }
-
 @Composable
 fun LoginScreen(
     state: LoginState,
@@ -106,7 +104,6 @@ fun LoginScreen(
                     .height(120.dp)
             )
         },
-
     ) {
         Column(
             modifier = Modifier
@@ -122,7 +119,6 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
             )
-
             TaskyPasswordEditTextField(
                 state = state.password,
                 hint = stringResource(R.string.password_hint),
@@ -133,7 +129,6 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
             )
-
             TaskyActionButton(
                 text = stringResource(R.string.login_button),
                 isLoading = state.isLoggingIn,
@@ -143,12 +138,10 @@ fun LoginScreen(
         }
     }
 }
-
 @Composable
 @Preview
 fun LoginScreenRootPreview() {
     TaskyTheme {
-
         LoginScreen(
             state = LoginState(),
             onAction = {}
