@@ -41,6 +41,7 @@ class LoginViewModel @Inject constructor(
 
         combine(email,password) { email, password ->
             state = state.copy(
+                isEmailValid = userDataValidator.isValidEmail(email.toString()),
                 canLogin = userDataValidator.isValidEmail(email.toString()) &&
                     password.isNotEmpty()
             )
