@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.center
@@ -58,8 +60,8 @@ fun LoginScreenRoot(
 
     ObserveAsEvents(
         flow = viewModel.events
-    ) {
-        when (val event = it) {
+    ) { event ->
+        when (event) {
             is LoginSuccess -> {
                 keyboardController?.hide()
                 Toast.makeText(
@@ -101,17 +103,15 @@ fun LoginScreen(
                 content = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        Spacer(modifier = Modifier.weight(1f))
                         Text(
                             text = stringResource(R.string.login_title),
                             style = MaterialTheme.typography.displayLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                         )
-                        Spacer(modifier = Modifier.weight(1f))
                     }
                 },
                 modifier  = Modifier
