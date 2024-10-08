@@ -127,7 +127,6 @@ fun RegisterScreen(
             TaskyTextField(
                 state = state.fullName,
                 endIcon = if (state.isEmailValid) CheckIcon else null,
-                error = state.isErrorName,
                 hint = stringResource(R.string.name_hint),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -136,14 +135,12 @@ fun RegisterScreen(
             TaskyTextField(
                 state = state.email,
                 endIcon = if (state.isEmailValid) CheckIcon else null,
-                error = state.isErrorEmail,
                 hint = stringResource(R.string.email_hint),
                 modifier = Modifier
                     .fillMaxWidth()
             )
             TaskyPasswordEditTextField(
                 state = state.password,
-                error = state.isErrorPassword,
                 hint = stringResource(R.string.password_hint),
                 isPasswordVisible = state.isPasswordVisible,
                 onTogglePasswordVisibility = {

@@ -12,4 +12,5 @@
   <string name="dont_have_an_account">DON\'T HAVE AN ACCOUNT?</string>
   <string name="name_hint">Name</string>
   <string name="get_started">GET STARTED</string>
+  <string name="error_email_exist">A user with that email alredy exist</string>
 </resources>

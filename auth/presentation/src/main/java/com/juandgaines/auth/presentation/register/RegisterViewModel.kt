@@ -8,11 +8,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.auth.domain.AuthRepository
 import com.juandgaines.auth.domain.UserDataValidator
+import com.juandgaines.auth.presentation.login.LoginEvents
+import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
+import com.juandgaines.core.presentation.ui.UiText
+import com.juandgaines.core.presentation.ui.asUiText
+import com.juandgaines.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +28,9 @@ class RegisterViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userDataValidator: UserDataValidator
 ):ViewModel(){
+
+    private val eventChannel = Channel<RegisterEvents>()
+    val events = eventChannel.receiveAsFlow()
 
     var state by mutableStateOf(RegisterState())
         private set
@@ -79,8 +89,26 @@ class RegisterViewModel @Inject constructor(
                     )
                     state = state.copy(isRegistering = false)
                     when(result){
-                        is Error -> TODO()
-                        is Success -> TODO()
+                        is Error -> {
+                            if (result.error == DataError.Network.CONFLICT){
+                                eventChannel.send(
+                                    RegisterEvents.Error(
+                                        UiText.StringResource(
+                                            R.string.error_email_exist
+                                        )
+                                    )
+                                )
+                            } else {
+                                eventChannel.send(
+                                    RegisterEvents.Error(
+                                        result.error.asUiText()
+                                    )
+                                )
+                            }
+                        }
+                        is Success ->{
+                            eventChannel.send(RegisterEvents.RegistrationSuccess)
+                        }
                     }
                 }
                 is RegisterAction.OnTogglePassWordVisibility -> {
