@@ -17,6 +17,8 @@ import com.juandgaines.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -33,34 +35,16 @@ class LoginViewModel @Inject constructor(
 
     private val eventChannel = Channel<LoginEvents>()
     val events = eventChannel.receiveAsFlow()
-
+    private val email = snapshotFlow { state.email.text}
+    private val password = snapshotFlow { state.password.text}
     init {
-        snapshotFlow { state.email.text }
-            .onEach {
-                state = state.copy(
-                    isEmailValid = userDataValidator.isValidEmail(
-                        it.toString()
-                    ),
-                    canLogin = state.isEmailValid && state.password.text.isNotEmpty()
-                )
-            }.stateIn(
-                viewModelScope,
-                started = SharingStarted.Eagerly,
-                ""
+
+        combine(email,password) { email, password ->
+            state = state.copy(
+                canLogin = userDataValidator.isValidEmail(email.toString()) &&
+                    password.isNotEmpty()
             )
-        snapshotFlow { state.password.text }
-            .onEach {
-                state = state.copy(
-                    isEmailValid = userDataValidator.isValidEmail(
-                        state.email.text.toString()
-                    ),
-                    canLogin = state.isEmailValid && it.isNotEmpty()
-                )
-            }.stateIn(
-                viewModelScope,
-                started = SharingStarted.Eagerly,
-                ""
-            )
+        }.launchIn(viewModelScope)
     }
     fun onAction(event: LoginAction) {
         viewModelScope.launch {

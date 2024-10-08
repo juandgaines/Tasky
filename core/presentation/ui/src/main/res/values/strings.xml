@@ -2,8 +2,8 @@
 <resources>
   <string name="error_disk_full">No enough space in the device.</string>
   <string name="error_request_timeout">Request timeout</string>
-  <string name="error_too_many_request">You\\\'ve hit your rate limit\\n</string>
-  <string name="error_no_internet">Couldn\\\'t reach server please check your connection</string>
+  <string name="error_too_many_request">You\'ve hit your rate limit\n</string>
+  <string name="error_no_internet">Couldn\'t reach server please check your connection</string>
   <string name="error_payload_too_large">The file you are trying to upload is too large</string>
   <string name="error_server_error">Oops, something went wrong, please try again.\n</string>
   <string name="error_serialization">Oops, Coudn\'t parse data.\n</string>
