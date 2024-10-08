@@ -39,7 +39,7 @@ class LoginViewModel @Inject constructor(
             .onEach {
                 state = state.copy(
                     isEmailValid = userDataValidator.isValidEmail(
-                        it.toString().trim()
+                        it.toString()
                     ),
                     canLogin = state.isEmailValid && state.password.text.isNotEmpty()
                 )
@@ -52,9 +52,9 @@ class LoginViewModel @Inject constructor(
             .onEach {
                 state = state.copy(
                     isEmailValid = userDataValidator.isValidEmail(
-                        it.toString().trim()
+                        state.email.text.toString()
                     ),
-                    canLogin = state.isEmailValid && state.password.text.isNotEmpty()
+                    canLogin = state.isEmailValid && it.isNotEmpty()
                 )
             }.stateIn(
                 viewModelScope,
@@ -71,8 +71,7 @@ class LoginViewModel @Inject constructor(
                 is LoginAction.OnLoginClick -> {
                     state = state.copy(isLoggingIn = true)
                     val response = authRepository.login(
-                        state.email.text.toString()
-                        ,state.password.text.toString()
+                        state.email.text.toString(),state.password.text.toString()
                     )
                     state = state.copy(isLoggingIn = false)
                     when(response){
