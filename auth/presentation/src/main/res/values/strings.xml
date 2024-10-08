@@ -4,4 +4,6 @@
   <string name="email_hint">Email address</string>
   <string name="password_hint">Password</string>
   <string name="login_button">LOGIN</string>
+  <string name="you_are_logged_in">You´re logged in.</string>
+  <string name="error_email_password_incorrect">The email or password is incorrect.</string>
 </resources>

@@ -7,18 +7,26 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.auth.domain.AuthRepository
+import com.juandgaines.auth.domain.UserDataValidator
+import com.juandgaines.core.domain.util.DataError.Network
 import com.juandgaines.core.domain.util.Result
+import com.juandgaines.core.domain.util.Result.Error
+import com.juandgaines.core.domain.util.Result.Success
+import com.juandgaines.core.presentation.ui.UiText
+import com.juandgaines.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userDataValidator: UserDataValidator
 ):ViewModel() {
     var state by mutableStateOf(LoginState())
         private set
@@ -26,15 +34,31 @@ class LoginViewModel @Inject constructor(
     private val eventChannel = Channel<LoginEvents>()
     val events = eventChannel.receiveAsFlow()
 
-    private val email = snapshotFlow { state.email.text }
-    private val password = snapshotFlow { state.password.text }
-
     init {
-        combine(email,password){ email, password ->
-        // TODO: validate email.
 
+        snapshotFlow { state.email.text }
+            .onEach {
+                state = state.copy(
+                    canLogin = userDataValidator.isValidEmail(it.toString())
+                        && state.password.text.isNotEmpty()
+                )
+            }.stateIn(
+                viewModelScope,
+                started = SharingStarted.Eagerly,
+                ""
+            )
 
-        }.launchIn(viewModelScope)
+        snapshotFlow { state.password.text }
+            .onEach {
+                state = state.copy(
+                    canLogin = userDataValidator.isValidEmail(state.email.text.toString()) &&
+                        it.isNotEmpty()
+                )
+            }.stateIn(
+                viewModelScope,
+                started = SharingStarted.Eagerly,
+                ""
+            )
     }
 
     fun onAction(event: LoginAction) {
@@ -48,8 +72,36 @@ class LoginViewModel @Inject constructor(
                         state.email.text.toString()
                         ,state.password.text.toString()
                     )
+                    when(response){
+                        is Error -> {
+                            if (response.error == Network.UNAUTHORIZED){
+                                eventChannel.send(
+                                    LoginEvents.Error(
+                                        UiText.StringResource(
+                                            R.string.error_email_password_incorrect
+                                        )
+                                    )
+                                )
+                            } else {
+                                eventChannel.send(
+                                    LoginEvents.Error(
+                                        response.error.as
+                                    )
+                                )
+                            }
+                        }
+                        is Success -> TODO()
+                    }
                     if (response is Result.Success){
-
+                        eventChannel.send(LoginEvents.LoginSuccess)
+                    } else {
+                        eventChannel.send(
+                            LoginEvents.Error(
+                                UiText.StringResource(
+                                    R.string.error_email_password_incorrect
+                                )
+                            )
+                        )
                     }
                 }
                 is LoginAction.OnRegisterClick -> {

@@ -1,10 +1,13 @@
-package com.juandgaines.auth.data.network.di
+package com.juandgaines.auth.data.di
 
 import com.juandgaines.auth.data.DefaultAuthRepository
+import com.juandgaines.auth.data.EmailPatternValidator
 import com.juandgaines.auth.data.network.AuthApi
 import com.juandgaines.auth.data.network.RemoteAuthDataSourceImpl
 import com.juandgaines.auth.domain.AuthRepository
+import com.juandgaines.auth.domain.PatternValidator
 import com.juandgaines.auth.domain.RemoteAuthDataSource
+import com.juandgaines.auth.domain.UserDataValidator
 import com.juandgaines.core.domain.auth.SessionManager
 import dagger.Module
 import dagger.Provides
@@ -32,6 +35,16 @@ class AuthModule {
         sessionStorage: SessionManager
     ): AuthRepository {
         return DefaultAuthRepository(remoteAuthDataSource, sessionStorage)
+    }
+
+    @Provides
+    fun providePatternValidator(): PatternValidator {
+        return EmailPatternValidator
+    }
+
+    @Provides
+    fun provideUserDataValidator(patternValidator: PatternValidator): UserDataValidator {
+        return UserDataValidator(patternValidator)
     }
 
 }

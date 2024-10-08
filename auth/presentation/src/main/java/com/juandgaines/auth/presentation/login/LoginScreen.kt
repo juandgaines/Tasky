@@ -2,6 +2,7 @@
 
 package com.juandgaines.auth.presentation.login
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,28 +16,64 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.juandgaines.auth.presentation.login.LoginAction.OnRegisterClick
+import com.juandgaines.auth.presentation.login.LoginEvents.LoginSuccess
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyActionButton
 import com.juandgaines.core.presentation.designsystem.components.TaskyPasswordEditTextField
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.designsystem.components.TaskyTextField
 import com.juandgaines.core.presentation.designsystem.components.TaskyToolbar
+import com.juandgaines.core.presentation.ui.ObserveAsEvents
 import com.juandgaines.presentation.R
 
 @Composable
 fun LoginScreenRoot(
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
+    onLoginSuccess: () -> Unit,
+    onSingUpClick: () -> Unit
 ) {
     val state = viewModel.state
-    val events = viewModel.events
+    val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    ObserveAsEvents(
+        flow = viewModel.events
+    ) {
+        when (val event = it) {
+            is LoginSuccess -> {
+                keyboardController?.hide()
+                Toast.makeText(
+                    context,
+                    R.string.you_are_logged_in,
+                    Toast.LENGTH_SHORT
+                ).show()
+                onLoginSuccess()
+            }
+            is LoginEvents.Error -> {
+                keyboardController?.hide()
+                Toast.makeText(
+                    context,
+                    event.message.asString(context),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     LoginScreen(
         state = state,
-        onAction = { event ->
-            viewModel.onAction(event)
+        onAction = { action ->
+            when (action) {
+                is OnRegisterClick -> onSingUpClick()
+                else -> Unit
+            }
+            viewModel.onAction(action)
         }
     )
 }
