@@ -10,6 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
+import com.juandgaines.auth.presentation.register.RegisterScreenRoot
+import com.juandgaines.auth.presentation.register.RegisterViewModel
 
 @Composable
 fun NavigationRoot(
@@ -31,8 +33,20 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
         route = "auth"
     ) {
         composable(route = "register") {
-            Text(
-                text = "Register"
+            RegisterScreenRoot(
+                viewModel = hiltViewModel<RegisterViewModel>(),
+                onRegisteredSuccess = {
+                    navController.navigate("login"){
+                        popUpTo("register") {
+                            inclusive = true
+                            saveState = true
+                        }
+                        restoreState = true
+                    }
+                },
+                onBackClick = {
+                    navController.navigate("login")
+                }
             )
         }
 
