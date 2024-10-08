@@ -85,9 +85,7 @@ class LoginViewModel @Inject constructor(
                         is Success -> eventChannel.send(LoginEvents.LoginSuccess)
                     }
                 }
-                is LoginAction.OnRegisterClick -> {
-
-                }
+                is LoginAction.OnRegisterClick ->  Unit
             }
         }
     }
