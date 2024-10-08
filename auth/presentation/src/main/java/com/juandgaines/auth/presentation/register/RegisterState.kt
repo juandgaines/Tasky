@@ -1,6 +1,7 @@
 package com.juandgaines.auth.presentation.register
 
 import androidx.compose.foundation.text.input.TextFieldState
+import com.juandgaines.auth.domain.PasswordValidationState
 
 data class RegisterState(
     val fullName: TextFieldState = TextFieldState(),
@@ -11,7 +12,5 @@ data class RegisterState(
     val isPasswordVisible: Boolean = false,
     val isEmailValid: Boolean = false,
     val isNameValid: Boolean = false,
-    val isErrorName: Boolean = false,
-    val isErrorEmail: Boolean = false,
-    val isErrorPassword: Boolean = false,
+    val passWordValidationState: PasswordValidationState = PasswordValidationState()
 )
