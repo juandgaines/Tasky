@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.juandgaines.auth.domain.AuthRepository
 import com.juandgaines.auth.domain.UserDataValidator
 import com.juandgaines.core.domain.util.DataError.Network
-import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.presentation.ui.UiText
@@ -35,7 +34,6 @@ class LoginViewModel @Inject constructor(
     val events = eventChannel.receiveAsFlow()
 
     init {
-
         snapshotFlow { state.email.text }
             .onEach {
                 state = state.copy(
@@ -47,7 +45,6 @@ class LoginViewModel @Inject constructor(
                 started = SharingStarted.Eagerly,
                 ""
             )
-
         snapshotFlow { state.password.text }
             .onEach {
                 state = state.copy(
@@ -60,7 +57,6 @@ class LoginViewModel @Inject constructor(
                 ""
             )
     }
-
     fun onAction(event: LoginAction) {
         viewModelScope.launch {
             when(event) {
@@ -83,25 +79,10 @@ class LoginViewModel @Inject constructor(
                                     )
                                 )
                             } else {
-                                eventChannel.send(
-                                    LoginEvents.Error(
-                                        response.error.as
-                                    )
-                                )
+
                             }
                         }
-                        is Success -> TODO()
-                    }
-                    if (response is Result.Success){
-                        eventChannel.send(LoginEvents.LoginSuccess)
-                    } else {
-                        eventChannel.send(
-                            LoginEvents.Error(
-                                UiText.StringResource(
-                                    R.string.error_email_password_incorrect
-                                )
-                            )
-                        )
+                        is Success -> eventChannel.send(LoginEvents.LoginSuccess)
                     }
                 }
                 is LoginAction.OnRegisterClick -> {
