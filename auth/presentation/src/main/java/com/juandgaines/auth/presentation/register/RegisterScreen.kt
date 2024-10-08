@@ -1,11 +1,9 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.juandgaines.auth.presentation.login
+package com.juandgaines.auth.presentation.register
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,18 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.auth.presentation.login.LoginAction.OnRegisterClick
+import com.juandgaines.auth.presentation.login.LoginEvents
 import com.juandgaines.auth.presentation.login.LoginEvents.LoginSuccess
+import com.juandgaines.auth.presentation.login.LoginScreen
+import com.juandgaines.auth.presentation.login.LoginViewModel
+import com.juandgaines.core.presentation.designsystem.BackIcon
 import com.juandgaines.core.presentation.designsystem.CheckIcon
-import com.juandgaines.core.presentation.designsystem.Inter
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyActionButton
+import com.juandgaines.core.presentation.designsystem.components.TaskyFAB
 import com.juandgaines.core.presentation.designsystem.components.TaskyPasswordEditTextField
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.designsystem.components.TaskyTextField
@@ -41,7 +39,7 @@ import com.juandgaines.core.presentation.ui.ObserveAsEvents
 import com.juandgaines.presentation.R
 
 @Composable
-fun LoginScreenRoot(
+fun RegisterScreenRoot(
     viewModel: LoginViewModel,
     onLoginSuccess: () -> Unit,
     onSingUpClick: () -> Unit
@@ -58,7 +56,7 @@ fun LoginScreenRoot(
                 keyboardController?.hide()
                 Toast.makeText(
                     context,
-                    R.string.you_are_logged_in,
+                    R.string.registration_successful,
                     Toast.LENGTH_SHORT
                 ).show()
                 onLoginSuccess()
@@ -85,9 +83,9 @@ fun LoginScreenRoot(
     )
 }
 @Composable
-fun LoginScreen(
-    state: LoginState,
-    onAction: (LoginAction) -> Unit
+fun RegisterScreen(
+    state: RegisterState,
+    onAction: (RegisterAction) -> Unit
 ) {
     TaskyScaffold(
         topAppBar = {
@@ -99,7 +97,7 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         Text(
-                            text = stringResource(R.string.login_title),
+                            text = stringResource(R.string.register_title),
                             style = MaterialTheme.typography.displayLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
@@ -110,6 +108,14 @@ fun LoginScreen(
                     .height(120.dp)
             )
         },
+        floatingActionButton = {
+            TaskyFAB(
+                icon = BackIcon,
+                onClick = {
+                    onAction(RegisterAction.OnBackClick)
+                }
+            )
+        }
     ) {
         Column(
             modifier = Modifier
@@ -119,68 +125,40 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
             TaskyTextField(
+                state = state.fullName,
+                endIcon = if (state.isEmailValid) CheckIcon else null,
+                error = state.isErrorName,
+                hint = stringResource(R.string.name_hint),
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+
+            TaskyTextField(
                 state = state.email,
                 endIcon = if (state.isEmailValid) CheckIcon else null,
-                error = state.isError,
+                error = state.isErrorEmail,
                 hint = stringResource(R.string.email_hint),
                 modifier = Modifier
                     .fillMaxWidth()
             )
             TaskyPasswordEditTextField(
                 state = state.password,
-                error = state.isError,
+                error = state.isErrorPassword,
                 hint = stringResource(R.string.password_hint),
                 isPasswordVisible = state.isPasswordVisible,
                 onTogglePasswordVisibility = {
-                    onAction(LoginAction.OnTogglePasswordVisibility)
+                    onAction(RegisterAction.OnTogglePassWordVisibility)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
             )
             TaskyActionButton(
-                text = stringResource(R.string.login_button),
-                isLoading = state.isLoggingIn,
-                enabled = state.canLogin,
+                text = stringResource(R.string.get_started),
+                isLoading = state.isRegistering,
+                enabled = state.canRegister,
             ) {
-                onAction(LoginAction.OnLoginClick)
+                onAction(RegisterAction.OnRegisterClick)
             }
-
-            val annotatedString = buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = Inter
-                    )
-                ) {
-                    append(stringResource(id = R.string.dont_have_an_account)+ " ")
-
-                    withStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontFamily = Inter
-                        )
-                    ){
-                        append(stringResource(id = R.string.sign_up))
-                    }
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = androidx.compose.ui.Alignment.BottomCenter
-            ) {
-                Text(
-                    text = annotatedString,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .clickable {
-                            onAction(OnRegisterClick)
-                        }
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -188,8 +166,8 @@ fun LoginScreen(
 @Preview
 fun LoginScreenRootPreview() {
     TaskyTheme {
-        LoginScreen(
-            state = LoginState(),
+        RegisterScreen(
+            state = RegisterState(),
             onAction = {}
         )
     }
