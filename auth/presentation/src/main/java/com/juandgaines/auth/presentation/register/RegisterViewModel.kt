@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.auth.domain.AuthRepository
 import com.juandgaines.auth.domain.UserDataValidator
-import com.juandgaines.auth.presentation.login.LoginEvents
 import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success

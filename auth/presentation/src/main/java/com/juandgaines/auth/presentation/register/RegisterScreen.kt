@@ -21,11 +21,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.juandgaines.auth.presentation.login.LoginAction.OnRegisterClick
-import com.juandgaines.auth.presentation.login.LoginEvents
-import com.juandgaines.auth.presentation.login.LoginEvents.LoginSuccess
-import com.juandgaines.auth.presentation.login.LoginScreen
-import com.juandgaines.auth.presentation.login.LoginViewModel
+import com.juandgaines.auth.presentation.register.RegisterEvents.RegistrationSuccess
 import com.juandgaines.core.presentation.designsystem.BackIcon
 import com.juandgaines.core.presentation.designsystem.CheckIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -40,9 +36,9 @@ import com.juandgaines.presentation.R
 
 @Composable
 fun RegisterScreenRoot(
-    viewModel: LoginViewModel,
-    onLoginSuccess: () -> Unit,
-    onSingUpClick: () -> Unit
+    viewModel: RegisterViewModel,
+    onRegisteredSuccess: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     val state = viewModel.state
     val context = LocalContext.current
@@ -52,30 +48,30 @@ fun RegisterScreenRoot(
         flow = viewModel.events
     ) { event ->
         when (event) {
-            is LoginSuccess -> {
+            is RegistrationSuccess -> {
                 keyboardController?.hide()
                 Toast.makeText(
                     context,
                     R.string.registration_successful,
                     Toast.LENGTH_SHORT
                 ).show()
-                onLoginSuccess()
+                onRegisteredSuccess()
             }
-            is LoginEvents.Error -> {
+            is RegisterEvents.Error -> {
                 keyboardController?.hide()
                 Toast.makeText(
                     context,
-                    event.message.asString(context),
+                    event.error.asString(context),
                     Toast.LENGTH_SHORT
                 ).show()
             }
         }
     }
-    LoginScreen(
+    RegisterScreen (
         state = state,
         onAction = { action ->
             when (action) {
-                is OnRegisterClick -> onSingUpClick()
+                is RegisterAction.OnBackClick -> onBackClick()
                 else -> Unit
             }
             viewModel.onAction(action)
