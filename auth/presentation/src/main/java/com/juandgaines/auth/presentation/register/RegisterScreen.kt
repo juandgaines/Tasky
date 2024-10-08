@@ -39,7 +39,7 @@ import com.juandgaines.presentation.R
 fun RegisterScreenRoot(
     viewModel: RegisterViewModel,
     onRegisteredSuccess: () -> Unit,
-    onBackClick: () -> Unit
+    onLoginScreen: () -> Unit
 ) {
     val state = viewModel.state
     val context = LocalContext.current
@@ -72,7 +72,7 @@ fun RegisterScreenRoot(
         state = state,
         onAction = { action ->
             when (action) {
-                is RegisterAction.OnBackClick -> onBackClick()
+                is RegisterAction.OnLoginClick -> onLoginScreen()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -110,7 +110,7 @@ fun RegisterScreen(
             TaskyFAB(
                 icon = BackIcon,
                 onClick = {
-                    onAction(RegisterAction.OnBackClick)
+                    onAction(RegisterAction.OnLoginClick)
                 }
             )
         }

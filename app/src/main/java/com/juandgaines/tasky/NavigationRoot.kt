@@ -44,7 +44,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                         restoreState = true
                     }
                 },
-                onBackClick = {
+                onLoginScreen = {
                     navController.navigate("login")
                 }
             )
@@ -60,7 +60,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                         }
                     }
                 },
-                onSingUpClick = {
+                onSignUpScreen = {
                     navController.navigate("register"){
                         popUpTo("login"){
                             inclusive = true

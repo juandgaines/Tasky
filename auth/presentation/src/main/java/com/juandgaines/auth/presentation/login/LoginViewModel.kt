@@ -35,16 +35,20 @@ class LoginViewModel @Inject constructor(
 
     private val eventChannel = Channel<LoginEvents>()
     val events = eventChannel.receiveAsFlow()
-    private val email = snapshotFlow { state.email.text}
-    private val password = snapshotFlow { state.password.text}
-    init {
 
-        combine(email,password) { email, password ->
-            val isEmailValid = userDataValidator.isValidEmail(email.toString())
+    init {
+        snapshotFlow { state.email.text }.onEach {
+            val isEmailValid = userDataValidator.isValidEmail(it.toString())
             state = state.copy(
                 isEmailValid = isEmailValid,
-                canLogin = userDataValidator.isValidEmail(email.toString()) &&
-                    password.isNotEmpty()
+                canLogin = isEmailValid && state.password.text.isNotEmpty()
+            )
+        }.launchIn(viewModelScope)
+
+        snapshotFlow { state.password.text }.onEach {
+            state = state.copy(
+                canLogin = state.isEmailValid &&
+                    it.isNotEmpty()
             )
         }.launchIn(viewModelScope)
     }

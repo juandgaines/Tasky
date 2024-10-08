@@ -44,7 +44,7 @@ import com.juandgaines.presentation.R
 fun LoginScreenRoot(
     viewModel: LoginViewModel,
     onLoginSuccess: () -> Unit,
-    onSingUpClick: () -> Unit
+    onSignUpScreen: () -> Unit
 ) {
     val state = viewModel.state
     val context = LocalContext.current
@@ -77,7 +77,7 @@ fun LoginScreenRoot(
         state = state,
         onAction = { action ->
             when (action) {
-                is OnRegisterClick -> onSingUpClick()
+                is OnRegisterClick -> onSignUpScreen()
                 else -> Unit
             }
             viewModel.onAction(action)
