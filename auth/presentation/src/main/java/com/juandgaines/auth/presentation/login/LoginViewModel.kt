@@ -40,8 +40,9 @@ class LoginViewModel @Inject constructor(
     init {
 
         combine(email,password) { email, password ->
+            val isEmailValid = userDataValidator.isValidEmail(email.toString())
             state = state.copy(
-                isEmailValid = userDataValidator.isValidEmail(email.toString()),
+                isEmailValid = isEmailValid,
                 canLogin = userDataValidator.isValidEmail(email.toString()) &&
                     password.isNotEmpty()
             )
