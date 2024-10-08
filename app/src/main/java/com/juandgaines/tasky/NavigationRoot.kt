@@ -1,7 +1,17 @@
 package com.juandgaines.tasky
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -18,12 +28,27 @@ fun NavigationRoot(
     navController: NavHostController,
     isLoggedIn: Boolean
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = if (isLoggedIn) "home" else "auth"
-    ) {
-        authGraph(navController)
-        agendaGraph(navController)
+    Column (
+        modifier = Modifier.fillMaxSize().background(
+            color = MaterialTheme.colorScheme.surface
+        ),
+    ){
+        Box(
+            modifier = Modifier
+                .windowInsetsTopHeight(
+                    WindowInsets.statusBars
+                )
+                .background(
+                    color = MaterialTheme.colorScheme.surface
+                )
+        )
+        NavHost(
+            navController = navController,
+            startDestination = if (isLoggedIn) "home" else "auth"
+        ) {
+            authGraph(navController)
+            agendaGraph(navController)
+        }
     }
 }
 
