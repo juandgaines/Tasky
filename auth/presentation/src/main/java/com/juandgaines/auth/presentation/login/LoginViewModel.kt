@@ -12,6 +12,7 @@ import com.juandgaines.core.domain.util.DataError.Network
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.presentation.ui.UiText
+import com.juandgaines.core.presentation.ui.asUiText
 import com.juandgaines.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -37,8 +38,9 @@ class LoginViewModel @Inject constructor(
         snapshotFlow { state.email.text }
             .onEach {
                 state = state.copy(
-                    canLogin = userDataValidator.isValidEmail(it.toString())
-                        && state.password.text.isNotEmpty()
+                    canLogin = userDataValidator.isValidEmail(
+                        it.toString().trim()
+                    ) && state.password.text.isNotEmpty()
                 )
             }.stateIn(
                 viewModelScope,
@@ -48,8 +50,9 @@ class LoginViewModel @Inject constructor(
         snapshotFlow { state.password.text }
             .onEach {
                 state = state.copy(
-                    canLogin = userDataValidator.isValidEmail(state.email.text.toString()) &&
-                        it.isNotEmpty()
+                    canLogin = userDataValidator.isValidEmail(
+                        state.email.text.toString().trim()
+                    ) && it.isNotEmpty()
                 )
             }.stateIn(
                 viewModelScope,
@@ -79,13 +82,17 @@ class LoginViewModel @Inject constructor(
                                     )
                                 )
                             } else {
-
+                                eventChannel.send(
+                                    LoginEvents.Error(
+                                        response.error.asUiText()
+                                    )
+                                )
                             }
                         }
                         is Success -> eventChannel.send(LoginEvents.LoginSuccess)
                     }
                 }
-                is LoginAction.OnRegisterClick ->  Unit
+                else -> Unit
             }
         }
     }

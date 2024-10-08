@@ -38,7 +38,23 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
 
         composable(route = "login") {
             LoginScreenRoot(
-                viewModel = hiltViewModel<LoginViewModel>()
+                viewModel = hiltViewModel<LoginViewModel>(),
+                onLoginSuccess = {
+                    navController.navigate("home") {
+                        popUpTo("auth") {
+                            inclusive = true
+                        }
+                    }
+                },
+                onSingUpClick = {
+                    navController.navigate("register"){
+                        popUpTo("login"){
+                            inclusive = true
+                            saveState = true
+                        }
+                        restoreState = true
+                    }
+                }
             )
         }
     }
