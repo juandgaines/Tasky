@@ -39,7 +39,7 @@ class RegisterViewModel @Inject constructor(
             .onEach { fullName ->
                 val isNameValid = userDataValidator.isValidName(fullName.toString())
                 state = state.copy(
-                    isNameValid =isNameValid ,
+                    isNameValid =isNameValid,
                     canRegister = state.isEmailValid &&
                         state.passWordValidationState.isValidPassword &&
                         isNameValid &&
