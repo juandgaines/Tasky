@@ -38,9 +38,10 @@ class LoginViewModel @Inject constructor(
         snapshotFlow { state.email.text }
             .onEach {
                 state = state.copy(
-                    canLogin = userDataValidator.isValidEmail(
+                    isEmailValid = userDataValidator.isValidEmail(
                         it.toString().trim()
-                    ) && state.password.text.isNotEmpty()
+                    ),
+                    canLogin = state.isEmailValid && state.password.text.isNotEmpty()
                 )
             }.stateIn(
                 viewModelScope,
@@ -50,9 +51,10 @@ class LoginViewModel @Inject constructor(
         snapshotFlow { state.password.text }
             .onEach {
                 state = state.copy(
-                    canLogin = userDataValidator.isValidEmail(
-                        state.email.text.toString().trim()
-                    ) && it.isNotEmpty()
+                    isEmailValid = userDataValidator.isValidEmail(
+                        it.toString().trim()
+                    ),
+                    canLogin = state.isEmailValid && state.password.text.isNotEmpty()
                 )
             }.stateIn(
                 viewModelScope,
@@ -67,13 +69,16 @@ class LoginViewModel @Inject constructor(
                     state = state.copy(isPasswordVisible = !state.isPasswordVisible)
                 }
                 is LoginAction.OnLoginClick -> {
+                    state = state.copy(isLoggingIn = true)
                     val response = authRepository.login(
                         state.email.text.toString()
                         ,state.password.text.toString()
                     )
+                    state = state.copy(isLoggingIn = false)
                     when(response){
                         is Error -> {
                             if (response.error == Network.UNAUTHORIZED){
+                                state = state.copy(isError = true)
                                 eventChannel.send(
                                     LoginEvents.Error(
                                         UiText.StringResource(
@@ -89,7 +94,10 @@ class LoginViewModel @Inject constructor(
                                 )
                             }
                         }
-                        is Success -> eventChannel.send(LoginEvents.LoginSuccess)
+                        is Success -> {
+                            state = state.copy(isError = false)
+                            eventChannel.send(LoginEvents.LoginSuccess)
+                        }
                     }
                 }
                 else -> Unit

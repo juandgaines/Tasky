@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.auth.presentation.login.LoginAction.OnRegisterClick
 import com.juandgaines.auth.presentation.login.LoginEvents.LoginSuccess
+import com.juandgaines.core.presentation.designsystem.CheckIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyActionButton
 import com.juandgaines.core.presentation.designsystem.components.TaskyPasswordEditTextField
@@ -114,13 +115,15 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
             TaskyTextField(
                 state = state.email,
-                endIcon = null,
+                endIcon = if (state.isEmailValid) CheckIcon else null,
+                error = state.isError,
                 hint = stringResource(R.string.email_hint),
                 modifier = Modifier
                     .fillMaxWidth()
             )
             TaskyPasswordEditTextField(
                 state = state.password,
+                error = state.isError,
                 hint = stringResource(R.string.password_hint),
                 isPasswordVisible = state.isPasswordVisible,
                 onTogglePasswordVisibility = {
@@ -132,6 +135,7 @@ fun LoginScreen(
             TaskyActionButton(
                 text = stringResource(R.string.login_button),
                 isLoading = state.isLoggingIn,
+                enabled = state.canLogin,
             ) {
                 onAction(LoginAction.OnLoginClick)
             }
