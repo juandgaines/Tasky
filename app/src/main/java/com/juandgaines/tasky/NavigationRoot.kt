@@ -36,7 +36,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             RegisterScreenRoot(
                 viewModel = hiltViewModel<RegisterViewModel>(),
                 onRegisteredSuccess = {
-                    navController.navigate("login"){
+                    navController.navigate("login") {
                         popUpTo("register") {
                             inclusive = true
                             saveState = true
