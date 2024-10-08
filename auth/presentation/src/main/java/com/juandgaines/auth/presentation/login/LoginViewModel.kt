@@ -12,10 +12,13 @@ import com.juandgaines.core.domain.util.DataError.Network
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.presentation.ui.UiText
+import com.juandgaines.core.presentation.ui.asUiText
 import com.juandgaines.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -32,30 +35,16 @@ class LoginViewModel @Inject constructor(
 
     private val eventChannel = Channel<LoginEvents>()
     val events = eventChannel.receiveAsFlow()
-
+    private val email = snapshotFlow { state.email.text}
+    private val password = snapshotFlow { state.password.text}
     init {
-        snapshotFlow { state.email.text }
-            .onEach {
-                state = state.copy(
-                    canLogin = userDataValidator.isValidEmail(it.toString())
-                        && state.password.text.isNotEmpty()
-                )
-            }.stateIn(
-                viewModelScope,
-                started = SharingStarted.Eagerly,
-                ""
+
+        combine(email,password) { email, password ->
+            state = state.copy(
+                canLogin = userDataValidator.isValidEmail(email.toString()) &&
+                    password.isNotEmpty()
             )
-        snapshotFlow { state.password.text }
-            .onEach {
-                state = state.copy(
-                    canLogin = userDataValidator.isValidEmail(state.email.text.toString()) &&
-                        it.isNotEmpty()
-                )
-            }.stateIn(
-                viewModelScope,
-                started = SharingStarted.Eagerly,
-                ""
-            )
+        }.launchIn(viewModelScope)
     }
     fun onAction(event: LoginAction) {
         viewModelScope.launch {
@@ -64,13 +53,15 @@ class LoginViewModel @Inject constructor(
                     state = state.copy(isPasswordVisible = !state.isPasswordVisible)
                 }
                 is LoginAction.OnLoginClick -> {
+                    state = state.copy(isLoggingIn = true)
                     val response = authRepository.login(
-                        state.email.text.toString()
-                        ,state.password.text.toString()
+                        state.email.text.toString(),state.password.text.toString()
                     )
+                    state = state.copy(isLoggingIn = false)
                     when(response){
                         is Error -> {
                             if (response.error == Network.UNAUTHORIZED){
+                                state = state.copy(isError = true)
                                 eventChannel.send(
                                     LoginEvents.Error(
                                         UiText.StringResource(
@@ -79,13 +70,20 @@ class LoginViewModel @Inject constructor(
                                     )
                                 )
                             } else {
-
+                                eventChannel.send(
+                                    LoginEvents.Error(
+                                        response.error.asUiText()
+                                    )
+                                )
                             }
                         }
-                        is Success -> eventChannel.send(LoginEvents.LoginSuccess)
+                        is Success -> {
+                            state = state.copy(isError = false)
+                            eventChannel.send(LoginEvents.LoginSuccess)
+                        }
                     }
                 }
-                is LoginAction.OnRegisterClick ->  Unit
+                else -> Unit
             }
         }
     }
