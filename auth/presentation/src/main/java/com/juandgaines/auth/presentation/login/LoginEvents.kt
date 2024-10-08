@@ -1,4 +1,4 @@
-package com.juandgaines.presentation.login
+package com.juandgaines.auth.presentation.login
 
 import com.juandgaines.core.presentation.ui.UiText
 

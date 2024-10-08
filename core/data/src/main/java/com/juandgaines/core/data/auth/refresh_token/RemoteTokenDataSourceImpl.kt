@@ -31,13 +31,4 @@ class RemoteTokenDataSourceImpl @Inject constructor(
         )
         newAuthData
     }
-
-
-    override suspend fun checkAuth(): Result<Unit, Network> = safeCall {
-        api.checkAuth()
-    }
-
-    override suspend fun logOut(): Result<Unit, Network> = safeCall {
-        api.logout()
-    }
 }

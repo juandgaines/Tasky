@@ -1,4 +1,4 @@
-package com.juandgaines.presentation.login
+package com.juandgaines.auth.presentation.login
 
 sealed interface LoginAction {
     data object OnTogglePasswordVisibility : LoginAction

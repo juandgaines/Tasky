@@ -2,14 +2,11 @@ package com.juandgaines.core.data.di
 
 import com.juandgaines.core.data.BuildConfig
 import com.juandgaines.core.data.network.AuthInterceptor
-import com.juandgaines.core.domain.auth.SessionManager
-import com.juandgaines.core.domain.auth.refresh_token.RemoteTokenDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
-import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -48,16 +45,9 @@ class RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(
-        sessionManager: SessionManager,
-        remoteTokenDataSource: RemoteTokenDataSource
-    ): Interceptor = AuthInterceptor(sessionManager, remoteTokenDataSource)
-
-    @Provides
-    @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        authInterceptor: Interceptor
+        authInterceptor: AuthInterceptor
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
         builder
