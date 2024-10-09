@@ -105,7 +105,6 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
 
 private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
     navigation<HomeNavGraph>(
-
         startDestination = AgendaDest,
     ) {
         composable<AgendaDest> {
