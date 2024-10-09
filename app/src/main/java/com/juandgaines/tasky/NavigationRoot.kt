@@ -55,7 +55,7 @@ fun NavigationRoot(
 private fun NavGraphBuilder.authGraph(navController: NavHostController) {
 
     navigation<ScreenNav.AuthNav>(
-        startDestination = ScreenNav.Register,
+        startDestination = ScreenNav.Login,
     ) {
         composable<ScreenNav.Register>{
             RegisterScreenRoot(
@@ -75,7 +75,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             )
         }
 
-        composable<ScreenNav.Login>() {
+        composable<ScreenNav.Login>{
             LoginScreenRoot(
                 viewModel = hiltViewModel<LoginViewModel>(),
                 onLoginSuccess = {
