@@ -21,7 +21,6 @@ import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
 import com.juandgaines.auth.presentation.register.RegisterScreenRoot
 import com.juandgaines.auth.presentation.register.RegisterViewModel
-import com.juandgaines.tasky.navigation.RegisterDest
 import com.juandgaines.tasky.navigation.ScreenNav
 
 @Composable
@@ -63,7 +62,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 viewModel = hiltViewModel<RegisterViewModel>(),
                 onRegisteredSuccess = {
                     navController.navigate(ScreenNav.Login) {
-                        popUpTo(RegisterDest) {
+                        popUpTo(ScreenNav.Register) {
                             inclusive = true
                             saveState = true
                         }
