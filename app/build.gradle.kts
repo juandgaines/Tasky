@@ -31,7 +31,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.navigation.compose)
 
     // Coil
     implementation(libs.coil.compose)
@@ -41,9 +40,6 @@ dependencies {
 
     //Crypto
     implementation(libs.androidx.security.crypto.ktx)
-
-    //Navigation
-    implementation(libs.androidx.navigation.compose)
 
     //Modules projects
     implementation(projects.core.domain)

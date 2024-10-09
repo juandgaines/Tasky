@@ -1,7 +1,16 @@
 package com.juandgaines.tasky
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -12,32 +21,48 @@ import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
 import com.juandgaines.auth.presentation.register.RegisterScreenRoot
 import com.juandgaines.auth.presentation.register.RegisterViewModel
+import com.juandgaines.tasky.navigation.ScreenNav
 
 @Composable
 fun NavigationRoot(
     navController: NavHostController,
     isLoggedIn: Boolean
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = if (isLoggedIn) "home" else "auth"
-    ) {
-        authGraph(navController)
-        agendaGraph(navController)
+    Column (
+        modifier = Modifier.fillMaxSize().background(
+            color = MaterialTheme.colorScheme.surface
+        ),
+    ){
+        Box(
+            modifier = Modifier
+                .windowInsetsTopHeight(
+                    WindowInsets.statusBars
+                )
+                .background(
+                    color = MaterialTheme.colorScheme.surface
+                )
+        )
+        NavHost(
+            navController = navController,
+            startDestination = if (isLoggedIn) ScreenNav.HomeNav else ScreenNav.AuthNav
+        ) {
+            authGraph(navController)
+            agendaGraph(navController)
+        }
     }
 }
 
 private fun NavGraphBuilder.authGraph(navController: NavHostController) {
-    navigation(
-        startDestination = "login",
-        route = "auth"
+
+    navigation<ScreenNav.AuthNav>(
+        startDestination = ScreenNav.Login,
     ) {
-        composable(route = "register") {
+        composable<ScreenNav.Register>{
             RegisterScreenRoot(
                 viewModel = hiltViewModel<RegisterViewModel>(),
                 onRegisteredSuccess = {
-                    navController.navigate("login") {
-                        popUpTo("register") {
+                    navController.navigate(ScreenNav.Login) {
+                        popUpTo(ScreenNav.Register) {
                             inclusive = true
                             saveState = true
                         }
@@ -45,24 +70,24 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                     }
                 },
                 onLoginScreen = {
-                    navController.navigate("login")
+                    navController.navigate(ScreenNav.Login)
                 }
             )
         }
 
-        composable(route = "login") {
+        composable<ScreenNav.Login>{
             LoginScreenRoot(
                 viewModel = hiltViewModel<LoginViewModel>(),
                 onLoginSuccess = {
-                    navController.navigate("home") {
-                        popUpTo("auth") {
+                    navController.navigate(ScreenNav.HomeNav) {
+                        popUpTo(ScreenNav.AuthNav) {
                             inclusive = true
                         }
                     }
                 },
                 onSignUpScreen = {
-                    navController.navigate("register"){
-                        popUpTo("login"){
+                    navController.navigate(ScreenNav.Register) {
+                        popUpTo(ScreenNav.Login) {
                             inclusive = true
                             saveState = true
                         }
@@ -75,11 +100,10 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
 }
 
 private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
-    navigation(
-        startDestination = "agenda",
-        route = "home"
+    navigation<ScreenNav.HomeNav>(
+        startDestination = ScreenNav.Agenda,
     ) {
-        composable(route = "agenda") {
+        composable<ScreenNav.Agenda> {
             Text(
                 text = "Agenda"
             )
