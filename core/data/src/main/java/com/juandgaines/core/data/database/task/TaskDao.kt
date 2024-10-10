@@ -1,0 +1,18 @@
+package com.juandgaines.core.data.database.task
+
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface TaskDao {
+    @Upsert
+    suspend fun upsertTask(taskEntity: TaskEntity)
+
+    @Query("SELECT * FROM task WHERE id=:id")
+    suspend fun getTaskById(id: String): TaskEntity?
+
+    @Query("SELECT * FROM task")
+    fun getTasks(): Flow<List<TaskEntity>>
+}

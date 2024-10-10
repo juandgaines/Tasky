@@ -2,16 +2,46 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b8fe03e695cdd784963b7fd51ce72204",
+    "identityHash": "44114f2a4b135b21339cc4a90be715ac",
     "entities": [
       {
-        "tableName": "TaskTestEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "tableName": "task",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `is_done` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remindAt",
+            "columnName": "remind_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDone",
+            "columnName": "is_done",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -28,7 +58,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b8fe03e695cdd784963b7fd51ce72204')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '44114f2a4b135b21339cc4a90be715ac')"
     ]
   }
 }
