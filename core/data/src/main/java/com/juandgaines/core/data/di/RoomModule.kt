@@ -3,7 +3,8 @@ package com.juandgaines.core.data.di
 import android.content.Context
 import androidx.room.Room
 import com.juandgaines.core.data.database.TaskyDataBase
-import com.juandgaines.core.data.database.local.TaskDao
+import com.juandgaines.core.data.database.reminder.ReminderDao
+import com.juandgaines.core.data.database.task.TaskDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,6 +33,12 @@ class RoomModule {
     fun provideTaskDao(
         taskyDataBase: TaskyDataBase
     ) :TaskDao = taskyDataBase.taskDao()
+
+    @Provides
+    @Singleton
+    fun provideReminderDao(
+        taskyDataBase: TaskyDataBase
+    ) : ReminderDao = taskyDataBase.reminderDao()
 }
 
 

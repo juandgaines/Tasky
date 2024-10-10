@@ -1,4 +1,4 @@
-package com.juandgaines.core.data.database.local
+package com.juandgaines.core.data.database.task
 
 import androidx.room.Dao
 import androidx.room.Query
