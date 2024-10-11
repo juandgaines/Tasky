@@ -16,7 +16,7 @@ interface TaskApi{
     suspend fun updateTask(@Body taskRequest: TaskRequest): Response<Unit>
 
     @GET("/task")
-    suspend fun getTaskById(@Query("taskId") id: String): Response<TaskRequest>
+    suspend fun getTaskById(@Query("taskId") id: String): Response<TaskResponse>
 
     @DELETE("/task")
     suspend fun deleteTask(@Query("taskId") id: String): Response<Unit>
