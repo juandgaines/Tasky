@@ -41,7 +41,7 @@ class RoomLocalReminderDataSource @Inject constructor(
         }?: Result.Error(LocalError.NOT_FOUND)
     }
 
-    override fun getTasks(): Flow<List<Reminder>> {
+    override fun getReminders(): Flow<List<Reminder>> {
         return reminderDao
             .getReminders()
             .map { reminderEntities ->
