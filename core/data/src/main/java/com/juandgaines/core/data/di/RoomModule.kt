@@ -2,8 +2,9 @@ package com.juandgaines.core.data.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.juandgaines.core.data.database.TaskyDataBase
+import com.juandgaines.core.data.database.reminder.ReminderDao
+import com.juandgaines.core.data.database.task.TaskDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,11 +20,25 @@ class RoomModule {
     @Singleton
     fun provideRoomDatabase(
         @ApplicationContext context: Context
-    ): RoomDatabase {
+    ): TaskyDataBase {
         return Room.databaseBuilder(
             context,
             TaskyDataBase::class.java,
             "tasky.db"
         ).build()
     }
+
+    @Provides
+    @Singleton
+    fun provideTaskDao(
+        taskyDataBase: TaskyDataBase
+    ) :TaskDao = taskyDataBase.taskDao()
+
+    @Provides
+    @Singleton
+    fun provideReminderDao(
+        taskyDataBase: TaskyDataBase
+    ) : ReminderDao = taskyDataBase.reminderDao()
 }
+
+
