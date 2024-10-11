@@ -7,8 +7,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
+
     @Upsert
     suspend fun upsertTask(taskEntity: TaskEntity)
+
+    @Upsert
+    suspend fun upsertTasks(taskEntities: List<TaskEntity>)
 
     @Query("SELECT * FROM task WHERE id=:id")
     suspend fun getTaskById(id: String): TaskEntity?
