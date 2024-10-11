@@ -16,8 +16,8 @@ interface ReminderApi {
     suspend fun updateReminder(@Body reminderRequest: ReminderRequest): Response<Unit>
 
     @GET("/reminder")
-    suspend fun getReminder(@Query("reminderId") id:String): Response<ReminderResponse>
+    suspend fun getReminderById(@Query("reminderId") id:String): Response<ReminderResponse>
 
     @DELETE
-    suspend fun deleteReminder(@Query("reminderId") id:String): Response<Unit>
+    suspend fun deleteReminderById(@Query("reminderId") id:String): Response<Unit>
 }
