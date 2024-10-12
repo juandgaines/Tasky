@@ -72,7 +72,6 @@ class DefaultReminderRepository @Inject constructor(
     override suspend fun upsertReminder(list: List<Reminder>): Result<Unit, Error> {
         return try {
             val entities = list.map { it.toReminderEntity() }
-            reminderDao.upsertReminders(entities)
             applicationScope.async {
                 reminderDao.upsertReminders(entities)
             }.await()
