@@ -40,3 +40,5 @@ fun <T, E:Error> Result<T,E>.asEmptyDataResult(): Result<Unit, E> {
         }
     }
 }
+
+typealias EmptyDataResult<E> = Result<Unit, E>

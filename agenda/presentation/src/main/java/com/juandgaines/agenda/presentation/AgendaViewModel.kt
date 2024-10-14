@@ -20,6 +20,7 @@ import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.ShowProfileMenu
 import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeDays
+import com.juandgaines.core.domain.auth.AuthCoreService
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.presentation.ui.asUiText
@@ -33,7 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val initialsCalculator: InitialsCalculator,
-    private val agendaRepository: AgendaRepository
+    private val authCoreService: AuthCoreService
 ):ViewModel() {
 
 
@@ -102,7 +103,7 @@ class AgendaViewModel @Inject constructor(
 
                 Logout ->{
                     state = state.copy(isLoading = true)
-                    when(val result = agendaRepository.logout()){
+                    when(val result = authCoreService.logout()){
                         is Success -> {
                             eventChannel.send(AgendaEvents.LogOut)
                         }

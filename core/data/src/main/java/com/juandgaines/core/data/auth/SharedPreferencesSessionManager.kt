@@ -50,6 +50,13 @@ class SharedPreferencesSessionManager @Inject constructor(
         return System.currentTimeMillis() >= authData.accessTokenExpirationTimestamp
     }
 
+    override suspend fun clear() {
+        withContext(Dispatchers.IO){
+            sharedPreferences.edit()
+                .clear()
+                .apply()
+        }
+    }
 
     companion object{
         const val KEY_AUTH_DATA = "KEY_AUTH_DATA"

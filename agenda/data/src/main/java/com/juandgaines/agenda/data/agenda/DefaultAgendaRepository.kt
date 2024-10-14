@@ -12,18 +12,8 @@ import com.juandgaines.core.domain.util.asEmptyDataResult
 import javax.inject.Inject
 
 class DefaultAgendaRepository @Inject constructor(
-    private val tokenApi: TokenApi,
-    private val sessionManager: SessionManager,
     private val reminderRepository: ReminderRepository,
     private val taskRepository: TaskRepository
 ) : AgendaRepository {
-    override suspend fun logout(): Result<Unit, Network> {
-        val response = safeCall {
-            tokenApi.logout()
-        }
-        if (response is Result.Success){
-            sessionManager.set(null)
-        }
-        return response
-    }
+
 }

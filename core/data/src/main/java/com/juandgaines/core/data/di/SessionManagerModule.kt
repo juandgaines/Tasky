@@ -42,5 +42,5 @@ class SessionManagerModule {
     ): RemoteTokenDataSource {
         return RemoteTokenDataSourceImpl(tokenApi)
     }
-
 }
+
