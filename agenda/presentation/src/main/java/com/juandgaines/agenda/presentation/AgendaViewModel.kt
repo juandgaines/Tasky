@@ -13,6 +13,7 @@ import com.juandgaines.agenda.presentation.AgendaActions.CreateAgendaItem
 import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.DismissProfileMenu
+import com.juandgaines.agenda.presentation.AgendaActions.Logout
 import com.juandgaines.agenda.presentation.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
@@ -94,6 +95,11 @@ class AgendaViewModel @Inject constructor(
 
                 is CreateAgendaItem -> {
 
+                }
+
+                Logout ->{
+                    agendaRepository.logout()
+                    eventChannel.send(AgendaEvents.LogOut)
                 }
             }
         }
