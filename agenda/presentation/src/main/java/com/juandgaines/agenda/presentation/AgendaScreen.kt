@@ -64,6 +64,9 @@ fun AgendaScreen(
     var pressOffSet by remember {
         mutableStateOf(DpOffset.Zero)
     }
+    var pressOffSetProfile by remember {
+        mutableStateOf(DpOffset.Zero)
+    }
     val density = LocalDensity.current
     var itemHeight by remember {
         mutableStateOf(0.dp)
@@ -94,7 +97,20 @@ fun AgendaScreen(
                 Spacer(modifier = Modifier.weight(1f))
                 ProfileIcon(
                     initials = stateAgenda.userInitials,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier
+                        .size(36.dp)
+                        .onGloballyPositioned { coordinates->
+                            val y = with(density) { coordinates.positionInParent().y.toDp()}
+                            val x = with(density) { coordinates.positionInParent().x.toDp()}
+                            itemHeight = with(density) { coordinates.size.height.toDp() }
+                            pressOffSetProfile = DpOffset(
+                                x,
+                                y
+                            )
+                        }
+                        .clickable {
+                            agendaActions(AgendaActions.ShowProfileMenu)
+                        }
                 )
             }
         },
@@ -141,7 +157,8 @@ fun AgendaScreen(
             expanded = stateAgenda.isCreateContextMenuVisible,
             onDismissRequest = { agendaActions(AgendaActions.DismissCreateContextMenu) },
             offset = pressOffSet.copy(
-                y = pressOffSet.y - itemHeight
+                y = pressOffSet.y - itemHeight,
+                x = pressOffSet.x
             )
         ) {
 
@@ -167,6 +184,22 @@ fun AgendaScreen(
 
                 }
             }
+        }
+
+        DropdownMenu(
+            expanded = stateAgenda.isProfileMenuVisible,
+            onDismissRequest = { agendaActions(AgendaActions.DismissProfileMenu) },
+            offset = pressOffSetProfile.copy(
+                y = pressOffSetProfile.y + itemHeight,
+                x = pressOffSetProfile.x
+            )
+        ) {
+            DropdownMenuItem(
+                onClick = {
+
+                },
+                text = { Text(stringResource(R.string.logout)) }
+            )
         }
     }
 }

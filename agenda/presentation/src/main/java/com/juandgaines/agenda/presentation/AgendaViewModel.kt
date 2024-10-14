@@ -11,11 +11,12 @@ import com.juandgaines.agenda.domain.utils.toZonedDateTimeWithZoneId
 import com.juandgaines.agenda.presentation.AgendaActions.CreateAgendaItem
 import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
+import com.juandgaines.agenda.presentation.AgendaActions.DismissProfileMenu
 import com.juandgaines.agenda.presentation.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.AgendaActions.SelectDateWithingRange
-import com.juandgaines.agenda.presentation.AgendaActions.SelectProfile
 import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
+import com.juandgaines.agenda.presentation.AgendaActions.ShowProfileMenu
 import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeDays
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -67,8 +68,12 @@ class AgendaViewModel @Inject constructor(
                     state = state.copy(dateRange = range)
                 }
 
-                SelectProfile -> {
+                ShowProfileMenu -> {
+                    state = state.copy(isProfileMenuVisible = true)
+                }
 
+                DismissProfileMenu -> {
+                    state = state.copy(isProfileMenuVisible = false)
                 }
 
                 DismissDateDialog -> {
