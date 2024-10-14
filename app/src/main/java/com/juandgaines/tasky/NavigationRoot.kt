@@ -106,6 +106,13 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         composable<ScreenNav.Agenda> {
             AgendaScreenRoot(
                 viewModel = hiltViewModel(),
+                navigateToLogin = {
+                    navController.navigate(ScreenNav.AuthNav) {
+                        popUpTo(ScreenNav.HomeNav) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
     }

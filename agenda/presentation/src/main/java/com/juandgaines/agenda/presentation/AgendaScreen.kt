@@ -42,12 +42,27 @@ import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyFAB
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
+import com.juandgaines.core.presentation.ui.ObserveAsEvents
 
 @Composable
 fun AgendaScreenRoot(
-    viewModel: AgendaViewModel
+    viewModel: AgendaViewModel,
+    navigateToLogin: () -> Unit
 ){
     val state = viewModel.state
+    val events = viewModel.events
+
+    ObserveAsEvents(
+        events
+    ) { agendaEvents ->
+        when (agendaEvents) {
+            is AgendaEvents.LogOut -> {
+                navigateToLogin()
+            }
+            else -> Unit
+        }
+
+    }
 
     AgendaScreen(
         stateAgenda = state,

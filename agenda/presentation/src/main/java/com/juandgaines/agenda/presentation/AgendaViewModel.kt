@@ -20,6 +20,9 @@ import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.ShowProfileMenu
 import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeDays
+import com.juandgaines.core.domain.util.Result.Error
+import com.juandgaines.core.domain.util.Result.Success
+import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -98,8 +101,14 @@ class AgendaViewModel @Inject constructor(
                 }
 
                 Logout ->{
-                    agendaRepository.logout()
-                    eventChannel.send(AgendaEvents.LogOut)
+                    when(val result = agendaRepository.logout()){
+                        is Success -> {
+                            eventChannel.send(AgendaEvents.LogOut)
+                        }
+                        is Error -> {
+                            eventChannel.send(AgendaEvents.Error(result.error.asUiText()))
+                        }
+                    }
                 }
             }
         }
