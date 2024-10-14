@@ -43,7 +43,7 @@ class RoomModule {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
                     applicationScope.launch {
-
+                        //TODO: Remove this
                         taskDao.get().upsertTasks(
                             listOf(
                                 TaskEntity(
