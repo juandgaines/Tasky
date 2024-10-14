@@ -196,7 +196,7 @@ fun AgendaScreen(
         ) {
             DropdownMenuItem(
                 onClick = {
-
+                    agendaActions(AgendaActions.Logout)
                 },
                 text = { Text(stringResource(R.string.logout)) }
             )
