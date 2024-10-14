@@ -73,7 +73,7 @@ fun AgendaScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 ProfileIcon(
-                    initials = "JD",
+                    initials = stateAgenda.userInitials,
                     modifier = Modifier.size(36.dp)
                 )
             }
