@@ -2,6 +2,7 @@
 
 package com.juandgaines.agenda.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +46,7 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyFAB
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.ui.ObserveAsEvents
+import com.juandgaines.core.presentation.ui.UiText
 
 @Composable
 fun AgendaScreenRoot(
@@ -53,12 +56,18 @@ fun AgendaScreenRoot(
     val state = viewModel.state
     val events = viewModel.events
 
+    val context= LocalContext.current
     ObserveAsEvents(
         events
     ) { agendaEvents ->
         when (agendaEvents) {
             is AgendaEvents.LogOut -> {
                 navigateToLogin()
+                Toast.makeText(
+                    context,
+                     UiText.StringResource(R.string.logout_success).asString(context),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             else -> Unit
         }
