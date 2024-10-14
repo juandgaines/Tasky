@@ -39,7 +39,6 @@ class AgendaViewModel @Inject constructor(
                 state = state.copy(userInitials = it)
             }
         }
-        state = state.copy()
     }
 
     fun onAction(action: AgendaActions) {
@@ -47,11 +46,9 @@ class AgendaViewModel @Inject constructor(
             is SelectDate -> {
 
                 val utcZonedDateTime = action.date.toUtcZonedDateTime()
-
                 val newDate = utcZonedDateTime.toZonedDateTimeWithZoneId(
                     ZoneId.systemDefault()
                 )
-
                 state = state.copy(
                     selectedLocalDate = newDate,
                     isDatePickerOpened = false,

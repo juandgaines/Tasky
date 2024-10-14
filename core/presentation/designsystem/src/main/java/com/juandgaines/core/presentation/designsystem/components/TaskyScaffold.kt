@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +39,7 @@ fun TaskyScaffold(
     fabPosition: FabPosition = FabPosition.End,
     topAppBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
-    content : @Composable () -> Unit,
+    content : @Composable ColumnScope.() -> Unit,
 
 ) {
     Scaffold(
@@ -70,6 +71,7 @@ fun TaskyScaffold(
                         )
                     )
                     .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 content()
             }

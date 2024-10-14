@@ -92,6 +92,14 @@ fun AgendaScreen(
             }
         )
 
+        Text(
+            text = stateAgenda.labelDateRange,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSecondary,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
         if (stateAgenda.isDatePickerOpened) {
             AgendaDatePicker(
                 agendaActions = agendaActions,

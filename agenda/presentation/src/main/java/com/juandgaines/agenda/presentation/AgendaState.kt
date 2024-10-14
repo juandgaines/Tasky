@@ -1,6 +1,7 @@
 package com.juandgaines.agenda.presentation
 
 import com.juandgaines.agenda.componets.selector_date.SelectorDayData
+import com.juandgaines.agenda.domain.utils.toFormattedDate
 import java.time.ZonedDateTime
 
 data class AgendaState(
@@ -12,6 +13,9 @@ data class AgendaState(
 ){
     val currentMonth:String
         get() = selectedLocalDate.month.name.uppercase()
+
+    val labelDateRange:String
+        get() = dateRange.first{it.isSelected}.dayTime.toFormattedDate()
 
     companion object{
 
