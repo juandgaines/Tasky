@@ -6,12 +6,12 @@ import java.time.ZonedDateTime
 data class AgendaState(
     val labelDate:String = "",
     val isDatePickerOpened:Boolean = false,
-    val selectedDate:ZonedDateTime = ZonedDateTime.now(),
-    val dateRange: List<SelectorDayData> = calculateRangeDays(selectedDate),
+    val selectedLocalDate:ZonedDateTime = ZonedDateTime.now(),
+    val dateRange: List<SelectorDayData> = calculateRangeDays(selectedLocalDate),
     val userInitials:String = ""
 ){
     val currentMonth:String
-        get() = selectedDate.month.name.uppercase()
+        get() = selectedLocalDate.month.name.uppercase()
 
     companion object{
 

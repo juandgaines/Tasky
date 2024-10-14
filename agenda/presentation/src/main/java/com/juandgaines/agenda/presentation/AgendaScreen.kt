@@ -93,9 +93,10 @@ fun AgendaScreen(
         )
 
         if (stateAgenda.isDatePickerOpened) {
-            AgendaDatePicker { action ->
-                agendaActions(action)
-            }
+            AgendaDatePicker(
+                agendaActions = agendaActions,
+                initialDate = stateAgenda.selectedLocalDate
+            )
         }
     }
 }
