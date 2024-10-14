@@ -32,6 +32,7 @@ import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -53,9 +54,8 @@ class AgendaViewModel @Inject constructor(
 
     private val eventChannel = Channel<AgendaEvents>()
     val events = eventChannel.receiveAsFlow()
-    private val time = snapshotFlow {
-        state.selectedLocalDate
-    }
+
+    private val _time = MutableStateFlow(state.selectedLocalDate)
 
     init {
         viewModelScope.launch {
@@ -64,7 +64,7 @@ class AgendaViewModel @Inject constructor(
             }
         }
 
-        time.flatMapLatest {
+        _time.flatMapLatest {
             agendaRepository.getItems(
                 it.startOfDay(),
                 it.endOfDay()
@@ -83,6 +83,7 @@ class AgendaViewModel @Inject constructor(
                     val newDate = utcZonedDateTime.toLocalDateWithZoneId(
                         ZoneId.systemDefault()
                     )
+                    _time.value = newDate
                     state = state.copy(
                         selectedLocalDate = newDate,
                         isDatePickerOpened = false,
@@ -91,6 +92,7 @@ class AgendaViewModel @Inject constructor(
                 }
                 is SelectDateWithingRange -> {
                     val date = action.date
+                    _time.value = date
                     val range = state.dateRange.map {
                         it.copy(isSelected = it.dayTime == date)
                     }
