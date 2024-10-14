@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -34,9 +36,9 @@ import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.componets.AgendaDatePicker
 import com.juandgaines.agenda.componets.ProfileIcon
 import com.juandgaines.agenda.componets.selector_date.DateSelector
-import com.juandgaines.agenda.domain.agenda.AgendaItems
-import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
-import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
+import com.juandgaines.agenda.domain.agenda.AgendaItem
+import com.juandgaines.agenda.domain.agenda.AgendaItem.AgendaItems.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaItem.AgendaItems.Task
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -158,6 +160,17 @@ fun AgendaScreen(
                     color = MaterialTheme.colorScheme.onSecondary,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
+
+                LazyColumn {
+                    items(stateAgenda.agendaItems) { agendaItem ->
+                        Text(
+                            text = agendaItem.date.toString(),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                    }
+                }
             }
             if (stateAgenda.isDatePickerOpened) {
                 AgendaDatePicker(
@@ -173,7 +186,7 @@ fun AgendaScreen(
                     onDismissRequest = { agendaActions(AgendaActions.DismissCreateContextMenu) },
                 ) {
 
-                    AgendaItems.entries.forEach { agendaItem ->
+                    AgendaItem.AgendaItems.entries.forEach { agendaItem ->
                         when (agendaItem) {
                             Reminder -> {
                                 DropdownMenuItem(

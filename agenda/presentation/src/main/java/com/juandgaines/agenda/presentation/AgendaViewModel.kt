@@ -1,14 +1,18 @@
+@file:Suppress("OPT_IN_USAGE")
+
 package com.juandgaines.agenda.presentation
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
+import com.juandgaines.agenda.domain.utils.toEpochMilli
+import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcZonedDateTime
-import com.juandgaines.agenda.domain.utils.toZonedDateTimeWithZoneId
 import com.juandgaines.agenda.presentation.AgendaActions.CreateAgendaItem
 import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
@@ -26,6 +30,9 @@ import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.ZoneId
@@ -34,7 +41,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val initialsCalculator: InitialsCalculator,
-    private val authCoreService: AuthCoreService
+    private val authCoreService: AuthCoreService,
+    private val agendaRepository: AgendaRepository
 ):ViewModel() {
 
 
@@ -43,6 +51,9 @@ class AgendaViewModel @Inject constructor(
 
     private val eventChannel = Channel<AgendaEvents>()
     val events = eventChannel.receiveAsFlow()
+    private val time = snapshotFlow {
+        state.selectedLocalDate
+    }
 
     init {
         viewModelScope.launch {
@@ -50,6 +61,14 @@ class AgendaViewModel @Inject constructor(
                 state = state.copy(userInitials = it)
             }
         }
+
+        time.flatMapLatest {
+            agendaRepository.getItems(
+                it.toEpochMilli()
+            )
+        }.onEach {
+            state = state.copy(agendaItems = it)
+        }.launchIn(viewModelScope)
     }
 
     fun onAction(action: AgendaActions) {
@@ -58,7 +77,7 @@ class AgendaViewModel @Inject constructor(
                 is SelectDate -> {
 
                     val utcZonedDateTime = action.date.toUtcZonedDateTime()
-                    val newDate = utcZonedDateTime.toZonedDateTimeWithZoneId(
+                    val newDate = utcZonedDateTime.toLocalDateWithZoneId(
                         ZoneId.systemDefault()
                     )
                     state = state.copy(

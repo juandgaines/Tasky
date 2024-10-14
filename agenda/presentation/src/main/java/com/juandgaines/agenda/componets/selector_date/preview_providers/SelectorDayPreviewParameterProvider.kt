@@ -2,10 +2,11 @@ package com.juandgaines.agenda.componets.selector_date.preview_providers
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.juandgaines.agenda.componets.selector_date.SelectorDayData
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 class SelectorDayPreviewParameterProvider: PreviewParameterProvider<List<SelectorDayData>> {
-    private val date = ZonedDateTime.now()
+    private val date = LocalDate.now()
     override val values = sequenceOf(
         listOf(
             SelectorDayData(

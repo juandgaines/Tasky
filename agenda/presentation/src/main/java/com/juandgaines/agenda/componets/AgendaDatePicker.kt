@@ -13,19 +13,25 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.juandgaines.agenda.domain.utils.toEpochMilliUtc
+import com.juandgaines.agenda.domain.utils.toUtcLocalDate
 import com.juandgaines.agenda.domain.utils.toUtcZonedDateTime
 import com.juandgaines.agenda.presentation.AgendaActions
 import com.juandgaines.agenda.presentation.R
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Composable
 fun AgendaDatePicker(
     modifier: Modifier = Modifier,
     agendaActions: (AgendaActions)->Unit,
-    initialDate:ZonedDateTime
+    initialDate:LocalDate
 ) {
     val datePickerState = rememberDatePickerState(
-        initialDate.toUtcZonedDateTime().toEpochSecond().times(1000)
+        initialDate.toEpochMilliUtc()
     )
     DatePickerDialog(
         modifier = modifier,
