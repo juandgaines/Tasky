@@ -123,9 +123,9 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override fun getTasks(): Flow<List<Task>> {
+    override fun getTasks(time:Long): Flow<List<Task>> {
         return taskDao
-            .getTasks()
+            .getTasks(time)
             .map { taskEntities ->
                 taskEntities.map {
                     it.toTask()

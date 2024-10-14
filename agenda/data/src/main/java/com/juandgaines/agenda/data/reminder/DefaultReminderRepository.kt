@@ -115,9 +115,9 @@ class DefaultReminderRepository @Inject constructor(
         }
     }
 
-    override fun getReminders(): Flow<List<Reminder>> {
+    override fun getReminders(time:Long): Flow<List<Reminder>> {
         return reminderDao
-            .getReminders()
+            .getReminders(time)
             .map { reminderEntities ->
                 reminderEntities
                     .map {

@@ -1,11 +1,17 @@
 package com.juandgaines.agenda.domain.agenda
 
-sealed interface AgendaItems{
-    data object Task: AgendaItems
-    data object Reminder: AgendaItems
+interface AgendaItem{
+    val date:Long
 
-    companion object{
-        val entries  = listOf(Task, Reminder)
+    sealed interface AgendaItems{
+        data object Task: AgendaItems
+        data object Reminder: AgendaItems
+
+        companion object{
+            val entries  = listOf(Task, Reminder)
+        }
     }
 }
+
+
 
