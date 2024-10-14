@@ -21,21 +21,25 @@ import com.juandgaines.core.presentation.designsystem.TaskyDarkGray
 import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyOrange
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
+import java.time.ZonedDateTime
 
 @Composable
 fun DateSelector(
     modifier: Modifier,
     daysList: List<SelectorDayData>,
+    onSelectDate: (ZonedDateTime)->Unit
 ) {
     Row(
         modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         daysList.forEach { selectorDayData ->
             DayItem(
                 modifier = Modifier
                     .width(40.dp)
                     .height(60.dp),
-                dayItem = selectorDayData
+                dayItem = selectorDayData,
+                onSelectDate = onSelectDate
             )
         }
     }
@@ -45,9 +49,7 @@ fun DateSelector(
 fun DayItem(
     modifier: Modifier,
     dayItem: SelectorDayData,
-    onClickDate: (Long) -> Unit = {
-
-    }
+    onSelectDate: (ZonedDateTime) -> Unit
 ){
     Column(
         modifier = modifier
@@ -59,7 +61,7 @@ fun DayItem(
                     )
                 else Modifier
             ).clickable {
-                onClickDate(dayItem.dayTime)
+                onSelectDate(dayItem.dayTime)
             },
         horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
@@ -87,7 +89,8 @@ fun DateSelectorPreview(
     TaskyTheme {
         DateSelector(
             daysList = daysList,
-            modifier = Modifier
+            modifier = Modifier,
+            onSelectDate = {}
         )
     }
 }

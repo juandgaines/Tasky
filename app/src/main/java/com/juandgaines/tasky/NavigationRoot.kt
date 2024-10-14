@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.juandgaines.agenda.presentation.AgendaScreenRoot
 import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
 import com.juandgaines.auth.presentation.register.RegisterScreenRoot
@@ -104,8 +104,8 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         startDestination = ScreenNav.Agenda,
     ) {
         composable<ScreenNav.Agenda> {
-            Text(
-                text = "Agenda"
+            AgendaScreenRoot(
+                viewModel = hiltViewModel(),
             )
         }
     }

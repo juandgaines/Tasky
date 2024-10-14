@@ -31,3 +31,7 @@ val EditIcon: ImageVector
 val CloseIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.ic_close)
+
+val ArrowDownIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.ic_arrow)
