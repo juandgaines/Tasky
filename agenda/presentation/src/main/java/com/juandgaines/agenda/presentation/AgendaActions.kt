@@ -1,5 +1,6 @@
 package com.juandgaines.agenda.presentation
 
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import java.time.ZonedDateTime
 
 sealed interface AgendaActions{
@@ -10,4 +11,5 @@ sealed interface AgendaActions{
     data class SelectDateWithingRange(val date: ZonedDateTime) : AgendaActions
     data object ShowCreateContextMenu : AgendaActions
     data object DismissCreateContextMenu : AgendaActions
+    data class CreateAgendaItem(val agendaItems: AgendaItems) : AgendaActions
 }

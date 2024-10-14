@@ -2,4 +2,6 @@
 <resources>
   <string name="select">Select</string>
   <string name="cancel">Cancel</string>
+  <string name="reminder">Reminder</string>
+  <string name="task">Task</string>
 </resources>

@@ -3,15 +3,14 @@
 package com.juandgaines.agenda.presentation
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -24,7 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -32,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.componets.AgendaDatePicker
 import com.juandgaines.agenda.componets.ProfileIcon
 import com.juandgaines.agenda.componets.selector_date.DateSelector
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
+import com.juandgaines.agenda.domain.agenda.agendaItems
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -59,6 +64,7 @@ fun AgendaScreen(
     var pressOffSet by remember {
         mutableStateOf(DpOffset.Zero)
     }
+    val density = LocalDensity.current
     var itemHeight by remember {
         mutableStateOf(0.dp)
     }
@@ -95,16 +101,16 @@ fun AgendaScreen(
         floatingActionButton = {
             TaskyFAB(
                 modifier = Modifier
-                    .pointerInput(true){
-                        detectTapGestures(
-                            onTap = {
-                                agendaActions(AgendaActions.ShowCreateContextMenu)
-                                pressOffSet = DpOffset(it.x.toDp(), it.y.toDp())
-                            }
+                    .onGloballyPositioned { coordinates->
+                        pressOffSet = DpOffset(
+                            with(density) { coordinates.positionInParent().x.toDp()},
+                            with(density) { coordinates.positionInParent().y.toDp()},
                         )
                     },
+                onClick = {
+                    agendaActions(AgendaActions.ShowCreateContextMenu)
+                },
                 icon = AddIcon,
-                onClick = {}
             )
         }
     ){
@@ -134,8 +140,33 @@ fun AgendaScreen(
         DropdownMenu(
             expanded = stateAgenda.isCreateContextMenuVisible,
             onDismissRequest = { agendaActions(AgendaActions.DismissCreateContextMenu) },
+            offset = pressOffSet.copy(
+                y = pressOffSet.y - itemHeight
+            )
         ) {
 
+            agendaItems.forEach { agendaItem ->
+                when (agendaItem) {
+                    Reminder -> {
+                        DropdownMenuItem(
+                            onClick = {
+                                agendaActions(AgendaActions.CreateAgendaItem(agendaItem))
+                            },
+                            text = { Text(stringResource(R.string.reminder)) }
+                        )
+                    }
+
+                    Task -> {
+                        DropdownMenuItem(
+                            onClick = {
+                                agendaActions(AgendaActions.CreateAgendaItem(agendaItem))
+                            },
+                            text = { Text(stringResource(R.string.task)) }
+                        )
+                    }
+
+                }
+            }
         }
     }
 }

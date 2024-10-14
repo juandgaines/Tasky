@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.utils.toUtcZonedDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTimeWithZoneId
+import com.juandgaines.agenda.presentation.AgendaActions.CreateAgendaItem
 import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.SelectDate
@@ -44,44 +45,51 @@ class AgendaViewModel @Inject constructor(
     }
 
     fun onAction(action: AgendaActions) {
-        when (action) {
-            is SelectDate -> {
+        viewModelScope.launch {
+            when (action) {
+                is SelectDate -> {
 
-                val utcZonedDateTime = action.date.toUtcZonedDateTime()
-                val newDate = utcZonedDateTime.toZonedDateTimeWithZoneId(
-                    ZoneId.systemDefault()
-                )
-                state = state.copy(
-                    selectedLocalDate = newDate,
-                    isDatePickerOpened = false,
-                    dateRange = calculateRangeDays(newDate)
-                )
-            }
-            is SelectDateWithingRange -> {
-                val date = action.date
-                val range = state.dateRange.map {
-                    it.copy(isSelected = it.dayTime == date)
+                    val utcZonedDateTime = action.date.toUtcZonedDateTime()
+                    val newDate = utcZonedDateTime.toZonedDateTimeWithZoneId(
+                        ZoneId.systemDefault()
+                    )
+                    state = state.copy(
+                        selectedLocalDate = newDate,
+                        isDatePickerOpened = false,
+                        dateRange = calculateRangeDays(newDate)
+                    )
                 }
-                state = state.copy(dateRange = range)
-            }
+                is SelectDateWithingRange -> {
+                    val date = action.date
+                    val range = state.dateRange.map {
+                        it.copy(isSelected = it.dayTime == date)
+                    }
+                    state = state.copy(dateRange = range)
+                }
 
-            SelectProfile -> {
+                SelectProfile -> {
 
-            }
+                }
 
-            DismissDateDialog -> {
-                state = state.copy(isDatePickerOpened = false)
-            }
-            ShowDateDialog -> {
-                state = state.copy(isDatePickerOpened = true)
-            }
+                DismissDateDialog -> {
+                    state = state.copy(isDatePickerOpened = false)
+                }
+                ShowDateDialog -> {
+                    state = state.copy(isDatePickerOpened = true)
+                }
 
-            ShowCreateContextMenu ->{
-                state = state.copy(isCreateContextMenuVisible = true)
-            }
+                ShowCreateContextMenu ->{
+                    state = state.copy(isCreateContextMenuVisible = true)
+                }
 
-            DismissCreateContextMenu ->
-                state = state.copy(isCreateContextMenuVisible = false)
+                DismissCreateContextMenu ->
+                    state = state.copy(isCreateContextMenuVisible = false)
+
+                is CreateAgendaItem -> {
+
+                }
+            }
         }
+
     }
 }

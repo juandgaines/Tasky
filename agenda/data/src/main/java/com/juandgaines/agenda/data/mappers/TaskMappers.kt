@@ -2,7 +2,7 @@ package com.juandgaines.agenda.data.mappers
 
 import com.juandgaines.agenda.data.task.remote.TaskRequest
 import com.juandgaines.agenda.data.task.remote.TaskResponse
-import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
+import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.core.data.database.task.TaskEntity
 
 fun Task.toTaskRequest() = TaskRequest(
