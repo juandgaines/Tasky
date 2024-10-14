@@ -12,43 +12,43 @@ class SelectorDayPreviewParameterProvider: PreviewParameterProvider<List<Selecto
                 date.dayOfWeek.toString().first(),
                 1,
                 true,
-                dayTime = date.toInstant().toEpochMilli()
+                dayTime = date
             ),
             SelectorDayData(
                 date.plusDays(1).dayOfWeek.toString().first(),
                 2,
                 false,
-                dayTime = date.plusDays(1).toInstant().toEpochMilli()
+                dayTime = date.plusDays(1)
             ),
             SelectorDayData(
                 date.plusDays(2).dayOfWeek.toString().first(),
                 3,
                 false,
-                dayTime = date.plusDays(2).toInstant().toEpochMilli()
+                dayTime = date.plusDays(2)
             ),
             SelectorDayData(
                 date.plusDays(3).dayOfWeek.toString().first(),
                 4,
                 false,
-                dayTime = date.plusDays(3).toInstant().toEpochMilli()
+                dayTime = date.plusDays(3)
             ),
             SelectorDayData(
                 date.plusDays(4).dayOfWeek.toString().first(),
                 5,
                 false,
-                dayTime = date.plusDays(4).toInstant().toEpochMilli()
+                dayTime = date.plusDays(4)
             ),
             SelectorDayData(
                 date.plusDays(5).dayOfWeek.toString().first(),
                 6,
                 false,
-                dayTime = date.plusDays(5).toInstant().toEpochMilli()
+                dayTime = date.plusDays(5)
             ),
             SelectorDayData(
                 date.plusDays(6).dayOfWeek.toString().first(),
                 7,
                 false,
-                dayTime = date.plusDays(6).toInstant().toEpochMilli()
+                dayTime = date.plusDays(6)
             ),
         )
     )
