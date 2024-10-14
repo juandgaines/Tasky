@@ -101,6 +101,7 @@ class AgendaViewModel @Inject constructor(
                 }
 
                 Logout ->{
+                    state = state.copy(isLoading = true)
                     when(val result = agendaRepository.logout()){
                         is Success -> {
                             eventChannel.send(AgendaEvents.LogOut)
@@ -109,6 +110,7 @@ class AgendaViewModel @Inject constructor(
                             eventChannel.send(AgendaEvents.Error(result.error.asUiText()))
                         }
                     }
+                    state = state.copy(isLoading = false)
                 }
             }
         }

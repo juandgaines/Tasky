@@ -12,6 +12,7 @@ data class AgendaState(
     val userInitials:String = "",
     val isCreateContextMenuVisible : Boolean = false,
     val isProfileMenuVisible : Boolean = false,
+    val isLoading:Boolean = false
 ){
     val currentMonth:String
         get() = selectedLocalDate.month.name.uppercase()
