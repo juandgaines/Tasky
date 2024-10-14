@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.utils.toUtcZonedDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTimeWithZoneId
@@ -28,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val initialsCalculator: InitialsCalculator,
+    private val agendaRepository: AgendaRepository
 ):ViewModel() {
 
 
