@@ -46,10 +46,10 @@ fun DateSelector(
 }
 
 @Composable
-fun DayItem(
+private fun DayItem(
     modifier: Modifier,
+    onSelectDate: (ZonedDateTime) -> Unit,
     dayItem: SelectorDayData,
-    onSelectDate: (ZonedDateTime) -> Unit
 ){
     Column(
         modifier = modifier
