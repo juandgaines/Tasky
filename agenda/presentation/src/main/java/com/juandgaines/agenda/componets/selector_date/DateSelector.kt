@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.componets
+package com.juandgaines.agenda.componets.selector_date
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,8 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import com.juandgaines.agenda.presentation.SelectorDayData
-import com.juandgaines.agenda.presentation.preview_providers.SelectorDayPreviewParameterProvider
+import com.juandgaines.agenda.componets.selector_date.preview_providers.SelectorDayPreviewParameterProvider
 import com.juandgaines.core.presentation.designsystem.TaskyDarkGray
 import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyOrange

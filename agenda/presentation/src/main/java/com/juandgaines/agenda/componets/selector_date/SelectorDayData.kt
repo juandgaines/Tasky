@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.componets.selector_date
 
 data class SelectorDayData(
     val initialDayOfWeek:Char,
