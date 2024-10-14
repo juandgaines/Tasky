@@ -10,5 +10,8 @@ interface TaskRepository {
     suspend fun upsertTasks(list: List<Task>): Result<Unit, Error>
     suspend fun getTaskById(taskId: String): Result<Task, Error>
     suspend fun deleteTask(taskId: String):Result<Unit,Error>
-    fun getTasks(time:Long): Flow<List<Task>>
+    fun getTasks(
+        startDate: Long,
+        endDay: Long
+    ): Flow<List<Task>>
 }

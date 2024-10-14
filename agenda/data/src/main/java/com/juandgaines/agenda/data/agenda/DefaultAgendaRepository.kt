@@ -12,9 +12,18 @@ class DefaultAgendaRepository @Inject constructor(
     private val reminderRepository: ReminderRepository,
     private val taskRepository: TaskRepository
 ) : AgendaRepository {
-    override fun getItems(date: Long): Flow<List<AgendaItem>> = combine(
-        reminderRepository.getReminders(date),
-        taskRepository.getTasks(date)
+    override fun getItems(
+        startDate: Long,
+        endDay: Long
+    ): Flow<List<AgendaItem>> = combine(
+        reminderRepository.getReminders(
+            startDate,
+            endDay
+        ),
+        taskRepository.getTasks(
+            startDate,
+            endDay
+        )
     ){ reminders, tasks ->
         (reminders + tasks).sortedBy { it.date}
     }

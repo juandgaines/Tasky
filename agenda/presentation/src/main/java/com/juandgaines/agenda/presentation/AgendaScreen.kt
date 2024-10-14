@@ -27,6 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -152,7 +154,6 @@ fun AgendaScreen(
                         agendaActions(AgendaActions.SelectDateWithingRange(it))
                     }
                 )
-
                 Text(
                     text = stateAgenda.labelDateRange,
                     style = MaterialTheme.typography.bodyLarge,
@@ -161,13 +162,15 @@ fun AgendaScreen(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
-                LazyColumn {
+                LazyColumn (
+                    modifier = Modifier.weight(1f)
+                ){
                     items(stateAgenda.agendaItems) { agendaItem ->
                         Text(
                             text = agendaItem.date.toString(),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            color = Color.Black,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

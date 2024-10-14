@@ -34,3 +34,11 @@ fun LocalDate.toFormattedDate(): String {
         return this.format(it)
     }
 }
+
+fun LocalDate.startOfDay(): Long {
+    return this.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+}
+
+fun LocalDate.endOfDay(): Long {
+    return this.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+}
