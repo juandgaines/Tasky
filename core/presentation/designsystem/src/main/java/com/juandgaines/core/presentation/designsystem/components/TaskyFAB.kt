@@ -1,5 +1,6 @@
 package com.juandgaines.core.presentation.designsystem.components
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -16,14 +17,16 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 fun TaskyFAB(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    icon:ImageVector
+    icon:ImageVector,
+    interactionSource: MutableInteractionSource? = null,
 ) {
     FloatingActionButton(
-        modifier = modifier,
         onClick = onClick,
+        modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
+        interactionSource=interactionSource
     ) {
         Icon(
             imageVector = icon,

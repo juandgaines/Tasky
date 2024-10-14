@@ -9,7 +9,10 @@ data class AgendaState(
     val isDatePickerOpened:Boolean = false,
     val selectedLocalDate:ZonedDateTime = ZonedDateTime.now(),
     val dateRange: List<SelectorDayData> = calculateRangeDays(selectedLocalDate),
-    val userInitials:String = ""
+    val userInitials:String = "",
+    val isCreateContextMenuVisible : Boolean = false,
+    val isProfileMenuVisible : Boolean = false,
+    val isLoading:Boolean = false
 ){
     val currentMonth:String
         get() = selectedLocalDate.month.name.uppercase()
