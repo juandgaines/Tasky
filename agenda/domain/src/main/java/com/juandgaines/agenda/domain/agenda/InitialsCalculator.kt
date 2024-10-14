@@ -6,7 +6,7 @@ class InitialsCalculator(
     private val sessionManager: SessionManager
 ) {
     suspend fun getInitials(): String {
-        val authData = sessionManager.get() ?: return "" // Return empty if no auth data
+        val authData = sessionManager.get() ?: return ""
 
         return extractInitials(authData.fullName)
     }
