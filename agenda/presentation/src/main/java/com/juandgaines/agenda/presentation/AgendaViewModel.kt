@@ -8,10 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.utils.toUtcZonedDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTimeWithZoneId
+import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.AgendaActions.SelectProfile
+import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeDays
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -73,6 +75,13 @@ class AgendaViewModel @Inject constructor(
             ShowDateDialog -> {
                 state = state.copy(isDatePickerOpened = true)
             }
+
+            ShowCreateContextMenu ->{
+                state = state.copy(isCreateContextMenuVisible = true)
+            }
+
+            DismissCreateContextMenu ->
+                state = state.copy(isCreateContextMenuVisible = false)
         }
     }
 }

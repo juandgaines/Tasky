@@ -5,7 +5,7 @@ import com.juandgaines.agenda.data.mappers.toTask
 import com.juandgaines.agenda.data.mappers.toTaskEntity
 import com.juandgaines.agenda.data.mappers.toTaskRequest
 import com.juandgaines.agenda.data.task.remote.TaskApi
-import com.juandgaines.agenda.domain.task.Task
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.task.TaskDao
 import com.juandgaines.core.data.network.safeCall

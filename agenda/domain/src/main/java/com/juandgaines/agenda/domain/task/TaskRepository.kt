@@ -1,4 +1,5 @@
 package com.juandgaines.agenda.domain.task
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.core.domain.util.Error
 import com.juandgaines.core.domain.util.Result
 import kotlinx.coroutines.flow.Flow
