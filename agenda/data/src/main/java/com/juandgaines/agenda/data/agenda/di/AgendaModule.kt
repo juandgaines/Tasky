@@ -6,7 +6,6 @@ import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
-import com.juandgaines.core.data.auth.TokenApi
 import com.juandgaines.core.domain.auth.SessionManager
 import dagger.Module
 import dagger.Provides
@@ -35,14 +34,10 @@ class AgendaModule {
     @Provides
     @Singleton
     fun providesAgendaRepository(
-        tokenApi: TokenApi,
-        sessionManager: SessionManager,
         reminderRepository: ReminderRepository,
         taskRepository: TaskRepository
     ): AgendaRepository {
         return DefaultAgendaRepository(
-            tokenApi,
-            sessionManager,
             reminderRepository,
             taskRepository
         )

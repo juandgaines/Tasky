@@ -20,6 +20,9 @@ interface TaskDao {
     @Query("DELETE FROM task WHERE id=:id")
     suspend fun deleteTask(id: String)
 
-    @Query("SELECT * FROM task")
-    fun getTasks(): Flow<List<TaskEntity>>
+    @Query("SELECT * FROM task WHERE time >= :startDate AND time <= :endDay")
+    fun getTasks(
+        startDate: Long,
+        endDay: Long
+    ): Flow<List<TaskEntity>>
 }

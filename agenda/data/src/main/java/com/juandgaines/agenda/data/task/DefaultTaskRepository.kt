@@ -123,9 +123,15 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override fun getTasks(): Flow<List<Task>> {
+    override fun getTasks(
+        startDate: Long,
+        endDay: Long
+    ): Flow<List<Task>> {
         return taskDao
-            .getTasks()
+            .getTasks(
+                startDate,
+                endDay
+            )
             .map { taskEntities ->
                 taskEntities.map {
                     it.toTask()

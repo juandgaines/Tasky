@@ -1,8 +1,10 @@
 package com.juandgaines.agenda.domain.agenda
 
-import com.juandgaines.core.domain.util.DataError
-import com.juandgaines.core.domain.util.Result
+import kotlinx.coroutines.flow.Flow
 
-interface AgendaRepository {
-    suspend fun logout() :Result<Unit, DataError.Network>
+interface AgendaRepository{
+    fun getItems(
+        startDate:Long,
+        endDay:Long
+    ): Flow<List<AgendaItem>>
 }

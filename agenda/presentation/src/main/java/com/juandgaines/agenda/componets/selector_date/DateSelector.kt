@@ -21,13 +21,14 @@ import com.juandgaines.core.presentation.designsystem.TaskyDarkGray
 import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyOrange
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 @Composable
 fun DateSelector(
     modifier: Modifier,
     daysList: List<SelectorDayData>,
-    onSelectDate: (ZonedDateTime)->Unit
+    onSelectDate: (LocalDate)->Unit
 ) {
     Row(
         modifier = modifier,
@@ -48,7 +49,7 @@ fun DateSelector(
 @Composable
 private fun DayItem(
     modifier: Modifier,
-    onSelectDate: (ZonedDateTime) -> Unit,
+    onSelectDate: (LocalDate) -> Unit,
     dayItem: SelectorDayData,
 ){
     Column(
