@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -36,7 +35,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.componets.AgendaDatePicker
 import com.juandgaines.agenda.componets.ProfileIcon
+import com.juandgaines.agenda.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.componets.selector_date.DateSelector
+import com.juandgaines.agenda.domain.reminder.Reminder
+import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.presentation.AgendaItemOption.EVENT
 import com.juandgaines.agenda.presentation.AgendaItemOption.REMINDER
 import com.juandgaines.agenda.presentation.AgendaItemOption.TASK
@@ -165,12 +167,34 @@ fun AgendaScreen(
                     modifier = Modifier.weight(1f)
                 ){
                     items(stateAgenda.agendaItems) { agendaItem ->
-                        Text(
-                            text = agendaItem.date.toString(),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.Black,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        when (agendaItem) {
+                           is Task -> {
+                                 AgendaCard(
+                                     onCheckClick = {
+                                     },
+                                     agendaItem = agendaItem,
+                                     isDone = agendaItem.isDone,
+                                     onClickItem = {
+
+                                     },
+                                     title = agendaItem.title,
+                                     description = agendaItem.description ?: "",
+                                     date = agendaItem.time.toString()
+                                 )
+                            }
+                            is Reminder -> {
+                                AgendaCard(
+                                    onCheckClick = null,
+                                    agendaItem = agendaItem,
+                                    onClickItem = {
+
+                                    },
+                                    title = agendaItem.title,
+                                    description = agendaItem.description ?: "",
+                                    date = agendaItem.time.toString()
+                                )
+                            }
+                        }
                     }
                 }
             }
