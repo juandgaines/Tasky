@@ -69,11 +69,11 @@ class AgendaViewModel @Inject constructor(
                 date.endOfDay()
             )
         }.map {agendaItems->
-            val agendaItemsUi= agendaItems.map {
+            val agendaItemsUi= (agendaItems.map {
                 AgendaItemUi.Item(it)
             } + listOf(
                 AgendaItemUi.Needle()
-            ).sortedBy {
+            )).sortedBy {
                 it.date
             }
             agendaItemsUi
