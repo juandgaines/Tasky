@@ -26,6 +26,6 @@ class DefaultAgendaRepository @Inject constructor(
             endDay
         )
     ){ reminders, tasks ->
-        (reminders + tasks).sortedBy { it.date }
+        (reminders + tasks)
     }
 }
