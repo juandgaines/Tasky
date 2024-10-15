@@ -69,3 +69,9 @@ fun ZonedDateTime.toUtcFromZonedDateTime(): ZonedDateTime {
     return this.withZoneSameInstant(ZoneOffset.UTC)
 }
 
+fun ZonedDateTime.toFormattedSingleDateTime(): String {
+    DateTimeFormatter.ofPattern("MMM dd, HH:mm").let {
+        return this.format(it)
+    }
+}
+

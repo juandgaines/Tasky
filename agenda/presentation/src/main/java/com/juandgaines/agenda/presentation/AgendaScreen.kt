@@ -39,6 +39,7 @@ import com.juandgaines.agenda.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.componets.selector_date.DateSelector
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
+import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
 import com.juandgaines.agenda.presentation.AgendaItemOption.EVENT
 import com.juandgaines.agenda.presentation.AgendaItemOption.REMINDER
 import com.juandgaines.agenda.presentation.AgendaItemOption.TASK
@@ -164,7 +165,8 @@ fun AgendaScreen(
                 )
 
                 LazyColumn (
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ){
                     items(stateAgenda.agendaItems) { agendaItem ->
                         when (agendaItem) {
@@ -179,7 +181,7 @@ fun AgendaScreen(
                                      },
                                      title = agendaItem.title,
                                      description = agendaItem.description ?: "",
-                                     date = agendaItem.time.toString()
+                                     date = agendaItem.time.toFormattedSingleDateTime()
                                  )
                             }
                             is Reminder -> {
@@ -191,7 +193,7 @@ fun AgendaScreen(
                                     },
                                     title = agendaItem.title,
                                     description = agendaItem.description ?: "",
-                                    date = agendaItem.time.toString()
+                                    date = agendaItem.time.toFormattedSingleDateTime()
                                 )
                             }
                         }
