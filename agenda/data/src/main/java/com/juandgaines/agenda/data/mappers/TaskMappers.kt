@@ -3,8 +3,7 @@ package com.juandgaines.agenda.data.mappers
 import com.juandgaines.agenda.data.task.remote.TaskRequest
 import com.juandgaines.agenda.data.task.remote.TaskResponse
 import com.juandgaines.agenda.domain.task.Task
-import com.juandgaines.agenda.domain.utils.toUtcZonedDateTime
-import com.juandgaines.agenda.domain.utils.toZonedDateTimeWithZoneId
+import com.juandgaines.agenda.domain.utils.toZonedDateTime
 import com.juandgaines.core.data.database.task.TaskEntity
 import java.time.ZoneId
 
@@ -22,14 +21,12 @@ fun TaskResponse.toTask() = Task(
     title = title,
     description = description,
     time = time
-        .toUtcZonedDateTime()
-        .toZonedDateTimeWithZoneId(
-            ZoneId.systemDefault()
+        .toZonedDateTime(
+            zoneId = ZoneId.systemDefault()
         ),
     remindAt = remindAt
-        .toUtcZonedDateTime()
-        .toZonedDateTimeWithZoneId(
-            ZoneId.systemDefault()
+        .toZonedDateTime(
+            zoneId = ZoneId.systemDefault()
         ),
     isDone = isDone
 )
@@ -38,13 +35,13 @@ fun TaskEntity.toTask() = Task(
     id = id,
     title = title,
     description = description,
-    time = time.toUtcZonedDateTime()
-        .toZonedDateTimeWithZoneId(
-            ZoneId.systemDefault()
+    time = time
+        .toZonedDateTime(
+            zoneId = ZoneId.systemDefault()
         ),
-    remindAt = remindAt.toUtcZonedDateTime()
-        .toZonedDateTimeWithZoneId(
-            ZoneId.systemDefault()
+    remindAt = remindAt
+        .toZonedDateTime(
+            zoneId = ZoneId.systemDefault()
         ),
     isDone = isDone
 )

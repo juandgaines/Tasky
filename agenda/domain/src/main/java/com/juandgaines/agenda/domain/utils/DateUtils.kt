@@ -52,6 +52,10 @@ fun LocalDate.endOfDay(): Long {
     return this.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
 
+fun Long.toZonedDateTime(zoneId: ZoneId = ZoneId.systemDefault()): ZonedDateTime {
+    return Instant.ofEpochMilli(this) // Convert Long to Instant
+        .atZone(zoneId) // Apply the desired ZoneId to get ZonedDateTime
+}
 
 fun Long.toUtcZonedDateTime(): ZonedDateTime {
     return ZonedDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneOffset.UTC)
