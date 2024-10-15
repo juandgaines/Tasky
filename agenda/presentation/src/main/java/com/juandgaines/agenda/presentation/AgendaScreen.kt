@@ -38,13 +38,14 @@ import com.juandgaines.agenda.componets.CurrentTimeDivider
 import com.juandgaines.agenda.componets.ProfileIcon
 import com.juandgaines.agenda.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.componets.selector_date.DateSelector
-import com.juandgaines.agenda.domain.agenda.CurrentTime
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
 import com.juandgaines.agenda.presentation.AgendaItemOption.EVENT
 import com.juandgaines.agenda.presentation.AgendaItemOption.REMINDER
 import com.juandgaines.agenda.presentation.AgendaItemOption.TASK
+import com.juandgaines.agenda.presentation.AgendaItemUi.Item
+import com.juandgaines.agenda.presentation.AgendaItemUi.Needle
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -172,33 +173,37 @@ fun AgendaScreen(
                 ){
                     items(stateAgenda.agendaItems) { agendaItem ->
                         when (agendaItem) {
-                           is Task -> {
-                                 AgendaCard(
-                                     onCheckClick = {
-                                     },
-                                     agendaItem = agendaItem,
-                                     isDone = agendaItem.isDone,
-                                     onClickItem = {
+                            is Item -> {
+                                when (val item= agendaItem.agendaItem) {
+                                    is Task -> {
+                                        AgendaCard(
+                                            onCheckClick = {
+                                            },
+                                            agendaItem = item,
+                                            isDone = item.isDone,
+                                            onClickItem = {
 
-                                     },
-                                     title = agendaItem.title,
-                                     description = agendaItem.description ?: "",
-                                     date = agendaItem.time.toFormattedSingleDateTime()
-                                 )
-                            }
-                            is Reminder -> {
-                                AgendaCard(
-                                    onCheckClick = null,
-                                    agendaItem = agendaItem,
-                                    onClickItem = {
+                                            },
+                                            title = item.title,
+                                            description = item.description ?: "",
+                                            date = item.time.toFormattedSingleDateTime()
+                                        )
+                                    }
+                                    is Reminder -> {
+                                        AgendaCard(
+                                            onCheckClick = null,
+                                            agendaItem = item,
+                                            onClickItem = {
 
-                                    },
-                                    title = agendaItem.title,
-                                    description = agendaItem.description ?: "",
-                                    date = agendaItem.time.toFormattedSingleDateTime()
-                                )
+                                            },
+                                            title = item.title,
+                                            description = item.description ?: "",
+                                            date = item.time.toFormattedSingleDateTime()
+                                        )
+                                    }
+                                }
                             }
-                            is CurrentTime -> {
+                            is Needle -> {
                                 CurrentTimeDivider()
                             }
                         }

@@ -2,7 +2,6 @@ package com.juandgaines.agenda.data.agenda
 
 import com.juandgaines.agenda.domain.agenda.AgendaItem
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
-import com.juandgaines.agenda.domain.agenda.CurrentTime
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +26,6 @@ class DefaultAgendaRepository @Inject constructor(
             endDay
         )
     ){ reminders, tasks ->
-        val currentTime = listOf(CurrentTime(ZonedDateTime.now()))
-        (reminders + tasks + currentTime).sortedBy { it.date}
+        (reminders + tasks).sortedBy { it.date }
     }
 }
