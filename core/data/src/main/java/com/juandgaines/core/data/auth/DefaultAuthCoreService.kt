@@ -17,7 +17,7 @@ class DefaultAuthCoreService @Inject constructor(
             tokenApi.logout()
         }
         if (response is Result.Success){
-            sessionManager.clear()
+            sessionManager.set(null)
         }
         return response
     }

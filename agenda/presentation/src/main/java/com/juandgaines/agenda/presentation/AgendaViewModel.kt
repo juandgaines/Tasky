@@ -5,14 +5,12 @@ package com.juandgaines.agenda.presentation
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.utils.endOfDay
 import com.juandgaines.agenda.domain.utils.startOfDay
-import com.juandgaines.agenda.domain.utils.toEpochMilli
 import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcZonedDateTime
 import com.juandgaines.agenda.presentation.AgendaActions.CreateAgendaItem
