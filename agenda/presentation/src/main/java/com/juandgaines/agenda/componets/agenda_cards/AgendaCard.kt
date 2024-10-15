@@ -36,18 +36,35 @@ fun AgendaCard(
     modifier: Modifier = Modifier,
     title: String,
     isDone: Boolean = false,
-    onCheckClick:( () -> Unit )?,
+    onCheckClick:( () -> Unit )? = null,
     onClickItem: (() -> Unit),
     description: String,
     date: String,
     agendaItem: AgendaItem
 ) {
-    val colors = AgendaCardColorFactory.getColors(agendaItem)
+    val colorBackground= when (agendaItem){
+        is Task ->MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.primaryContainer
+    }
+
+    val colorPrimaryText= when (agendaItem){
+        is Task ->MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.surface
+    }
+
+    val colorSecondaryText= when (agendaItem){
+        is Task ->MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.onPrimary
+    }
+    val colorCheck = when (agendaItem){
+        is Task ->MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.surface
+    }
 
     Row (
         modifier
             .background(
-                color = colors.colorBackground,
+                color = colorBackground,
                 shape = RoundedCornerShape(16.dp)
             )
             .height(124.dp)
@@ -65,7 +82,7 @@ fun AgendaCard(
                     else
                         Modifier
                 ),
-                color = colors.colorCheck
+                color = colorCheck
             )
         }
         Column (
@@ -83,7 +100,7 @@ fun AgendaCard(
                         TextDecoration.None
                 ),
                 textAlign = TextAlign.Start,
-                color = colors.colorPrimaryText,
+                color = colorPrimaryText,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
 
@@ -92,7 +109,7 @@ fun AgendaCard(
                 text = description,
                 fontWeight = FontWeight.Light,
                 style = MaterialTheme.typography.bodyMedium,
-                color = colors.colorSecondaryText,
+                color = colorSecondaryText,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -104,13 +121,13 @@ fun AgendaCard(
             Icon(
                 imageVector = MoreHor,
                 contentDescription = null,
-                tint = colors.colorSecondaryText,
+                tint = colorSecondaryText,
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = date,
                 style = MaterialTheme.typography.labelSmall,
-                color = colors.colorSecondaryText
+                color = colorSecondaryText
             )
         }
     }

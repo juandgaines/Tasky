@@ -191,7 +191,6 @@ fun AgendaScreen(
                                     }
                                     is Reminder -> {
                                         AgendaCard(
-                                            onCheckClick = null,
                                             agendaItem = item,
                                             onClickItem = {
 
