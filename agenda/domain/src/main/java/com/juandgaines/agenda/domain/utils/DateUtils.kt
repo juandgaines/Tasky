@@ -5,14 +5,23 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-fun Long.toUtcZonedDateTime(): LocalDate {
+fun Long.toUtcLocalDateTime(): LocalDate {
     return Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 }
 
 fun LocalDate.toLocalDateWithZoneId(zone: ZoneId): LocalDate {
     return this.atStartOfDay(zone).toLocalDate()
+}
+
+fun LocalDate.toZonedDateTime(
+    localTime: LocalTime = LocalTime.MIDNIGHT,
+    zoneId: ZoneId = ZoneId.systemDefault()
+): ZonedDateTime {
+    return this.atTime(localTime)
+        .atZone(zoneId)
 }
 
 fun LocalDate.toUtcLocalDate(): LocalDate {
@@ -42,3 +51,17 @@ fun LocalDate.startOfDay(): Long {
 fun LocalDate.endOfDay(): Long {
     return this.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
+
+
+fun Long.toUtcZonedDateTime(): ZonedDateTime {
+    return ZonedDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneOffset.UTC)
+}
+
+fun ZonedDateTime.toZonedDateTimeWithZoneId(zone: ZoneId): ZonedDateTime {
+    return this.withZoneSameLocal(zone)
+}
+
+fun ZonedDateTime.toUtcFromZonedDateTime(): ZonedDateTime {
+    return this.withZoneSameInstant(ZoneOffset.UTC)
+}
+

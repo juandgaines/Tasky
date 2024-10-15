@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -38,9 +37,9 @@ import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.componets.AgendaDatePicker
 import com.juandgaines.agenda.componets.ProfileIcon
 import com.juandgaines.agenda.componets.selector_date.DateSelector
-import com.juandgaines.agenda.domain.agenda.AgendaItem
-import com.juandgaines.agenda.domain.agenda.AgendaItem.AgendaItems.Reminder
-import com.juandgaines.agenda.domain.agenda.AgendaItem.AgendaItems.Task
+import com.juandgaines.agenda.presentation.AgendaItemOption.EVENT
+import com.juandgaines.agenda.presentation.AgendaItemOption.REMINDER
+import com.juandgaines.agenda.presentation.AgendaItemOption.TASK
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -189,26 +188,34 @@ fun AgendaScreen(
                     onDismissRequest = { agendaActions(AgendaActions.DismissCreateContextMenu) },
                 ) {
 
-                    AgendaItem.AgendaItems.entries.forEach { agendaItem ->
+                    AgendaItemOption.entries.forEach { agendaItem ->
                         when (agendaItem) {
-                            Reminder -> {
+                            REMINDER -> {
                                 DropdownMenuItem(
                                     onClick = {
-                                        agendaActions(AgendaActions.CreateAgendaItem(agendaItem))
+                                        agendaActions(AgendaActions.CreateItem(agendaItem))
                                     },
                                     text = { Text(stringResource(R.string.reminder)) }
                                 )
                             }
 
-                            Task -> {
+                            TASK -> {
                                 DropdownMenuItem(
                                     onClick = {
-                                        agendaActions(AgendaActions.CreateAgendaItem(agendaItem))
+                                        agendaActions(AgendaActions.CreateItem(agendaItem))
                                     },
                                     text = { Text(stringResource(R.string.task)) }
                                 )
                             }
 
+                            EVENT -> {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        agendaActions(AgendaActions.CreateItem(agendaItem))
+                                    },
+                                    text = { Text(stringResource(R.string.event)) }
+                                )
+                            }
                         }
                     }
                 }

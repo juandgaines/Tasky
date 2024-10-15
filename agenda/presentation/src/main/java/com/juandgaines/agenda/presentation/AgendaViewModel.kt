@@ -12,8 +12,8 @@ import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.utils.endOfDay
 import com.juandgaines.agenda.domain.utils.startOfDay
 import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
-import com.juandgaines.agenda.domain.utils.toUtcZonedDateTime
-import com.juandgaines.agenda.presentation.AgendaActions.CreateAgendaItem
+import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
+import com.juandgaines.agenda.presentation.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.DismissProfileMenu
@@ -77,7 +77,7 @@ class AgendaViewModel @Inject constructor(
             when (action) {
                 is SelectDate -> {
 
-                    val utcZonedDateTime = action.date.toUtcZonedDateTime()
+                    val utcZonedDateTime = action.date.toUtcLocalDateTime()
                     val newDate = utcZonedDateTime.toLocalDateWithZoneId(
                         ZoneId.systemDefault()
                     )
@@ -119,7 +119,7 @@ class AgendaViewModel @Inject constructor(
                 DismissCreateContextMenu ->
                     state = state.copy(isCreateContextMenuVisible = false)
 
-                is CreateAgendaItem -> {
+                is CreateItem -> {
 
                 }
 

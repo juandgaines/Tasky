@@ -6,4 +6,5 @@
   <string name="task">Task</string>
   <string name="logout">Logout</string>
   <string name="logout_success">You logged out.</string>
+  <string name="event">Event</string>
 </resources>
