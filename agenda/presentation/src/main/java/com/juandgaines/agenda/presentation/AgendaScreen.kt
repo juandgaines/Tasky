@@ -34,9 +34,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.componets.AgendaDatePicker
+import com.juandgaines.agenda.componets.CurrentTimeDivider
 import com.juandgaines.agenda.componets.ProfileIcon
 import com.juandgaines.agenda.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.componets.selector_date.DateSelector
+import com.juandgaines.agenda.domain.agenda.CurrentTime
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
@@ -195,6 +197,9 @@ fun AgendaScreen(
                                     description = agendaItem.description ?: "",
                                     date = agendaItem.time.toFormattedSingleDateTime()
                                 )
+                            }
+                            is CurrentTime -> {
+                                CurrentTimeDivider()
                             }
                         }
                     }

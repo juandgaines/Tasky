@@ -5,8 +5,8 @@ import java.time.ZonedDateTime
 
 data class Task(
     val id:String,
-    override val title:String,
-    override val description:String?,
+    val title:String,
+    val description:String?,
     val time:ZonedDateTime,
     val remindAt:ZonedDateTime,
     val isDone:Boolean
