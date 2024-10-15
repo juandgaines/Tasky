@@ -35,3 +35,7 @@ val CloseIcon: ImageVector
 val ArrowDownIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.ic_arrow)
+
+val MoreHor: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.ic_menu_hor)

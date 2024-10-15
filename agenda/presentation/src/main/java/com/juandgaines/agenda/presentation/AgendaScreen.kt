@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -35,11 +34,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.componets.AgendaDatePicker
+import com.juandgaines.agenda.componets.CurrentTimeDivider
 import com.juandgaines.agenda.componets.ProfileIcon
+import com.juandgaines.agenda.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.componets.selector_date.DateSelector
+import com.juandgaines.agenda.domain.reminder.Reminder
+import com.juandgaines.agenda.domain.task.Task
+import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
 import com.juandgaines.agenda.presentation.AgendaItemOption.EVENT
 import com.juandgaines.agenda.presentation.AgendaItemOption.REMINDER
 import com.juandgaines.agenda.presentation.AgendaItemOption.TASK
+import com.juandgaines.agenda.presentation.AgendaItemUi.Item
+import com.juandgaines.agenda.presentation.AgendaItemUi.Needle
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -162,15 +168,44 @@ fun AgendaScreen(
                 )
 
                 LazyColumn (
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ){
                     items(stateAgenda.agendaItems) { agendaItem ->
-                        Text(
-                            text = agendaItem.date.toString(),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.Black,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        when (agendaItem) {
+                            is Item -> {
+                                when (val item= agendaItem.agendaItem) {
+                                    is Task -> {
+                                        AgendaCard(
+                                            onCheckClick = {
+                                            },
+                                            agendaItem = item,
+                                            isDone = item.isDone,
+                                            onClickItem = {
+
+                                            },
+                                            title = item.title,
+                                            description = item.description ?: "",
+                                            date = item.time.toFormattedSingleDateTime()
+                                        )
+                                    }
+                                    is Reminder -> {
+                                        AgendaCard(
+                                            agendaItem = item,
+                                            onClickItem = {
+
+                                            },
+                                            title = item.title,
+                                            description = item.description ?: "",
+                                            date = item.time.toFormattedSingleDateTime()
+                                        )
+                                    }
+                                }
+                            }
+                            is Needle -> {
+                                CurrentTimeDivider()
+                            }
+                        }
                     }
                 }
             }

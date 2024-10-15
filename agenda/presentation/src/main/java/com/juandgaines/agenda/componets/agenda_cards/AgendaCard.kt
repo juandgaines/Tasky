@@ -1,0 +1,166 @@
+package com.juandgaines.agenda.componets.agenda_cards
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.juandgaines.agenda.componets.Check
+import com.juandgaines.agenda.domain.agenda.AgendaItem
+import com.juandgaines.agenda.domain.reminder.Reminder
+import com.juandgaines.agenda.domain.task.Task
+import com.juandgaines.core.presentation.designsystem.MoreHor
+import com.juandgaines.core.presentation.designsystem.TaskyTheme
+import java.time.ZonedDateTime
+
+@Composable
+fun AgendaCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    isDone: Boolean = false,
+    onCheckClick:( () -> Unit )? = null,
+    onClickItem: (() -> Unit),
+    description: String,
+    date: String,
+    agendaItem: AgendaItem
+) {
+    val colorBackground= when (agendaItem){
+        is Task ->MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.primaryContainer
+    }
+
+    val colorPrimaryText= when (agendaItem){
+        is Task ->MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.surface
+    }
+
+    val colorSecondaryText= when (agendaItem){
+        is Task ->MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.onPrimary
+    }
+    val colorCheck = when (agendaItem){
+        is Task ->MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.surface
+    }
+
+    Row (
+        modifier
+            .background(
+                color = colorBackground,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .height(124.dp)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ){
+        Box(
+            modifier = Modifier.fillMaxHeight()
+        ){
+            Check(
+                isDone = isDone,
+                modifier = Modifier.then(
+                    if (onCheckClick != null)
+                        Modifier.clickable { onCheckClick() }
+                    else
+                        Modifier
+                ),
+                color = colorCheck
+            )
+        }
+        Column (
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ){
+            Text(
+                text = title,
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    textDecoration = if (isDone)
+                        TextDecoration.LineThrough
+                    else
+                        TextDecoration.None
+                ),
+                textAlign = TextAlign.Start,
+                color = colorPrimaryText,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+
+            )
+            Text(
+                text = description,
+                fontWeight = FontWeight.Light,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorSecondaryText,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = MoreHor,
+                contentDescription = null,
+                tint = colorSecondaryText,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = date,
+                style = MaterialTheme.typography.labelSmall,
+                color = colorSecondaryText
+            )
+        }
+    }
+
+}
+
+@Preview
+@Composable
+fun TaskCardPreview() {
+    TaskyTheme {
+        AgendaCard(
+            title = "Title",
+            isDone = true,
+            description = "Description",
+            date = "Mar 5, 10:00",
+            agendaItem = Task("1","Title", "Description", ZonedDateTime.now(), ZonedDateTime.now(), false),
+            onCheckClick = {},
+            onClickItem = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ReminderCardPreview() {
+    TaskyTheme {
+        AgendaCard(
+            title = "Title",
+            description = "Description",
+            date = "Mar 5, 10:00",
+            agendaItem = Reminder("1","Title", "Description", ZonedDateTime.now(), ZonedDateTime.now()),
+            onCheckClick = {},
+            onClickItem = {}
+        )
+    }
+}

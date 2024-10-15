@@ -6,6 +6,7 @@ import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 class DefaultAgendaRepository @Inject constructor(
@@ -25,6 +26,6 @@ class DefaultAgendaRepository @Inject constructor(
             endDay
         )
     ){ reminders, tasks ->
-        (reminders + tasks).sortedBy { it.date}
+        (reminders + tasks)
     }
 }

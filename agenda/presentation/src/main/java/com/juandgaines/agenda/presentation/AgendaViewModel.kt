@@ -33,6 +33,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -53,7 +54,7 @@ class AgendaViewModel @Inject constructor(
     private val eventChannel = Channel<AgendaEvents>()
     val events = eventChannel.receiveAsFlow()
 
-    private val _time = MutableStateFlow(state.selectedLocalDate)
+    private val _selectedDate = MutableStateFlow(state.selectedLocalDate)
 
     init {
         viewModelScope.launch {
@@ -62,13 +63,22 @@ class AgendaViewModel @Inject constructor(
             }
         }
 
-        _time.flatMapLatest {
+        _selectedDate.flatMapLatest { date->
             agendaRepository.getItems(
-                it.startOfDay(),
-                it.endOfDay()
+                date.startOfDay(),
+                date.endOfDay()
             )
-        }.onEach {
-            state = state.copy(agendaItems = it)
+        }.map {agendaItems->
+            val agendaItemsUi= (agendaItems.map {
+                AgendaItemUi.Item(it)
+            } + listOf(
+                AgendaItemUi.Needle()
+            )).sortedBy {
+                it.date
+            }
+            agendaItemsUi
+        }.onEach { agendaItems ->
+            state = state.copy(agendaItems = agendaItems)
         }.launchIn(viewModelScope)
     }
 
@@ -81,7 +91,7 @@ class AgendaViewModel @Inject constructor(
                     val newDate = utcZonedDateTime.toLocalDateWithZoneId(
                         ZoneId.systemDefault()
                     )
-                    _time.value = newDate
+                    _selectedDate.value = newDate
                     state = state.copy(
                         selectedLocalDate = newDate,
                         isDatePickerOpened = false,
@@ -90,7 +100,7 @@ class AgendaViewModel @Inject constructor(
                 }
                 is SelectDateWithingRange -> {
                     val date = action.date
-                    _time.value = date
+                    _selectedDate.value = date
                     val range = state.dateRange.map {
                         it.copy(isSelected = it.dayTime == date)
                     }
