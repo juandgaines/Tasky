@@ -12,7 +12,10 @@ import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.util.DataError.LocalError
 import com.juandgaines.core.domain.util.Error
 import com.juandgaines.core.domain.util.Result
+import com.juandgaines.core.domain.util.asEmptyDataResult
 import com.juandgaines.core.domain.util.map
+import com.juandgaines.core.domain.util.onError
+import com.juandgaines.core.domain.util.onSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -30,16 +33,10 @@ class DefaultTaskRepository @Inject constructor(
             taskDao.upsertTask(entity)
             val response = safeCall {
                 taskApi.createTask(task.toTaskRequest())
-            }
-            when(response) {
-                is Result.Success -> {
-                    Result.Success(Unit)
-                }
-                is Result.Error -> {
-                    //TODO: Add to queue to create task later
-                    Result.Error(response.error)
-                }
-            }
+            }.onError {
+                //TODO: Add to queue to create task later
+            }.asEmptyDataResult()
+            return response
         } catch (e: SQLiteException) {
             Result.Error(LocalError.DISK_FULL)
         }
@@ -52,16 +49,11 @@ class DefaultTaskRepository @Inject constructor(
 
             val response = safeCall {
                 taskApi.updateTask(task.toTaskRequest())
-            }
-            when(response) {
-                is Result.Success -> {
-                    Result.Success(Unit)
-                }
-                is Result.Error -> {
-                    //TODO: Add to queue to update task later
-                    Result.Error(response.error)
-                }
-            }
+            }.onError {
+                //TODO: Add to queue to update task later
+            }.asEmptyDataResult()
+
+            return response
         } catch (e: SQLiteException) {
             Result.Error(LocalError.DISK_FULL)
         }
@@ -88,20 +80,14 @@ class DefaultTaskRepository @Inject constructor(
                     taskApi.getTaskById(taskId)
                 }.map { taskResponse->
                     taskResponse.toTask()
+                }.onError {
+                    //TODO: Add to queue to get task later
+                }.onSuccess {
+                    applicationScope.async {
+                        taskDao.upsertTask(it.toTaskEntity())
+                    }.await()
                 }
-                when(response){
-                    is Result.Error ->{
-                        //TODO: Add to queue to get task later
-                    }
-                    is Result.Success -> {
-                        applicationScope.async {
-                            response.map { task->
-                                taskDao.upsertTask(task.toTaskEntity())
-                            }
-                        }.await()
-                    }
-                }
-                return Result.Success(task)
+                return response
             }?:Result.Error(LocalError.NOT_FOUND)
 
     }
@@ -110,17 +96,11 @@ class DefaultTaskRepository @Inject constructor(
         taskDao.deleteTask(taskId)
         val response = safeCall {
             taskApi.deleteTask(taskId)
-        }
-        return when(response) {
-            is Result.Error -> {
-                //TODO: Add to queue to delete task later
-                Result.Error(response.error)
-            }
+        }.onError {
+            //TODO: Add to queue to delete task later
+        }.asEmptyDataResult()
 
-            is Result.Success -> {
-                Result.Success(Unit)
-            }
-        }
+        return response
     }
 
     override fun getTasks(

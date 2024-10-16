@@ -2,6 +2,7 @@ package com.juandgaines.agenda.componets.agenda_cards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,22 +12,35 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.componets.Check
 import com.juandgaines.agenda.domain.agenda.AgendaItem
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
+import com.juandgaines.agenda.presentation.AgendaCardMenuOperations
+import com.juandgaines.agenda.presentation.R
 import com.juandgaines.core.presentation.designsystem.MoreHor
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import java.time.ZonedDateTime
@@ -38,6 +52,7 @@ fun AgendaCard(
     isDone: Boolean = false,
     onCheckClick:( () -> Unit )? = null,
     onClickItem: (() -> Unit),
+    onMenuItemClick: (AgendaCardMenuOperations) -> Unit,
     description: String,
     date: String,
     agendaItem: AgendaItem
@@ -60,6 +75,8 @@ fun AgendaCard(
         is Task ->MaterialTheme.colorScheme.onSurface
         else -> MaterialTheme.colorScheme.surface
     }
+
+    var isMenuExpanded by remember { mutableStateOf(false) }
 
     Row (
         modifier
@@ -118,11 +135,45 @@ fun AgendaCard(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(
-                imageVector = MoreHor,
-                contentDescription = null,
-                tint = colorSecondaryText,
-            )
+            Box {
+                Icon(
+                    imageVector = MoreHor,
+                    contentDescription = null,
+                    tint = colorSecondaryText,
+                    modifier = Modifier.pointerInput(true){
+                        detectTapGestures (
+                            onTap = {
+                                isMenuExpanded = true
+                            }
+                        )
+                    }
+                )
+
+                DropdownMenu(
+                    expanded = isMenuExpanded,
+                    onDismissRequest = { isMenuExpanded = false },
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onMenuItemClick(AgendaCardMenuOperations.Open(agendaItem))
+                        },
+                        text = { Text(stringResource(R.string.open)) }
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onMenuItemClick(AgendaCardMenuOperations.Edit(agendaItem))
+                        },
+                        text = { Text(stringResource(R.string.edit)) }
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onMenuItemClick(AgendaCardMenuOperations.Delete(agendaItem))
+                        },
+                        text = { Text(stringResource(R.string.delete)) }
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = date,
@@ -145,7 +196,8 @@ fun TaskCardPreview() {
             date = "Mar 5, 10:00",
             agendaItem = Task("1","Title", "Description", ZonedDateTime.now(), ZonedDateTime.now(), false),
             onCheckClick = {},
-            onClickItem = {}
+            onClickItem = {},
+            onMenuItemClick = {}
         )
     }
 }
@@ -160,7 +212,8 @@ fun ReminderCardPreview() {
             date = "Mar 5, 10:00",
             agendaItem = Reminder("1","Title", "Description", ZonedDateTime.now(), ZonedDateTime.now()),
             onCheckClick = {},
-            onClickItem = {}
+            onClickItem = {},
+            onMenuItemClick = {}
         )
     }
 }

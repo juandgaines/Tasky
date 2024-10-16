@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.componets.AgendaDatePicker
 import com.juandgaines.agenda.componets.CurrentTimeDivider
@@ -172,6 +173,7 @@ fun AgendaScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ){
                     items(stateAgenda.agendaItems) { agendaItem ->
+
                         when (agendaItem) {
                             is Item -> {
                                 when (val item= agendaItem.agendaItem) {
@@ -186,7 +188,10 @@ fun AgendaScreen(
                                             },
                                             title = item.title,
                                             description = item.description ?: "",
-                                            date = item.time.toFormattedSingleDateTime()
+                                            date = item.time.toFormattedSingleDateTime(),
+                                            onMenuItemClick = { operation ->
+                                                agendaActions(AgendaActions.AgendaOperation(operation))
+                                            }
                                         )
                                     }
                                     is Reminder -> {
@@ -197,7 +202,10 @@ fun AgendaScreen(
                                             },
                                             title = item.title,
                                             description = item.description ?: "",
-                                            date = item.time.toFormattedSingleDateTime()
+                                            date = item.time.toFormattedSingleDateTime(),
+                                            onMenuItemClick = {
+
+                                            }
                                         )
                                     }
                                 }
@@ -206,9 +214,11 @@ fun AgendaScreen(
                                 CurrentTimeDivider()
                             }
                         }
+
                     }
                 }
             }
+
             if (stateAgenda.isDatePickerOpened) {
                 AgendaDatePicker(
                     agendaActions = agendaActions,

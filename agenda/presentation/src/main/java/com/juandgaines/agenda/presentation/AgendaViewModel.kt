@@ -9,10 +9,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
+import com.juandgaines.agenda.domain.reminder.Reminder
+import com.juandgaines.agenda.domain.task.Task
+import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.endOfDay
 import com.juandgaines.agenda.domain.utils.startOfDay
+import com.juandgaines.agenda.domain.utils.toEpochMilli
 import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
+import com.juandgaines.agenda.presentation.AgendaActions.AgendaOperation
 import com.juandgaines.agenda.presentation.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
@@ -23,10 +28,17 @@ import com.juandgaines.agenda.presentation.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.ShowProfileMenu
+import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Delete
+import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Edit
+import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Open
+import com.juandgaines.agenda.presentation.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeDays
 import com.juandgaines.core.domain.auth.AuthCoreService
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
+import com.juandgaines.core.domain.util.map
+import com.juandgaines.core.domain.util.onError
+import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -44,7 +56,8 @@ import javax.inject.Inject
 class AgendaViewModel @Inject constructor(
     private val initialsCalculator: InitialsCalculator,
     private val authCoreService: AuthCoreService,
-    private val agendaRepository: AgendaRepository
+    private val agendaRepository: AgendaRepository,
+    private val taskRepository: TaskRepository
 ):ViewModel() {
 
 
@@ -60,26 +73,29 @@ class AgendaViewModel @Inject constructor(
         viewModelScope.launch {
             initialsCalculator.getInitials().let {
                 state = state.copy(userInitials = it)
+                agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
             }
         }
-
         _selectedDate.flatMapLatest { date->
             agendaRepository.getItems(
                 date.startOfDay(),
                 date.endOfDay()
             )
         }.map {agendaItems->
-            val agendaItemsUi= (agendaItems.map {
-                AgendaItemUi.Item(it)
-            } + listOf(
-                AgendaItemUi.Needle()
-            )).sortedBy {
-                it.date
-            }
-            agendaItemsUi
+            agendaItems
+                .map {
+                    AgendaItemUi.Item(it)
+                }
+                .plus(
+                    AgendaItemUi.Needle()
+                )
+                .sortedBy {
+                    it.date
+                }
         }.onEach { agendaItems ->
             state = state.copy(agendaItems = agendaItems)
         }.launchIn(viewModelScope)
+
     }
 
     fun onAction(action: AgendaActions) {
@@ -137,13 +153,39 @@ class AgendaViewModel @Inject constructor(
                     state = state.copy(isLoading = true)
                     when(val result = authCoreService.logout()){
                         is Success -> {
-                            eventChannel.send(AgendaEvents.LogOut)
+                            eventChannel.send(LogOut)
                         }
                         is Error -> {
                             eventChannel.send(AgendaEvents.Error(result.error.asUiText()))
                         }
                     }
                     state = state.copy(isLoading = false)
+                }
+
+                is AgendaOperation -> {
+                    when(action.agendaOperation){
+                        is Delete -> {
+                            when (val agendaItem = action.agendaOperation.agendaItem){
+                                is Task -> {
+                                   taskRepository.deleteTask(agendaItem.id)
+                                       .onSuccess {
+
+                                       }.onError {
+
+                                       }
+                                }
+                                is Reminder -> {
+
+                                }
+                            }
+                        }
+                        is Edit -> {
+
+                        }
+                        is Open -> {
+
+                        }
+                    }
                 }
             }
         }

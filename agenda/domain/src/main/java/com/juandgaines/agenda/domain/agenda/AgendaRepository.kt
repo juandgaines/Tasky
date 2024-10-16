@@ -1,5 +1,7 @@
 package com.juandgaines.agenda.domain.agenda
 
+import com.juandgaines.core.domain.util.DataError.Network
+import com.juandgaines.core.domain.util.EmptyDataResult
 import kotlinx.coroutines.flow.Flow
 
 interface AgendaRepository{
@@ -7,4 +9,8 @@ interface AgendaRepository{
         startDate:Long,
         endDay:Long
     ): Flow<List<AgendaItem>>
+
+    suspend fun fetchItems(
+        time:Long
+    ): EmptyDataResult<Network>
 }

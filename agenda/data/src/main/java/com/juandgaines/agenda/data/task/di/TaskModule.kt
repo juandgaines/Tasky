@@ -32,5 +32,4 @@ class TaskModule {
     ): TaskRepository {
         return DefaultTaskRepository(taskDao, taskApi, applicationScope)
     }
-
 }

@@ -12,6 +12,10 @@ import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.util.DataError.LocalError
 import com.juandgaines.core.domain.util.Error
 import com.juandgaines.core.domain.util.Result
+import com.juandgaines.core.domain.util.asEmptyDataResult
+import com.juandgaines.core.domain.util.map
+import com.juandgaines.core.domain.util.onError
+import com.juandgaines.core.domain.util.onSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -29,16 +33,10 @@ class DefaultReminderRepository @Inject constructor(
             reminderDao.upsertReminder(entity)
             val response = safeCall {
                 reminderApi.createReminder(reminder.toReminderRequest())
-            }
-            when(response) {
-                is Result.Success -> {
-                    Result.Success(Unit)
-                }
-                is Result.Error -> {
-                    //TODO: Add to queue to create reminder later
-                    Result.Error(response.error)
-                }
-            }
+            }.onError {
+                //TODO: Add to queue to create reminder later
+            }.asEmptyDataResult()
+            return response
         }
         catch (e: SQLiteException) {
             Result.Error(LocalError.DISK_FULL)
@@ -52,24 +50,17 @@ class DefaultReminderRepository @Inject constructor(
 
             val response = safeCall {
                 reminderApi.updateReminder(reminder.toReminderRequest())
-            }
-            when (response) {
-                is Result.Success -> {
-                    Result.Success(Unit)
-                }
-
-                is Result.Error -> {
-                    //TODO: Add to queue to update reminder later
-                    Result.Error(response.error)
-                }
-            }
+            }.onError {
+                //TODO: Add to queue to update reminder later
+            }.asEmptyDataResult()
+            return response
         }
         catch (e: SQLiteException) {
             Result.Error(LocalError.DISK_FULL)
         }
     }
 
-    override suspend fun upsertReminder(list: List<Reminder>): Result<Unit, Error> {
+    override suspend fun upsertReminders(list: List<Reminder>): Result<Unit, Error> {
         return try {
             val entities = list.map { it.toReminderEntity() }
             applicationScope.async {
@@ -86,15 +77,16 @@ class DefaultReminderRepository @Inject constructor(
         return reminder?.let {
             val response = safeCall {
                 reminderApi.getReminderById(reminderId)
+            }.map { data->
+                data.toReminder()
+            }.onError {
+                //TODO: Add to queue to get task later
+            }.onSuccess {
+                applicationScope.async {
+                    reminderDao.upsertReminder(it.toReminderEntity())
+                }.await()
             }
-            when (response) {
-                is Result.Success -> {
-                    Result.Success(response.data.toReminder())
-                }
-                is Result.Error -> {
-                    Result.Error(response.error)
-                }
-            }
+            return response
         } ?: Result.Error(LocalError.NOT_FOUND)
     }
 
@@ -102,17 +94,10 @@ class DefaultReminderRepository @Inject constructor(
         reminderDao.deleteReminderById(reminderId)
         val response = safeCall {
             reminderApi.deleteReminderById(reminderId)
-        }
-        return when (response) {
-            is Result.Success -> {
-                Result.Success(Unit)
-            }
-
-            is Result.Error -> {
+        }.onError {
                 // TODO: Add to queue to delete reminder later
-                Result.Error(response.error)
-            }
-        }
+            }.asEmptyDataResult()
+        return response
     }
 
     override fun getReminders(
