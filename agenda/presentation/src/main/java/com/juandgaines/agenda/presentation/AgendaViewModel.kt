@@ -9,6 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
+import com.juandgaines.agenda.domain.reminder.Reminder
+import com.juandgaines.agenda.domain.task.Task
+import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.endOfDay
 import com.juandgaines.agenda.domain.utils.startOfDay
 import com.juandgaines.agenda.domain.utils.toEpochMilli
@@ -25,14 +28,17 @@ import com.juandgaines.agenda.presentation.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.ShowProfileMenu
-import com.juandgaines.agenda.presentation.AgendaCardOperations.Delete
-import com.juandgaines.agenda.presentation.AgendaCardOperations.Edit
-import com.juandgaines.agenda.presentation.AgendaCardOperations.Open
+import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Delete
+import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Edit
+import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Open
 import com.juandgaines.agenda.presentation.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeDays
 import com.juandgaines.core.domain.auth.AuthCoreService
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
+import com.juandgaines.core.domain.util.map
+import com.juandgaines.core.domain.util.onError
+import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -50,7 +56,8 @@ import javax.inject.Inject
 class AgendaViewModel @Inject constructor(
     private val initialsCalculator: InitialsCalculator,
     private val authCoreService: AuthCoreService,
-    private val agendaRepository: AgendaRepository
+    private val agendaRepository: AgendaRepository,
+    private val taskRepository: TaskRepository
 ):ViewModel() {
 
 
@@ -159,7 +166,19 @@ class AgendaViewModel @Inject constructor(
                 is AgendaOperation -> {
                     when(action.agendaOperation){
                         is Delete -> {
+                            when (val agendaItem = action.agendaOperation.agendaItem){
+                                is Task -> {
+                                   taskRepository.deleteTask(agendaItem.id)
+                                       .onSuccess {
 
+                                       }.onError {
+
+                                       }
+                                }
+                                is Reminder -> {
+
+                                }
+                            }
                         }
                         is Edit -> {
 

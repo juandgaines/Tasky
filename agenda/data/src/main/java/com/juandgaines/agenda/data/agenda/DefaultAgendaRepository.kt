@@ -10,7 +10,9 @@ import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.util.DataError.Network
 import com.juandgaines.core.domain.util.EmptyDataResult
+import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.asEmptyDataResult
+import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -25,6 +27,7 @@ class DefaultAgendaRepository @Inject constructor(
     private val agendaApi: AgendaApi,
     private val applicationScope: CoroutineScope
 ) : AgendaRepository {
+
     override fun getItems(
         startDate: Long,
         endDay: Long

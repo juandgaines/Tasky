@@ -189,6 +189,9 @@ fun AgendaScreen(
                                             title = item.title,
                                             description = item.description ?: "",
                                             date = item.time.toFormattedSingleDateTime(),
+                                            onMenuItemClick = { operation ->
+                                                agendaActions(AgendaActions.AgendaOperation(operation))
+                                            }
                                         )
                                     }
                                     is Reminder -> {
@@ -199,7 +202,10 @@ fun AgendaScreen(
                                             },
                                             title = item.title,
                                             description = item.description ?: "",
-                                            date = item.time.toFormattedSingleDateTime()
+                                            date = item.time.toFormattedSingleDateTime(),
+                                            onMenuItemClick = {
+
+                                            }
                                         )
                                     }
                                 }

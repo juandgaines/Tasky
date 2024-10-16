@@ -38,7 +38,7 @@ import com.juandgaines.agenda.componets.Check
 import com.juandgaines.agenda.domain.agenda.AgendaItem
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
-import com.juandgaines.agenda.presentation.AgendaActions
+import com.juandgaines.agenda.presentation.AgendaCardMenuOperations
 import com.juandgaines.core.presentation.designsystem.MoreHor
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import java.time.ZonedDateTime
@@ -50,6 +50,7 @@ fun AgendaCard(
     isDone: Boolean = false,
     onCheckClick:( () -> Unit )? = null,
     onClickItem: (() -> Unit),
+    onMenuItemClick: (AgendaCardMenuOperations) -> Unit,
     description: String,
     date: String,
     agendaItem: AgendaItem
@@ -158,19 +159,19 @@ fun AgendaCard(
                         )
                     }
                 )
+
                 DropdownMenu(
                     expanded = isMenuExpanded,
                     onDismissRequest = { isMenuExpanded = false },
                     offset = dpOffset.copy(
                         y = dpOffset.y - itemHeight
-
                     )
                 ) {
                     DropdownMenuItem(
                         onClick = {
-
+                            onMenuItemClick(AgendaCardMenuOperations.Delete(agendaItem))
                         },
-                        text = { Text("Item") }
+                        text = { Text("Delete") }
                     )
                 }
             }
@@ -198,6 +199,7 @@ fun TaskCardPreview() {
             agendaItem = Task("1","Title", "Description", ZonedDateTime.now(), ZonedDateTime.now(), false),
             onCheckClick = {},
             onClickItem = {},
+            onMenuItemClick = {}
         )
     }
 }
@@ -213,6 +215,7 @@ fun ReminderCardPreview() {
             agendaItem = Reminder("1","Title", "Description", ZonedDateTime.now(), ZonedDateTime.now()),
             onCheckClick = {},
             onClickItem = {},
+            onMenuItemClick = {}
         )
     }
 }
