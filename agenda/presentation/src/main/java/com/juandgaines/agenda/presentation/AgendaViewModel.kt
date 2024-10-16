@@ -11,6 +11,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.utils.endOfDay
 import com.juandgaines.agenda.domain.utils.startOfDay
+import com.juandgaines.agenda.domain.utils.toEpochMilli
 import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.presentation.AgendaActions.CreateItem
@@ -63,23 +64,30 @@ class AgendaViewModel @Inject constructor(
             }
         }
 
+        viewModelScope.launch {
+            agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
+        }
         _selectedDate.flatMapLatest { date->
             agendaRepository.getItems(
                 date.startOfDay(),
                 date.endOfDay()
             )
         }.map {agendaItems->
-            val agendaItemsUi= (agendaItems.map {
-                AgendaItemUi.Item(it)
-            } + listOf(
-                AgendaItemUi.Needle()
-            )).sortedBy {
-                it.date
-            }
+            val agendaItemsUi = (
+                agendaItems.map {
+                    AgendaItemUi.Item(it)
+                } +
+                    listOf(
+                        AgendaItemUi.Needle()
+                    )
+                ).sortedBy {
+                    it.date
+                }
             agendaItemsUi
         }.onEach { agendaItems ->
             state = state.copy(agendaItems = agendaItems)
         }.launchIn(viewModelScope)
+
     }
 
     fun onAction(action: AgendaActions) {

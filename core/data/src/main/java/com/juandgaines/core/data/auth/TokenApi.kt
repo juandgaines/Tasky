@@ -11,7 +11,7 @@ interface TokenApi {
     @POST("/accessToken")
     suspend fun refreshToken(@Body refreshTokenRequest: RefreshTokenRequest): Response<RefreshTokenResponse>
 
-    @POST("/authenticate")
+    @GET("/authenticate")
     suspend fun checkAuth(): Response<Unit>
 
     @GET("/logout")
