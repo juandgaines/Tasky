@@ -61,11 +61,8 @@ class AgendaViewModel @Inject constructor(
         viewModelScope.launch {
             initialsCalculator.getInitials().let {
                 state = state.copy(userInitials = it)
+                agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
             }
-        }
-
-        viewModelScope.launch {
-            agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
         }
         _selectedDate.flatMapLatest { date->
             agendaRepository.getItems(
