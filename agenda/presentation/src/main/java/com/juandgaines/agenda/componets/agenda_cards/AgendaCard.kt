@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -39,6 +40,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItem
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.presentation.AgendaCardMenuOperations
+import com.juandgaines.agenda.presentation.R
 import com.juandgaines.core.presentation.designsystem.MoreHor
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import java.time.ZonedDateTime
@@ -169,9 +171,21 @@ fun AgendaCard(
                 ) {
                     DropdownMenuItem(
                         onClick = {
+                            onMenuItemClick(AgendaCardMenuOperations.Open(agendaItem))
+                        },
+                        text = { Text(stringResource(R.string.open)) }
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onMenuItemClick(AgendaCardMenuOperations.Edit(agendaItem))
+                        },
+                        text = { Text(stringResource(R.string.edit)) }
+                    )
+                    DropdownMenuItem(
+                        onClick = {
                             onMenuItemClick(AgendaCardMenuOperations.Delete(agendaItem))
                         },
-                        text = { Text("Delete") }
+                        text = { Text(stringResource(R.string.delete)) }
                     )
                 }
             }

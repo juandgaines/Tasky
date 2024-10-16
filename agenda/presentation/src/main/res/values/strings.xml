@@ -7,4 +7,7 @@
   <string name="logout">Logout</string>
   <string name="logout_success">You logged out.</string>
   <string name="event">Event</string>
+  <string name="open">Open</string>
+  <string name="edit">Edit</string>
+  <string name="delete">Delete</string>
 </resources>
