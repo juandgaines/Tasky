@@ -38,13 +38,13 @@ class AgendaModule {
         reminderRepository: ReminderRepository,
         taskRepository: TaskRepository,
         agendaApi: AgendaApi,
-        application: CoroutineScope
+        applicationScope: CoroutineScope
     ): AgendaRepository {
         return DefaultAgendaRepository(
             reminderRepository,
             taskRepository,
             agendaApi,
-            application
+            applicationScope
         )
     }
 }

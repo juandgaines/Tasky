@@ -77,10 +77,6 @@ fun AgendaCard(
     }
 
     var isMenuExpanded by remember { mutableStateOf(false) }
-    var itemHeight by remember { mutableStateOf(0.dp) }
-    var dpOffset by remember { mutableStateOf(DpOffset.Zero) }
-
-    val density = LocalDensity.current
 
     Row (
         modifier
@@ -89,12 +85,7 @@ fun AgendaCard(
                 shape = RoundedCornerShape(16.dp)
             )
             .height(124.dp)
-            .padding(16.dp)
-            .onSizeChanged {
-                itemHeight = with(density) {
-                    it.height.toDp()
-                }
-            },
+            .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ){
         Box(
@@ -153,10 +144,6 @@ fun AgendaCard(
                         detectTapGestures (
                             onTap = {
                                 isMenuExpanded = true
-                                dpOffset = DpOffset(
-                                    it.x.toDp(),
-                                    it.y.toDp()
-                                )
                             }
                         )
                     }
@@ -165,9 +152,6 @@ fun AgendaCard(
                 DropdownMenu(
                     expanded = isMenuExpanded,
                     onDismissRequest = { isMenuExpanded = false },
-                    offset = dpOffset.copy(
-                        y = dpOffset.y - itemHeight
-                    )
                 ) {
                     DropdownMenuItem(
                         onClick = {
