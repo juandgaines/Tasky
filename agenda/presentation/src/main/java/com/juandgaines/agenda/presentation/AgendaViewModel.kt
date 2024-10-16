@@ -14,6 +14,7 @@ import com.juandgaines.agenda.domain.utils.startOfDay
 import com.juandgaines.agenda.domain.utils.toEpochMilli
 import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
+import com.juandgaines.agenda.presentation.AgendaActions.AgendaOperation
 import com.juandgaines.agenda.presentation.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
@@ -24,6 +25,10 @@ import com.juandgaines.agenda.presentation.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.ShowProfileMenu
+import com.juandgaines.agenda.presentation.AgendaCardOperations.Delete
+import com.juandgaines.agenda.presentation.AgendaCardOperations.Edit
+import com.juandgaines.agenda.presentation.AgendaCardOperations.Open
+import com.juandgaines.agenda.presentation.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeDays
 import com.juandgaines.core.domain.auth.AuthCoreService
 import com.juandgaines.core.domain.util.Result.Error
@@ -142,13 +147,27 @@ class AgendaViewModel @Inject constructor(
                     state = state.copy(isLoading = true)
                     when(val result = authCoreService.logout()){
                         is Success -> {
-                            eventChannel.send(AgendaEvents.LogOut)
+                            eventChannel.send(LogOut)
                         }
                         is Error -> {
                             eventChannel.send(AgendaEvents.Error(result.error.asUiText()))
                         }
                     }
                     state = state.copy(isLoading = false)
+                }
+
+                is AgendaOperation -> {
+                    when(action.agendaOperation){
+                        is Delete -> {
+
+                        }
+                        is Edit -> {
+
+                        }
+                        is Open -> {
+
+                        }
+                    }
                 }
             }
         }
