@@ -11,6 +11,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -35,11 +36,15 @@ class AgendaModule {
     @Singleton
     fun providesAgendaRepository(
         reminderRepository: ReminderRepository,
-        taskRepository: TaskRepository
+        taskRepository: TaskRepository,
+        agendaApi: AgendaApi,
+        application: CoroutineScope
     ): AgendaRepository {
         return DefaultAgendaRepository(
             reminderRepository,
-            taskRepository
+            taskRepository,
+            agendaApi,
+            application
         )
     }
 }

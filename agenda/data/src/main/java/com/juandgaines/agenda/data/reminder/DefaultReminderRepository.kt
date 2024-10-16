@@ -69,7 +69,7 @@ class DefaultReminderRepository @Inject constructor(
         }
     }
 
-    override suspend fun upsertReminder(list: List<Reminder>): Result<Unit, Error> {
+    override suspend fun upsertReminders(list: List<Reminder>): Result<Unit, Error> {
         return try {
             val entities = list.map { it.toReminderEntity() }
             applicationScope.async {
