@@ -217,8 +217,6 @@ fun AgendaScreen(
 
                     }
                 }
-
-
             }
 
             if (stateAgenda.isDatePickerOpened) {
