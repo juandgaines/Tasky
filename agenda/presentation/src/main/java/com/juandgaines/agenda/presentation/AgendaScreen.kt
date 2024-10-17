@@ -76,7 +76,20 @@ fun AgendaScreenRoot(
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            else -> Unit
+            is AgendaEvents.Error -> {
+                Toast.makeText(
+                    context,
+                    agendaEvents.message.asString(context),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            is AgendaEvents.Success -> {
+                Toast.makeText(
+                    context,
+                    agendaEvents.message.asString(context),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
     }
@@ -180,6 +193,7 @@ fun AgendaScreen(
                                     is Task -> {
                                         AgendaCard(
                                             onCheckClick = {
+                                                agendaActions(AgendaActions.ToggleDoneTask(item.id))
                                             },
                                             agendaItem = item,
                                             isDone = item.isDone,

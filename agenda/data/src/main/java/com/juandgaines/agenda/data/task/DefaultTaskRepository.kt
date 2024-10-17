@@ -9,6 +9,7 @@ import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.task.TaskDao
 import com.juandgaines.core.data.network.safeCall
+import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.LocalError
 import com.juandgaines.core.domain.util.Error
 import com.juandgaines.core.domain.util.Result
@@ -27,7 +28,7 @@ class DefaultTaskRepository @Inject constructor(
     private val taskApi: TaskApi,
     private val applicationScope: CoroutineScope
 ): TaskRepository {
-    override suspend fun insertTask(task: Task): Result<Unit, Error> {
+    override suspend fun insertTask(task: Task): Result<Unit, DataError> {
         return try {
             val entity = task.toTaskEntity()
             taskDao.upsertTask(entity)
@@ -42,7 +43,7 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateTask(task: Task): Result<Unit, Error> {
+    override suspend fun updateTask(task: Task): Result<Unit, DataError> {
         return try {
             val entity = task.toTaskEntity()
             taskDao.upsertTask(entity)
@@ -59,7 +60,7 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override suspend fun upsertTasks(list: List<Task>): Result<Unit, Error> {
+    override suspend fun upsertTasks(list: List<Task>): Result<Unit, DataError> {
         return try {
             val entities = list.map { it.toTaskEntity()}
             applicationScope.async {
@@ -73,26 +74,27 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override suspend fun getTaskById(taskId: String): Result<Task, Error> {
-            val task = taskDao.getTaskById(taskId)?.toTask()
-            return task?.let {
-                val response = safeCall {
-                    taskApi.getTaskById(taskId)
-                }.map { taskResponse->
-                    taskResponse.toTask()
-                }.onError {
-                    //TODO: Add to queue to get task later
-                }.onSuccess {
-                    applicationScope.async {
-                        taskDao.upsertTask(it.toTaskEntity())
-                    }.await()
-                }
-                return response
-            }?:Result.Error(LocalError.NOT_FOUND)
+    override suspend fun getTaskById(taskId: String): Result<Task, DataError> {
+        safeCall {
+            taskApi.getTaskById(taskId)
+        }.map { taskResponse->
+            taskResponse.toTask()
+        }.onError {
+            //TODO: Add to queue to get task later
+        }.onSuccess {
+            applicationScope.async {
+                taskDao.upsertTask(it.toTaskEntity())
+            }.await()
+        }
 
+        return taskDao.getTaskById(taskId)?.toTask()?.let {
+            Result.Success(it)
+        } ?: run {
+            Result.Error(LocalError.NOT_FOUND)
+        }
     }
 
-    override suspend fun deleteTask(taskId: String): Result<Unit, Error> {
+    override suspend fun deleteTask(taskId: String): Result<Unit, DataError> {
         taskDao.deleteTask(taskId)
         val response = safeCall {
             taskApi.deleteTask(taskId)

@@ -9,6 +9,7 @@ import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.core.data.database.reminder.ReminderDao
 import com.juandgaines.core.data.network.safeCall
+import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.LocalError
 import com.juandgaines.core.domain.util.Error
 import com.juandgaines.core.domain.util.Result
@@ -27,7 +28,7 @@ class DefaultReminderRepository @Inject constructor(
     private val reminderApi: ReminderApi,
     private val applicationScope: CoroutineScope
 ):ReminderRepository {
-    override suspend fun insertReminder(reminder: Reminder): Result<Unit, Error> {
+    override suspend fun insertReminder(reminder: Reminder): Result<Unit, DataError> {
         return try {
             val entity = reminder.toReminderEntity()
             reminderDao.upsertReminder(entity)
@@ -43,7 +44,7 @@ class DefaultReminderRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateReminder(reminder: Reminder): Result<Unit, Error> {
+    override suspend fun updateReminder(reminder: Reminder): Result<Unit, DataError> {
         return try {
             val entity = reminder.toReminderEntity()
             reminderDao.upsertReminder(entity)
@@ -60,7 +61,7 @@ class DefaultReminderRepository @Inject constructor(
         }
     }
 
-    override suspend fun upsertReminders(list: List<Reminder>): Result<Unit, Error> {
+    override suspend fun upsertReminders(list: List<Reminder>): Result<Unit, DataError> {
         return try {
             val entities = list.map { it.toReminderEntity() }
             applicationScope.async {
@@ -72,7 +73,7 @@ class DefaultReminderRepository @Inject constructor(
         }
     }
 
-    override suspend fun getReminderById(reminderId: String): Result<Reminder, Error> {
+    override suspend fun getReminderById(reminderId: String): Result<Reminder, DataError> {
         val reminder = reminderDao.getReminderById(reminderId)?.toReminder()
         return reminder?.let {
             val response = safeCall {
@@ -90,7 +91,7 @@ class DefaultReminderRepository @Inject constructor(
         } ?: Result.Error(LocalError.NOT_FOUND)
     }
 
-    override suspend fun deleteReminder(reminderId: String): Result<Unit, Error> {
+    override suspend fun deleteReminder(reminderId: String): Result<Unit, DataError> {
         reminderDao.deleteReminderById(reminderId)
         val response = safeCall {
             reminderApi.deleteReminderById(reminderId)

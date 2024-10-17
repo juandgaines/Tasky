@@ -28,6 +28,7 @@ import com.juandgaines.agenda.presentation.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.AgendaActions.ShowProfileMenu
+import com.juandgaines.agenda.presentation.AgendaActions.ToggleDoneTask
 import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Delete
 import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Edit
 import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Open
@@ -36,9 +37,9 @@ import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeD
 import com.juandgaines.core.domain.auth.AuthCoreService
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
-import com.juandgaines.core.domain.util.map
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
+import com.juandgaines.core.presentation.ui.UiText
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -50,6 +51,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -96,6 +99,19 @@ class AgendaViewModel @Inject constructor(
             state = state.copy(agendaItems = agendaItems)
         }.launchIn(viewModelScope)
 
+        viewModelScope.launch {
+            taskRepository.insertTask(
+                Task(
+                    id = UUID.randomUUID().toString(),
+                    title = "Task 2",
+                    description = "Description 2",
+                    time = ZonedDateTime.now().plusHours(1),
+                    remindAt = ZonedDateTime.now().plusMinutes(30),
+                    isDone = false
+                )
+            )
+
+        }
     }
 
     fun onAction(action: AgendaActions) {
@@ -169,9 +185,9 @@ class AgendaViewModel @Inject constructor(
                                 is Task -> {
                                    taskRepository.deleteTask(agendaItem.id)
                                        .onSuccess {
-
+                                             eventChannel.send(AgendaEvents.Success(UiText.StringResource(R.string.task_deleted)))
                                        }.onError {
-
+                                            eventChannel.send(AgendaEvents.Error(it.asUiText()))
                                        }
                                 }
                                 is Reminder -> {
@@ -186,6 +202,15 @@ class AgendaViewModel @Inject constructor(
 
                         }
                     }
+                }
+
+                is ToggleDoneTask -> {
+                    agendaRepository.updateTask(action.id)
+                        .onSuccess {
+                            eventChannel.send(AgendaEvents.Success(UiText.StringResource(R.string.task_updated)))
+                        }.onError {
+                            eventChannel.send(AgendaEvents.Error(it.asUiText()))
+                        }
                 }
             }
         }

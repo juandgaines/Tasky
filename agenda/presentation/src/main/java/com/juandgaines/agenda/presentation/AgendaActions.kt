@@ -13,5 +13,6 @@ sealed interface AgendaActions{
     data object DismissCreateContextMenu : AgendaActions
     data class CreateItem(val option: AgendaItemOption) : AgendaActions
     data class AgendaOperation(val agendaOperation:AgendaCardMenuOperations) : AgendaActions
+    data class ToggleDoneTask(val id: String) : AgendaActions
     data object Logout : AgendaActions
 }
