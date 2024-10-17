@@ -10,4 +10,6 @@
   <string name="open">Open</string>
   <string name="edit">Edit</string>
   <string name="delete">Delete</string>
+  <string name="task_deleted">Task has been deleted</string>
+  <string name="task_updated">Task has been updated</string>
 </resources>
