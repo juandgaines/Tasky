@@ -62,11 +62,4 @@ class DefaultAgendaRepository @Inject constructor(
         }
     }.asEmptyDataResult()
 
-    override suspend fun updateTask(taskId:String): EmptyDataResult<DataError> {
-        val response= taskRepository.getTaskById(taskId)
-            .onSuccess {
-                taskRepository.updateTask(it.copy(isDone = !it.isDone))
-            }
-        return response.asEmptyDataResult()
-    }
 }

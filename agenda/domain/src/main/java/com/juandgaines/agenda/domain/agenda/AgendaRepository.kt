@@ -15,8 +15,4 @@ interface AgendaRepository{
     suspend fun fetchItems(
         time:Long
     ): EmptyDataResult<Network>
-
-    suspend fun updateTask(
-        taskId: String,
-    ): EmptyDataResult<DataError>
 }

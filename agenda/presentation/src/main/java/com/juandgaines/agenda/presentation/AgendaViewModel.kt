@@ -205,7 +205,9 @@ class AgendaViewModel @Inject constructor(
                 }
 
                 is ToggleDoneTask -> {
-                    agendaRepository.updateTask(action.id)
+
+                    val task = action.task
+                    taskRepository.updateTask(task.copy(isDone = !task.isDone))
                         .onSuccess {
                             eventChannel.send(AgendaEvents.Success(UiText.StringResource(R.string.task_updated)))
                         }.onError {

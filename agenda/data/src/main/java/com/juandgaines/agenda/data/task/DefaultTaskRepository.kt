@@ -75,18 +75,6 @@ class DefaultTaskRepository @Inject constructor(
     }
 
     override suspend fun getTaskById(taskId: String): Result<Task, DataError> {
-        safeCall {
-            taskApi.getTaskById(taskId)
-        }.map { taskResponse->
-            taskResponse.toTask()
-        }.onError {
-            //TODO: Add to queue to get task later
-        }.onSuccess {
-            applicationScope.async {
-                taskDao.upsertTask(it.toTaskEntity())
-            }.await()
-        }
-
         return taskDao.getTaskById(taskId)?.toTask()?.let {
             Result.Success(it)
         } ?: run {
