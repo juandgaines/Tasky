@@ -21,12 +21,14 @@ kotlinx-serialization = "1.6.3"
 datastore = "1.1.1"
 okhttp = "4.12.0"
 hilt = "2.51.1"
+hiltWork = "1.2.0"
 ksp = "2.0.0-1.0.22"
 navigationCompose = "2.8.1"
 navigationComposeHilt = "1.2.0"
 coroutines = "1.9.0"
 jetbrainsKotlinJvm = "1.9.0"
 desugar_jdk_libs = "2.1.2"
+work = "2.9.1"
 
 # Project versions
 projectApplicationId = "com.juandgaines.tasky"
@@ -44,6 +46,7 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-security-crypto-ktx = { module = "androidx.security:security-crypto-ktx", version.ref = "securityCryptoKtx" }
+androidx-work = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
 #Java
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 #Compose
@@ -67,6 +70,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 dagger-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "navigationComposeHilt" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
 
+
 # Room
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
@@ -85,6 +89,9 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 #hilt
 dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt"}
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt"}
+
+dagger-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork"}
+dagger-hilt-work-processor = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltWork"}
 
 #Testing
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

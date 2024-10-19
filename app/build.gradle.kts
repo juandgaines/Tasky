@@ -38,6 +38,7 @@ dependencies {
     //Splash
     implementation(libs.androidx.core.splashscreen)
 
+
     //Crypto
     implementation(libs.androidx.security.crypto.ktx)
 
@@ -55,6 +56,8 @@ dependencies {
     implementation(projects.agenda.data)
     implementation(projects.agenda.presentation)
 
+    implementation(libs.dagger.hilt.work)
+    ksp(libs.dagger.hilt.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

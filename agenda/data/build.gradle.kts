@@ -12,4 +12,8 @@ dependencies {
     implementation(projects.agenda.domain)
     implementation(projects.core.domain)
     implementation(projects.core.data)
+
+    implementation(libs.androidx.work)
+    implementation(libs.dagger.hilt.work)
+    ksp(libs.dagger.hilt.compiler)
 }
