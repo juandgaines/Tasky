@@ -193,7 +193,7 @@ fun AgendaScreen(
                                     is Task -> {
                                         AgendaCard(
                                             onCheckClick = {
-                                                agendaActions(AgendaActions.ToggleDoneTask(item.id))
+                                                agendaActions(AgendaActions.ToggleDoneTask(item))
                                             },
                                             agendaItem = item,
                                             isDone = item.isDone,

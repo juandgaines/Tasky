@@ -100,17 +100,18 @@ class AgendaViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         viewModelScope.launch {
+/* TODO: Remove after testing
             taskRepository.insertTask(
                 Task(
                     id = UUID.randomUUID().toString(),
-                    title = "Task 2",
-                    description = "Description 2",
+                    title = "Task 3",
+                    description = "Description 3",
                     time = ZonedDateTime.now().plusHours(1),
                     remindAt = ZonedDateTime.now().plusMinutes(30),
                     isDone = false
                 )
             )
-
+*/
         }
     }
 
@@ -183,7 +184,7 @@ class AgendaViewModel @Inject constructor(
                         is Delete -> {
                             when (val agendaItem = action.agendaOperation.agendaItem){
                                 is Task -> {
-                                   taskRepository.deleteTask(agendaItem.id)
+                                   taskRepository.deleteTask(agendaItem)
                                        .onSuccess {
                                              eventChannel.send(AgendaEvents.Success(UiText.StringResource(R.string.task_deleted)))
                                        }.onError {
@@ -205,7 +206,9 @@ class AgendaViewModel @Inject constructor(
                 }
 
                 is ToggleDoneTask -> {
-                    agendaRepository.updateTask(action.id)
+
+                    val task = action.task
+                    taskRepository.updateTask(task.copy(isDone = !task.isDone))
                         .onSuccess {
                             eventChannel.send(AgendaEvents.Success(UiText.StringResource(R.string.task_updated)))
                         }.onError {

@@ -5,6 +5,8 @@ import com.juandgaines.agenda.data.mappers.toTask
 import com.juandgaines.agenda.data.mappers.toTaskEntity
 import com.juandgaines.agenda.data.mappers.toTaskRequest
 import com.juandgaines.agenda.data.task.remote.TaskApi
+import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
+import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.task.TaskDao
@@ -21,12 +23,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DefaultTaskRepository @Inject constructor(
     private val taskDao: TaskDao,
     private val taskApi: TaskApi,
-    private val applicationScope: CoroutineScope
+    private val applicationScope: CoroutineScope,
+    private val agendaSyncScheduler: AgendaSyncScheduler
 ): TaskRepository {
     override suspend fun insertTask(task: Task): Result<Unit, DataError> {
         return try {
@@ -75,18 +79,6 @@ class DefaultTaskRepository @Inject constructor(
     }
 
     override suspend fun getTaskById(taskId: String): Result<Task, DataError> {
-        safeCall {
-            taskApi.getTaskById(taskId)
-        }.map { taskResponse->
-            taskResponse.toTask()
-        }.onError {
-            //TODO: Add to queue to get task later
-        }.onSuccess {
-            applicationScope.async {
-                taskDao.upsertTask(it.toTaskEntity())
-            }.await()
-        }
-
         return taskDao.getTaskById(taskId)?.toTask()?.let {
             Result.Success(it)
         } ?: run {
@@ -94,12 +86,18 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override suspend fun deleteTask(taskId: String): Result<Unit, DataError> {
-        taskDao.deleteTask(taskId)
+    override suspend fun deleteTask(task: Task): Result<Unit, DataError> {
+        taskDao.deleteTask(task.id)
         val response = safeCall {
-            taskApi.deleteTask(taskId)
+            taskApi.deleteTask(task.id)
         }.onError {
-            //TODO: Add to queue to delete task later
+            applicationScope.launch {
+                agendaSyncScheduler.scheduleSync(
+                    AgendaSyncOperations.DeleteAgendaItem(
+                        task
+                    )
+                )
+            }.join()
         }.asEmptyDataResult()
 
         return response

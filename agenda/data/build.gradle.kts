@@ -10,6 +10,11 @@ android {
 
 dependencies {
     implementation(projects.agenda.domain)
-    implementation(projects.core.domain)
     implementation(projects.core.data)
+    implementation(projects.core.domain)
+
+    implementation(libs.androidx.work)
+
+    implementation(libs.dagger.hilt.work)
+    ksp(libs.dagger.hilt.work.processor)
 }
