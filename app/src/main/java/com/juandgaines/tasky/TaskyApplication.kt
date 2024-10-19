@@ -13,7 +13,8 @@ class TaskyApplication:Application(), Configuration.Provider {
 
     val applicationScope = CoroutineScope(SupervisorJob())
 
-    @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()

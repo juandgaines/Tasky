@@ -19,6 +19,8 @@ class AndroidApplicationComposeConventionPlugin:Plugin<Project> {
                 "implementation"(libs.findLibrary("dagger.hilt.navigation.compose").get())
                 "implementation"(libs.findLibrary("androidx.navigation.compose").get())
                 "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
+                "implementation"(libs.findLibrary("dagger.hilt").get())
+                "ksp"(libs.findLibrary("dagger.hilt.compiler").get())
             }
         }
     }

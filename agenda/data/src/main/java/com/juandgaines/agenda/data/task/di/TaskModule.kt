@@ -2,6 +2,7 @@ package com.juandgaines.agenda.data.task.di
 
 import com.juandgaines.agenda.data.task.DefaultTaskRepository
 import com.juandgaines.agenda.data.task.remote.TaskApi
+import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.task.TaskDao
 import dagger.Module
@@ -28,8 +29,9 @@ class TaskModule {
     fun provideTaskRepository(
         taskDao: TaskDao,
         taskApi: TaskApi,
-        applicationScope:CoroutineScope
+        applicationScope:CoroutineScope,
+        agendaSyncScheduler: AgendaSyncScheduler
     ): TaskRepository {
-        return DefaultTaskRepository(taskDao, taskApi, applicationScope)
+        return DefaultTaskRepository(taskDao, taskApi, applicationScope,agendaSyncScheduler)
     }
 }

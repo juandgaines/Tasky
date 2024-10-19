@@ -29,11 +29,6 @@ class AndroidApplicationConventionPlugin :Plugin<Project> {
                 configureKotlinAndroid(this)
                 configureBuildTypes(this, ExtensionType.APPLICATION)
             }
-
-            dependencies{
-                "implementation"(libs.findLibrary("dagger.hilt").get())
-                "ksp"(libs.findLibrary("dagger.hilt.compiler").get())
-            }
         }
     }
 }

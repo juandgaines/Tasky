@@ -57,7 +57,7 @@ dependencies {
     implementation(projects.agenda.presentation)
 
     implementation(libs.dagger.hilt.work)
-    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.dagger.hilt.work.processor)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
