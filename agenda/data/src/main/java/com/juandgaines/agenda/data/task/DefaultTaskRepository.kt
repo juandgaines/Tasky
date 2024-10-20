@@ -55,7 +55,11 @@ class DefaultTaskRepository @Inject constructor(
             val response = safeCall {
                 taskApi.updateTask(task.toTaskRequest())
             }.onError {
-                //TODO: Add to queue to update task later
+                agendaSyncScheduler.scheduleSync(
+                    AgendaSyncOperations.UpdateAgendaItem(
+                        task
+                    )
+                )
             }.asEmptyDataResult()
 
             return response

@@ -8,6 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
+import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
+import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
@@ -54,13 +56,15 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val initialsCalculator: InitialsCalculator,
     private val authCoreService: AuthCoreService,
     private val agendaRepository: AgendaRepository,
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val agendaSyncScheduler: AgendaSyncScheduler
 ):ViewModel() {
 
 
@@ -73,6 +77,13 @@ class AgendaViewModel @Inject constructor(
     private val _selectedDate = MutableStateFlow(state.selectedLocalDate)
 
     init {
+        viewModelScope.launch {
+            agendaSyncScheduler.scheduleSync(
+                AgendaSyncOperations.FetchAgendas(
+                    30.minutes
+                )
+            )
+        }
         viewModelScope.launch {
             initialsCalculator.getInitials().let {
                 state = state.copy(userInitials = it)
@@ -100,18 +111,18 @@ class AgendaViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         viewModelScope.launch {
-/* TODO: Remove after testing
+
             taskRepository.insertTask(
                 Task(
                     id = UUID.randomUUID().toString(),
-                    title = "Task 3",
-                    description = "Description 3",
+                    title = "Task 4",
+                    description = "Description 4",
                     time = ZonedDateTime.now().plusHours(1),
                     remindAt = ZonedDateTime.now().plusMinutes(30),
                     isDone = false
                 )
             )
-*/
+
         }
     }
 
@@ -217,6 +228,5 @@ class AgendaViewModel @Inject constructor(
                 }
             }
         }
-
     }
 }

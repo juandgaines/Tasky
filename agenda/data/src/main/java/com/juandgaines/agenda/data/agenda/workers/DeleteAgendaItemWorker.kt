@@ -9,13 +9,12 @@ import com.juandgaines.agenda.data.agenda.remote.SyncAgendaRequest
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.auth.SessionManager
-import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.onSuccess
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 @HiltWorker
-class DeleteAgendaTaskWorker @AssistedInject constructor(
+class DeleteAgendaItemWorker @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted val params: WorkerParameters,
     private val agendaApi: AgendaApi,

@@ -7,6 +7,7 @@ interface AgendaItem{
     val type: AgendaType
     val date:ZonedDateTime
 }
+
 sealed interface AgendaType{
     data object Task: AgendaType
     data object Event: AgendaType
