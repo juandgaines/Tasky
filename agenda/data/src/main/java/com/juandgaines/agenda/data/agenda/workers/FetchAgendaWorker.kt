@@ -25,7 +25,6 @@ class FetchAgendaWorker @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted val params: WorkerParameters,
     private val agendaApi: AgendaApi,
-    private val sessionManager: SessionManager,
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository
 ) : CoroutineWorker(context, params) {
