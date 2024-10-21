@@ -25,4 +25,17 @@ interface AgendaSyncDao{
     @Query("DELETE FROM delete_reminder_sync WHERE reminderId = :reminderId")
     suspend fun deleteDeleteReminderSync(reminderId: String)
 
+
+    @Upsert
+    suspend fun upsertUpdateTaskSync(updateTaskSync: UpdateTaskSyncEntity)
+
+    @Query("SELECT * FROM update_task_sync WHERE userId = :userId")
+    suspend fun getAllUpdateTaskSync(userId: String): List<UpdateTaskSyncEntity>
+
+    @Query("DELETE FROM update_task_sync WHERE taskId = :taskId")
+    suspend fun deleteUpdateTaskSync(taskId: String)
+
+    @Query("SELECT * FROM update_task_sync WHERE taskId = :taskId")
+    suspend fun getUpdateTaskSync(taskId: String): UpdateTaskSyncEntity?
+
 }
