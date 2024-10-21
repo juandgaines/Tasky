@@ -4,6 +4,8 @@ import android.content.Context
 import com.juandgaines.agenda.data.agenda.AgendaPendingSyncScheduler
 import com.juandgaines.agenda.data.agenda.DefaultAgendaRepository
 import com.juandgaines.agenda.data.agenda.remote.AgendaApi
+import com.juandgaines.agenda.data.reminder.remote.ReminderApi
+import com.juandgaines.agenda.data.task.remote.TaskApi
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
@@ -43,12 +45,20 @@ class AgendaModule {
         reminderRepository: ReminderRepository,
         taskRepository: TaskRepository,
         agendaApi: AgendaApi,
+        sessionManager: SessionManager,
+        agendaSyncDao: AgendaSyncDao,
+        taskApi: TaskApi,
+        reminderApi: ReminderApi,
         applicationScope: CoroutineScope
     ): AgendaRepository {
         return DefaultAgendaRepository(
             reminderRepository,
             taskRepository,
+            sessionManager,
             agendaApi,
+            agendaSyncDao,
+            taskApi,
+            reminderApi,
             applicationScope
         )
     }

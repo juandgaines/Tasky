@@ -90,6 +90,11 @@ class AgendaViewModel @Inject constructor(
                 agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
             }
         }
+
+        viewModelScope.launch {
+            agendaRepository.syncPendingAgendaItem()
+        }
+
         _selectedDate.flatMapLatest { date->
             agendaRepository.getItems(
                 date.startOfDay(),
