@@ -115,20 +115,6 @@ class AgendaViewModel @Inject constructor(
             state = state.copy(agendaItems = agendaItems)
         }.launchIn(viewModelScope)
 
-        viewModelScope.launch {
-
-            taskRepository.insertTask(
-                Task(
-                    id = UUID.randomUUID().toString(),
-                    title = "Task 4",
-                    description = "Description 4",
-                    time = ZonedDateTime.now().plusHours(1),
-                    remindAt = ZonedDateTime.now().plusMinutes(30),
-                    isDone = false
-                )
-            )
-
-        }
     }
 
     fun onAction(action: AgendaActions) {
