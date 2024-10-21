@@ -15,7 +15,6 @@ import dagger.assisted.AssistedInject
 class UpdateAgendaItemWorker @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted val params: WorkerParameters,
-    private val sessionManager: SessionManager,
     private val agendaSyncDao: AgendaSyncDao,
     private val taskRepository: TaskRepository
 ) : CoroutineWorker(context, params) {
