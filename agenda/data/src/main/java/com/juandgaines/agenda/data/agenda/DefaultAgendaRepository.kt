@@ -13,7 +13,6 @@ import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.auth.SessionManager
-import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.Network
 import com.juandgaines.core.domain.util.EmptyDataResult
 import com.juandgaines.core.domain.util.Result
@@ -70,9 +69,9 @@ class DefaultAgendaRepository @Inject constructor(
         }
     }.asEmptyDataResult()
 
-    override suspend fun syncPendingAgendaItem(): Result<Unit, DataError> {
+    override suspend fun syncPendingAgendaItem() {
         return withContext(Dispatchers.IO){
-            val userId = sessionManager.get()?.userId ?: return@withContext Result.Error(DataError.LocalError.NOT_FOUND)
+            val userId = sessionManager.get()?.userId ?: return@withContext
 
             val pendingDeleteReminders = async {
                 agendaSyncDao.getAllDeleteReminderSync(userId)
@@ -90,7 +89,7 @@ class DefaultAgendaRepository @Inject constructor(
                 .map {
                     launch {
                         val taskId: String = it.taskId
-                         safeCall {
+                        safeCall {
                                 taskApi.deleteTask(taskId)
                          }.onSuccess {
                              applicationScope.launch {

@@ -18,5 +18,5 @@ interface AgendaRepository{
         time:Long
     ): EmptyDataResult<Network>
 
-    suspend fun syncPendingAgendaItem():Result<Unit,DataError>
+    suspend fun syncPendingAgendaItem()
 }
