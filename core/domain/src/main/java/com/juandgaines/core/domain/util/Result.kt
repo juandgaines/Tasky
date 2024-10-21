@@ -12,6 +12,13 @@ inline fun <T,E:Error,R> Result<T,E>.map(map: (T) -> R): Result<R,E> {
     }
 }
 
+inline fun <T, E: Error, R: Error> Result<T, E>.mapError(map: (E) -> R): Result<T, R> {
+    return when (this) {
+        is Result.Error -> Result.Error(map(error))
+        is Result.Success -> Result.Success(data)
+    }
+}
+
 inline fun <T, E: Error> Result<T, E>.onSuccess(action: (T) -> Unit): Result<T, E> {
     return when(this) {
         is Result.Error -> this
@@ -42,3 +49,5 @@ fun <T, E:Error> Result<T,E>.asEmptyDataResult(): Result<Unit, E> {
 }
 
 typealias EmptyDataResult<E> = Result<Unit, E>
+
+

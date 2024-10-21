@@ -9,6 +9,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.domain.task.TaskRepository
+import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.database.task.TaskDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.util.DataError
@@ -30,7 +31,7 @@ class DefaultTaskRepository @Inject constructor(
     private val taskDao: TaskDao,
     private val taskApi: TaskApi,
     private val applicationScope: CoroutineScope,
-    private val agendaSyncScheduler: AgendaSyncScheduler
+    private val agendaSyncScheduler: AgendaSyncScheduler,
 ): TaskRepository {
     override suspend fun insertTask(task: Task): Result<Unit, DataError> {
         return try {
@@ -55,7 +56,11 @@ class DefaultTaskRepository @Inject constructor(
             val response = safeCall {
                 taskApi.updateTask(task.toTaskRequest())
             }.onError {
-                //TODO: Add to queue to update task later
+                agendaSyncScheduler.scheduleSync(
+                    AgendaSyncOperations.UpdateAgendaItem(
+                        task
+                    )
+                )
             }.asEmptyDataResult()
 
             return response
