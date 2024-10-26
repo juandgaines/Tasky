@@ -1,6 +1,6 @@
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.presentation.home
 
-import com.juandgaines.agenda.componets.selector_date.SelectorDayData
+import com.juandgaines.agenda.presentation.home.componets.selector_date.SelectorDayData
 import com.juandgaines.agenda.domain.utils.toFormattedDate
 import java.time.LocalDate
 

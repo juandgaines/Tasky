@@ -1,7 +1,7 @@
-package com.juandgaines.agenda.componets.selector_date.preview_providers
+package com.juandgaines.agenda.presentation.home.componets.selector_date.preview_providers
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.juandgaines.agenda.componets.selector_date.SelectorDayData
+import com.juandgaines.agenda.presentation.home.componets.selector_date.SelectorDayData
 import java.time.LocalDate
 import java.time.ZonedDateTime
 

@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.componets
+package com.juandgaines.agenda.presentation.home.componets
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box

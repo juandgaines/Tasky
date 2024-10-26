@@ -1,6 +1,6 @@
 @file:Suppress("OPT_IN_USAGE")
 
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.presentation.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,29 +19,32 @@ import com.juandgaines.agenda.domain.utils.startOfDay
 import com.juandgaines.agenda.domain.utils.toEpochMilli
 import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
-import com.juandgaines.agenda.presentation.AgendaActions.AgendaOperation
-import com.juandgaines.agenda.presentation.AgendaActions.CreateItem
-import com.juandgaines.agenda.presentation.AgendaActions.DismissCreateContextMenu
-import com.juandgaines.agenda.presentation.AgendaActions.DismissDateDialog
-import com.juandgaines.agenda.presentation.AgendaActions.DismissProfileMenu
-import com.juandgaines.agenda.presentation.AgendaActions.Logout
-import com.juandgaines.agenda.presentation.AgendaActions.SelectDate
-import com.juandgaines.agenda.presentation.AgendaActions.SelectDateWithingRange
-import com.juandgaines.agenda.presentation.AgendaActions.ShowCreateContextMenu
-import com.juandgaines.agenda.presentation.AgendaActions.ShowDateDialog
-import com.juandgaines.agenda.presentation.AgendaActions.ShowProfileMenu
-import com.juandgaines.agenda.presentation.AgendaActions.ToggleDoneTask
-import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Delete
-import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Edit
-import com.juandgaines.agenda.presentation.AgendaCardMenuOperations.Open
-import com.juandgaines.agenda.presentation.AgendaEvents.LogOut
-import com.juandgaines.agenda.presentation.AgendaState.Companion.calculateRangeDays
+import com.juandgaines.agenda.presentation.R
+import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
+import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
+import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.DismissDateDialog
+import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
+import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
+import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
+import com.juandgaines.agenda.presentation.home.AgendaActions.ShowCreateContextMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.ShowDateDialog
+import com.juandgaines.agenda.presentation.home.AgendaActions.ShowProfileMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.ToggleDoneTask
+import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Delete
+import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Edit
+import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Open
+import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
+import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
+import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
+import com.juandgaines.agenda.presentation.home.AgendaState.Companion.calculateRangeDays
 import com.juandgaines.core.domain.auth.AuthCoreService
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
-import com.juandgaines.core.presentation.ui.UiText
+import com.juandgaines.core.presentation.ui.UiText.StringResource
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -53,8 +56,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -103,10 +104,10 @@ class AgendaViewModel @Inject constructor(
         }.map {agendaItems->
             agendaItems
                 .map {
-                    AgendaItemUi.Item(it)
+                    Item(it)
                 }
                 .plus(
-                    AgendaItemUi.Needle()
+                    Needle()
                 )
                 .sortedBy {
                     it.date
@@ -188,7 +189,11 @@ class AgendaViewModel @Inject constructor(
                                 is Task -> {
                                    taskRepository.deleteTask(agendaItem)
                                        .onSuccess {
-                                             eventChannel.send(AgendaEvents.Success(UiText.StringResource(R.string.task_deleted)))
+                                             eventChannel.send(
+                                                 AgendaEvents.Success(
+                                                     StringResource(R.string.task_deleted)
+                                                 )
+                                             )
                                        }.onError {
                                             eventChannel.send(AgendaEvents.Error(it.asUiText()))
                                        }
@@ -212,7 +217,9 @@ class AgendaViewModel @Inject constructor(
                     val task = action.task
                     taskRepository.updateTask(task.copy(isDone = !task.isDone))
                         .onSuccess {
-                            eventChannel.send(AgendaEvents.Success(UiText.StringResource(R.string.task_updated)))
+                            eventChannel.send(
+                                AgendaEvents.Success(StringResource(R.string.task_updated))
+                            )
                         }.onError {
                             eventChannel.send(AgendaEvents.Error(it.asUiText()))
                         }

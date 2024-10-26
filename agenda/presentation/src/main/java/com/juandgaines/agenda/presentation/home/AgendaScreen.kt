@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.presentation.home
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -32,21 +32,34 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.juandgaines.agenda.componets.AgendaDatePicker
-import com.juandgaines.agenda.componets.CurrentTimeDivider
-import com.juandgaines.agenda.componets.ProfileIcon
-import com.juandgaines.agenda.componets.agenda_cards.AgendaCard
-import com.juandgaines.agenda.componets.selector_date.DateSelector
+import com.juandgaines.agenda.presentation.home.componets.AgendaDatePicker
+import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
+import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
+import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
+import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
-import com.juandgaines.agenda.presentation.AgendaItemOption.EVENT
-import com.juandgaines.agenda.presentation.AgendaItemOption.REMINDER
-import com.juandgaines.agenda.presentation.AgendaItemOption.TASK
-import com.juandgaines.agenda.presentation.AgendaItemUi.Item
-import com.juandgaines.agenda.presentation.AgendaItemUi.Needle
+import com.juandgaines.agenda.presentation.R
+import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
+import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
+import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
+import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
+import com.juandgaines.agenda.presentation.home.AgendaActions.ShowCreateContextMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.ShowDateDialog
+import com.juandgaines.agenda.presentation.home.AgendaActions.ShowProfileMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.ToggleDoneTask
+import com.juandgaines.agenda.presentation.home.AgendaEvents.Error
+import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
+import com.juandgaines.agenda.presentation.home.AgendaEvents.Success
+import com.juandgaines.agenda.presentation.home.AgendaItemOption.EVENT
+import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
+import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
+import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
+import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -68,7 +81,7 @@ fun AgendaScreenRoot(
         events
     ) { agendaEvents ->
         when (agendaEvents) {
-            is AgendaEvents.LogOut -> {
+            is LogOut -> {
                 navigateToLogin()
                 Toast.makeText(
                     context,
@@ -76,14 +89,14 @@ fun AgendaScreenRoot(
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            is AgendaEvents.Error -> {
+            is Error -> {
                 Toast.makeText(
                     context,
                     agendaEvents.message.asString(context),
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            is AgendaEvents.Success -> {
+            is Success -> {
                 Toast.makeText(
                     context,
                     agendaEvents.message.asString(context),
@@ -123,7 +136,7 @@ fun AgendaScreen(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable {
-                        agendaActions(AgendaActions.ShowDateDialog)
+                        agendaActions(ShowDateDialog)
                     }
                 )
                 Icon(
@@ -136,7 +149,7 @@ fun AgendaScreen(
                     modifier = Modifier
                         .size(36.dp)
                         .clickable {
-                            agendaActions(AgendaActions.ShowProfileMenu)
+                            agendaActions(ShowProfileMenu)
                         }
                 )
             }
@@ -153,7 +166,7 @@ fun AgendaScreen(
         floatingActionButton = {
             TaskyFAB(
                 onClick = {
-                    agendaActions(AgendaActions.ShowCreateContextMenu)
+                    agendaActions(ShowCreateContextMenu)
                 },
                 icon = AddIcon,
             )
@@ -170,7 +183,7 @@ fun AgendaScreen(
                     modifier = Modifier.fillMaxWidth(),
                     daysList = stateAgenda.dateRange,
                     onSelectDate = {
-                        agendaActions(AgendaActions.SelectDateWithingRange(it))
+                        agendaActions(SelectDateWithingRange(it))
                     }
                 )
                 Text(
@@ -193,7 +206,7 @@ fun AgendaScreen(
                                     is Task -> {
                                         AgendaCard(
                                             onCheckClick = {
-                                                agendaActions(AgendaActions.ToggleDoneTask(item))
+                                                agendaActions(ToggleDoneTask(item))
                                             },
                                             agendaItem = item,
                                             isDone = item.isDone,
@@ -204,7 +217,7 @@ fun AgendaScreen(
                                             description = item.description ?: "",
                                             date = item.time.toFormattedSingleDateTime(),
                                             onMenuItemClick = { operation ->
-                                                agendaActions(AgendaActions.AgendaOperation(operation))
+                                                agendaActions(AgendaOperation(operation))
                                             }
                                         )
                                     }
@@ -244,7 +257,7 @@ fun AgendaScreen(
             ){
                 DropdownMenu(
                     expanded = stateAgenda.isCreateContextMenuVisible,
-                    onDismissRequest = { agendaActions(AgendaActions.DismissCreateContextMenu) },
+                    onDismissRequest = { agendaActions(DismissCreateContextMenu) },
                 ) {
 
                     AgendaItemOption.entries.forEach { agendaItem ->
@@ -252,7 +265,7 @@ fun AgendaScreen(
                             REMINDER -> {
                                 DropdownMenuItem(
                                     onClick = {
-                                        agendaActions(AgendaActions.CreateItem(agendaItem))
+                                        agendaActions(CreateItem(agendaItem))
                                     },
                                     text = { Text(stringResource(R.string.reminder)) }
                                 )
@@ -261,7 +274,7 @@ fun AgendaScreen(
                             TASK -> {
                                 DropdownMenuItem(
                                     onClick = {
-                                        agendaActions(AgendaActions.CreateItem(agendaItem))
+                                        agendaActions(CreateItem(agendaItem))
                                     },
                                     text = { Text(stringResource(R.string.task)) }
                                 )
@@ -270,7 +283,7 @@ fun AgendaScreen(
                             EVENT -> {
                                 DropdownMenuItem(
                                     onClick = {
-                                        agendaActions(AgendaActions.CreateItem(agendaItem))
+                                        agendaActions(CreateItem(agendaItem))
                                     },
                                     text = { Text(stringResource(R.string.event)) }
                                 )
@@ -283,11 +296,11 @@ fun AgendaScreen(
             Box(modifier = Modifier.align(Alignment.TopEnd)){
                 DropdownMenu(
                     expanded = stateAgenda.isProfileMenuVisible,
-                    onDismissRequest = { agendaActions(AgendaActions.DismissProfileMenu) },
+                    onDismissRequest = { agendaActions(DismissProfileMenu) },
                 ) {
                     DropdownMenuItem(
                         onClick = {
-                            agendaActions(AgendaActions.Logout)
+                            agendaActions(Logout)
                         },
                         text = { Text(stringResource(R.string.logout)) }
                     )

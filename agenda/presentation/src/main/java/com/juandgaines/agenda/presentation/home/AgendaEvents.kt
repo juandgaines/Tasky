@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.presentation.home
 
 import com.juandgaines.core.presentation.ui.UiText
 
