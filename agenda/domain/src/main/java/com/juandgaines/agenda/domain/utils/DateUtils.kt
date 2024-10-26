@@ -75,3 +75,16 @@ fun ZonedDateTime.toFormattedSingleDateTime(): String {
     }
 }
 
+//Get time from ZonedDateTime
+fun ZonedDateTime.toFormattedTime(): String {
+    DateTimeFormatter.ofPattern("HH:mm").let {
+        return this.format(it)
+    }
+}
+
+fun ZonedDateTime.toFormattedDate(): String {
+    DateTimeFormatter.ofPattern("MMM dd yyyy").let {
+        return this.format(it)
+    }
+}
+

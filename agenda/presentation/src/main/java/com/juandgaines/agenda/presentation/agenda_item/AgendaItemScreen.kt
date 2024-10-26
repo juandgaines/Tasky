@@ -35,6 +35,8 @@ import com.juandgaines.agenda.domain.agenda.AgendaType
 import com.juandgaines.agenda.domain.agenda.AgendaType.Event
 import com.juandgaines.agenda.domain.agenda.AgendaType.Reminder
 import com.juandgaines.agenda.domain.task.Task
+import com.juandgaines.agenda.domain.utils.toFormattedDate
+import com.juandgaines.agenda.domain.utils.toFormattedTime
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.core.presentation.designsystem.CloseIcon
 import com.juandgaines.core.presentation.designsystem.EditIcon
@@ -127,6 +129,17 @@ fun AgendaItemScreen(
                 modifier = Modifier
                     .fillMaxWidth(),
                 color = TaskyLight
+            )
+
+            StartDateSection(
+                date = state.agendaItem.date,
+                isEditing = state.isEditing,
+                onEditStartDate = {
+
+                },
+                onEditStartTime = {
+
+                }
             )
         }
     }
@@ -284,7 +297,6 @@ fun DescriptionSection(
                 tint = MaterialTheme.colorScheme.onSecondary
             )
         }
-
     }
 }
 @Preview(
@@ -301,7 +313,87 @@ fun DescriptionSectionPreview() {
     }
 }
 
+@Composable
+fun StartDateSection(
+    modifier: Modifier = Modifier,
+    date: ZonedDateTime,
+    isEditing: Boolean,
+    onEditStartDate: () -> Unit,
+    onEditStartTime: () -> Unit
+){
+    Row (
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                if (isEditing)
+                    Modifier.clickable {
+                        onEditStartDate()
+                    }
+                else Modifier
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
 
+        ) {
+
+        Text(
+            text = stringResource(id = R.string.from),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSecondary,
+        )
+
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier.weight(1f)
+                .then(
+                    if (isEditing)
+                        Modifier.clickable {
+                            onEditStartDate()
+                        }
+                    else Modifier
+                )
+        ){
+            Text(
+                text = date.toFormattedTime(),
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSecondary,
+            )
+            if (isEditing) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Edit",
+                    tint = MaterialTheme.colorScheme.onSecondary
+                )
+            }
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = date.toFormattedDate(),
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSecondary,
+                modifier = Modifier.weight(1f)
+            )
+            if (isEditing) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Edit",
+                    tint = MaterialTheme.colorScheme.onSecondary
+                )
+            }
+        }
+
+    }
+}
 
 @Preview
 @Composable
