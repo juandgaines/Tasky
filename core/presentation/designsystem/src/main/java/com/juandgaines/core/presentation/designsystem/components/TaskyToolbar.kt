@@ -4,6 +4,7 @@ package com.juandgaines.core.presentation.designsystem.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -29,6 +30,7 @@ fun TaskyToolbar(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
     backNavigation: @Composable () -> Unit = {} ,
+    actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
 ) {
     TopAppBar(
@@ -40,6 +42,7 @@ fun TaskyToolbar(
         },
         modifier = modifier,
         scrollBehavior = scrollBehavior,
+        actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
