@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juandgaines.agenda.domain.utils.toEpochMilliUtc
-import com.juandgaines.agenda.presentation.AgendaActions
+import com.juandgaines.agenda.presentation.agenda.AgendaActions
 import com.juandgaines.agenda.presentation.R
 import java.time.LocalDate
 

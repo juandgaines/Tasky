@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.presentation.agenda
 
 import com.juandgaines.agenda.componets.selector_date.SelectorDayData
 import com.juandgaines.agenda.domain.utils.toFormattedDate

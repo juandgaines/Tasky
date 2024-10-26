@@ -16,12 +16,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.juandgaines.agenda.presentation.AgendaScreenRoot
+import com.juandgaines.agenda.presentation.agenda.AgendaScreenRoot
 import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
 import com.juandgaines.auth.presentation.register.RegisterScreenRoot
 import com.juandgaines.auth.presentation.register.RegisterViewModel
 import com.juandgaines.tasky.navigation.ScreenNav
+import com.juandgaines.tasky.navigation.ScreenNav.AuthNav
+import com.juandgaines.tasky.navigation.ScreenNav.HomeNav
 
 @Composable
 fun NavigationRoot(
@@ -107,8 +109,8 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
             AgendaScreenRoot(
                 viewModel = hiltViewModel(),
                 navigateToLogin = {
-                    navController.navigate(ScreenNav.AuthNav) {
-                        popUpTo(ScreenNav.HomeNav) {
+                    navController.navigate(AuthNav) {
+                        popUpTo(HomeNav) {
                             inclusive = true
                         }
                     }

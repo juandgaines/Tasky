@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.presentation.agenda
 
 enum class AgendaItemOption {
     REMINDER,
