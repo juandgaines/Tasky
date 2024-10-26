@@ -12,4 +12,5 @@
   <string name="delete">Delete</string>
   <string name="task_deleted">Task has been deleted</string>
   <string name="task_updated">Task has been updated</string>
+  <string name="no_description">Description…</string>
 </resources>
