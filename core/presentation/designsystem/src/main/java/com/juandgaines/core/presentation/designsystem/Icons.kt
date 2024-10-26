@@ -39,3 +39,7 @@ val ArrowDownIcon: ImageVector
 val MoreHor: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.ic_menu_hor)
+
+val BellIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.ic_bell)
