@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.componets.agenda_cards
+package com.juandgaines.agenda.presentation.home.componets.agenda_cards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,21 +25,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.juandgaines.agenda.componets.Check
+import com.juandgaines.agenda.presentation.home.componets.Check
 import com.juandgaines.agenda.domain.agenda.AgendaItem
 import com.juandgaines.agenda.domain.reminder.Reminder
 import com.juandgaines.agenda.domain.task.Task
-import com.juandgaines.agenda.presentation.AgendaCardMenuOperations
+import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.core.presentation.designsystem.MoreHor
 import com.juandgaines.core.presentation.designsystem.TaskyTheme

@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.componets.selector_date
+package com.juandgaines.agenda.presentation.home.componets.selector_date
 
 import java.time.LocalDate
 

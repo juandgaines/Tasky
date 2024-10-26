@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.presentation.home
 
 import com.juandgaines.agenda.domain.task.Task
 import java.time.LocalDate
@@ -13,7 +13,7 @@ sealed interface AgendaActions{
     data object ShowCreateContextMenu : AgendaActions
     data object DismissCreateContextMenu : AgendaActions
     data class CreateItem(val option: AgendaItemOption) : AgendaActions
-    data class AgendaOperation(val agendaOperation:AgendaCardMenuOperations) : AgendaActions
+    data class AgendaOperation(val agendaOperation: AgendaCardMenuOperations) : AgendaActions
     data class ToggleDoneTask(val task: Task) : AgendaActions
     data object Logout : AgendaActions
 }
