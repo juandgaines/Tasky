@@ -192,8 +192,7 @@ fun TaskCardPreview() {
             isDone = true,
             description = "Description",
             date = "Mar 5, 10:00",
-            agendaItem = Task("1","Title", "Description",
-                alarmOptions = DAY_ONE
+            agendaItem = Task("1","Title", "Description"
                 ,ZonedDateTime.now(),
                 ZonedDateTime.now(),
                 false)
@@ -214,8 +213,7 @@ fun ReminderCardPreview() {
             description = "Description",
             date = "Mar 5, 10:00",
             agendaItem = Reminder("1","Title", "Description",
-                alarmOptions = DAY_ONE
-                , ZonedDateTime.now(), ZonedDateTime.now()),
+                ZonedDateTime.now(), ZonedDateTime.now()),
             onCheckClick = {},
             onClickItem = {},
             onMenuItemClick = {}

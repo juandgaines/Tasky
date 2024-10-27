@@ -4,6 +4,7 @@ package com.juandgaines.agenda.presentation.agenda_item
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -126,6 +127,8 @@ fun AgendaItemScreen(
                 isEditing = state.isEditing,
                 onSelectAlarmTime = {}
             )
+
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
