@@ -1,6 +1,5 @@
 package com.juandgaines.agenda.presentation.agenda_item
 
-import com.juandgaines.agenda.domain.agenda.AlarmOptions
 import java.time.ZonedDateTime
 
 data class AgendaItemState(

@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.domain.agenda
+package com.juandgaines.agenda.presentation.agenda_item
 
 enum class AlarmOptions {
     MINUTES_TEN,

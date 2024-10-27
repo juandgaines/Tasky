@@ -27,7 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.juandgaines.agenda.domain.agenda.AlarmOptions
+import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.core.presentation.designsystem.BellIcon
 import com.juandgaines.core.presentation.designsystem.TaskyGray
@@ -44,10 +44,10 @@ fun AlarmSection(
     var isExpanded  by remember { mutableStateOf(false) }
     val options = listOf(
         AlarmOptions.MINUTES_TEN to stringResource(R.string.ten_minutes_before),
-            AlarmOptions.MINUTES_THIRTY to stringResource(R.string.thirty_minutes_before),
-            AlarmOptions.HOUR_ONE to stringResource(R.string.one_hour_before),
-            AlarmOptions.HOUR_SIX to  stringResource(R.string.six_hours_before),
-            AlarmOptions.DAY_ONE to  stringResource(R.string.one_day_before)
+        AlarmOptions.MINUTES_THIRTY to stringResource(R.string.thirty_minutes_before),
+        AlarmOptions.HOUR_ONE to stringResource(R.string.one_hour_before),
+        AlarmOptions.HOUR_SIX to  stringResource(R.string.six_hours_before),
+        AlarmOptions.DAY_ONE to  stringResource(R.string.one_day_before)
     )
 
     val alarmText = options.find { it.first == alarm }?.second ?: ""

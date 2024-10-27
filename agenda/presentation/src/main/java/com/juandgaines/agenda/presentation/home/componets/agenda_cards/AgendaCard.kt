@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
-import com.juandgaines.agenda.domain.agenda.AlarmOptions.DAY_ONE
+import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.DAY_ONE
 import com.juandgaines.agenda.presentation.home.componets.Check
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations
 import com.juandgaines.agenda.presentation.R
