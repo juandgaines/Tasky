@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
+import com.juandgaines.agenda.domain.agenda.AlarmOptions.DAY_ONE
 import com.juandgaines.agenda.presentation.home.componets.Check
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations
 import com.juandgaines.agenda.presentation.R
@@ -191,7 +192,12 @@ fun TaskCardPreview() {
             isDone = true,
             description = "Description",
             date = "Mar 5, 10:00",
-            agendaItem = Task("1","Title", "Description", ZonedDateTime.now(), ZonedDateTime.now(), false),
+            agendaItem = Task("1","Title", "Description",
+                alarmOptions = DAY_ONE
+                ,ZonedDateTime.now(),
+                ZonedDateTime.now(),
+                false)
+            ,
             onCheckClick = {},
             onClickItem = {},
             onMenuItemClick = {}
@@ -207,7 +213,9 @@ fun ReminderCardPreview() {
             title = "Title",
             description = "Description",
             date = "Mar 5, 10:00",
-            agendaItem = Reminder("1","Title", "Description", ZonedDateTime.now(), ZonedDateTime.now()),
+            agendaItem = Reminder("1","Title", "Description",
+                alarmOptions = DAY_ONE
+                , ZonedDateTime.now(), ZonedDateTime.now()),
             onCheckClick = {},
             onClickItem = {},
             onMenuItemClick = {}

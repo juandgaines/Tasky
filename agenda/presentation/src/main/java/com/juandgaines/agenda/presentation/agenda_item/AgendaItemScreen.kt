@@ -15,7 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.juandgaines.agenda.domain.agenda.AlarmOptions
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
+import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
 import com.juandgaines.agenda.presentation.agenda_item.components.StartDateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
@@ -119,6 +121,12 @@ fun AgendaItemScreen(
 
                 }
             )
+
+            AlarmSection(
+                alarm = state.alarm,
+                isEditing = state.isEditing,
+                onSelectAlarmTime = {}
+            )
         }
     }
 }
@@ -134,7 +142,8 @@ fun AgendaItemScreenPreview() {
                 title = "Title",
                 description = "",
                 startDateTime = ZonedDateTime.now(),
-                details = AgendaItemDetails.ReminderDetails
+                details = AgendaItemDetails.ReminderDetails,
+                alarm = AlarmOptions.MINUTES_TEN
             ),
             onAction = {}
         )
