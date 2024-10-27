@@ -33,13 +33,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.presentation.home.componets.AgendaDatePicker
 import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
-import com.juandgaines.agenda.domain.reminder.Reminder
-import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
@@ -203,7 +203,7 @@ fun AgendaScreen(
                         when (agendaItem) {
                             is Item -> {
                                 when (val item= agendaItem.agendaItem) {
-                                    is Task -> {
+                                    is Task-> {
                                         AgendaCard(
                                             onCheckClick = {
                                                 agendaActions(ToggleDoneTask(item))

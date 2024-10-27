@@ -5,13 +5,12 @@ import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toReminderEntity
 import com.juandgaines.agenda.data.mappers.toReminderRequest
 import com.juandgaines.agenda.data.reminder.remote.ReminderApi
-import com.juandgaines.agenda.domain.reminder.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.core.data.database.reminder.ReminderDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.LocalError
-import com.juandgaines.core.domain.util.Error
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.asEmptyDataResult
 import com.juandgaines.core.domain.util.map

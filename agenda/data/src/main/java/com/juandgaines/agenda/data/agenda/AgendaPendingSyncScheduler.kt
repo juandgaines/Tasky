@@ -13,16 +13,15 @@ import com.juandgaines.agenda.data.agenda.workers.DeleteAgendaItemWorker
 import com.juandgaines.agenda.data.agenda.workers.FetchAgendaWorker
 import com.juandgaines.agenda.data.agenda.workers.UpdateAgendaItemWorker
 import com.juandgaines.agenda.data.mappers.toTaskEntity
-import com.juandgaines.agenda.domain.agenda.AgendaItem
+import com.juandgaines.agenda.domain.agenda.AgendaItems
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations.CreateAgendaItem
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations.DeleteAgendaItem
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations.FetchAgendas
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations.UpdateAgendaItem
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
-import com.juandgaines.agenda.domain.agenda.AgendaType
-import com.juandgaines.agenda.domain.agenda.AgendaType.Event
-import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.database.agenda.DeleteReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteTaskSyncEntity
@@ -88,17 +87,14 @@ class AgendaPendingSyncScheduler (
         workManager.enqueue(workRequest).await()
     }
 
-    private suspend fun scheduleUpdateAgendaItem(agendaItem: AgendaItem) {
+    private suspend fun scheduleUpdateAgendaItem(agendaItem: AgendaItems) {
         val userId = sessionStorage.get()?.userId ?: return
 
-        when (agendaItem.type) {
-            Event -> {
-
+        when (agendaItem) {
+            is Reminder -> {
+                //TODO update reminder
             }
-            AgendaType.Reminder -> {
-               //TODO update reminder
-            }
-            AgendaType.Task -> {
+            is Task -> {
                 val task = agendaItem as Task
                 agendaSyncDao.upsertUpdateTaskSync(
                     UpdateTaskSyncEntity(
@@ -134,14 +130,12 @@ class AgendaPendingSyncScheduler (
     }
 
 
-    private suspend fun scheduleDeleteAgendaItem(agendaItem: AgendaItem) {
+    private suspend fun scheduleDeleteAgendaItem(agendaItem: AgendaItems) {
         val userId = sessionStorage.get()?.userId ?: return
 
-        when (agendaItem.type) {
-            Event -> {
+        when (agendaItem) {
 
-            }
-            AgendaType.Reminder -> {
+            is Reminder ->{
                 agendaSyncDao.upsertDeleteReminderSync(
                     DeleteReminderSyncEntity(
                         reminderId = agendaItem.id,
@@ -149,7 +143,7 @@ class AgendaPendingSyncScheduler (
                     )
                 )
             }
-            AgendaType.Task -> {
+            is Task -> {
                 agendaSyncDao.upsertDeleteTaskSync(
                     DeleteTaskSyncEntity(
                         taskId = agendaItem.id,

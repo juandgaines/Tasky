@@ -32,10 +32,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.juandgaines.agenda.domain.agenda.AgendaItems
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.presentation.home.componets.Check
-import com.juandgaines.agenda.domain.agenda.AgendaItem
-import com.juandgaines.agenda.domain.reminder.Reminder
-import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.core.presentation.designsystem.MoreHor
@@ -52,7 +52,7 @@ fun AgendaCard(
     onMenuItemClick: (AgendaCardMenuOperations) -> Unit,
     description: String,
     date: String,
-    agendaItem: AgendaItem
+    agendaItem: AgendaItems
 ) {
     val colorBackground= when (agendaItem){
         is Task ->MaterialTheme.colorScheme.primary
