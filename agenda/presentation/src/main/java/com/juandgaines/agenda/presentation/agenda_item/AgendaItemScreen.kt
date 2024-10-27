@@ -14,8 +14,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
@@ -23,6 +26,7 @@ import com.juandgaines.agenda.presentation.agenda_item.components.StartDateSecti
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
 import com.juandgaines.core.presentation.designsystem.CloseIcon
 import com.juandgaines.core.presentation.designsystem.EditIcon
+import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyLight
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
@@ -41,6 +45,11 @@ fun AgendaItemScreen(
     state: AgendaItemState,
     onAction: (AgendaItemAction) -> Unit
 ) {
+    val agendaItemName = when (state.details) {
+        is AgendaItemDetails.ReminderDetails -> stringResource(id = R.string.reminder)
+        is AgendaItemDetails.EventDetails -> stringResource(id = R.string.event)
+        is AgendaItemDetails.TaskDetails -> stringResource(id = R.string.task)
+    }
     TaskyScaffold (
         topAppBar = {
             TaskyToolbar(
@@ -129,6 +138,16 @@ fun AgendaItemScreen(
             )
 
             Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
+                style = MaterialTheme.typography.titleSmall,
+                color = TaskyGray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            )
         }
     }
 }
