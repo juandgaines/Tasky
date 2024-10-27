@@ -4,15 +4,21 @@
   <string name="cancel">Cancel</string>
   <string name="reminder">Reminder</string>
   <string name="task">Task</string>
+  <string name="event">Event</string>
   <string name="logout">Logout</string>
   <string name="logout_success">You logged out.</string>
-  <string name="event">Event</string>
   <string name="open">Open</string>
   <string name="edit">Edit</string>
   <string name="delete">Delete</string>
+  <string name="delete_item">Delete %s</string>
   <string name="task_deleted">Task has been deleted</string>
   <string name="task_updated">Task has been updated</string>
   <string name="no_description">Description…</string>
   <string name="at">At</string>
   <string name="from">From</string>
+  <string name="ten_minutes_before">10 minutes before</string>
+  <string name="thirty_minutes_before">30 minutes before</string>
+  <string name="one_hour_before">1 hour before</string>
+  <string name="six_hours_before">6 hours before</string>
+  <string name="one_day_before">1 day before</string>
 </resources>

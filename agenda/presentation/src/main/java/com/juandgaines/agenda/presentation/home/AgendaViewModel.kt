@@ -7,12 +7,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
-import com.juandgaines.agenda.domain.reminder.Reminder
-import com.juandgaines.agenda.domain.task.Task
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.endOfDay
 import com.juandgaines.agenda.domain.utils.startOfDay
@@ -56,6 +56,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -78,6 +80,7 @@ class AgendaViewModel @Inject constructor(
     private val _selectedDate = MutableStateFlow(state.selectedLocalDate)
 
     init {
+
         viewModelScope.launch {
             agendaSyncScheduler.scheduleSync(
                 AgendaSyncOperations.FetchAgendas(

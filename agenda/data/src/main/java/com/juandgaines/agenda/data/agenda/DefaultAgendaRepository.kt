@@ -6,7 +6,7 @@ import com.juandgaines.agenda.data.mappers.toTask
 import com.juandgaines.agenda.data.mappers.toTaskRequest
 import com.juandgaines.agenda.data.reminder.remote.ReminderApi
 import com.juandgaines.agenda.data.task.remote.TaskApi
-import com.juandgaines.agenda.domain.agenda.AgendaItem
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
@@ -41,7 +41,7 @@ class DefaultAgendaRepository @Inject constructor(
     override fun getItems(
         startDate: Long,
         endDay: Long
-    ): Flow<List<AgendaItem>> = combine(
+    ): Flow<List<AgendaItems>> = combine(
         reminderRepository.getReminders(
             startDate,
             endDay

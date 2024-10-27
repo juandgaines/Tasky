@@ -31,14 +31,7 @@ fun StartDateSection(
 ){
     Row (
         modifier = modifier
-            .fillMaxWidth()
-            .then(
-                if (isEditing)
-                    Modifier.clickable {
-                        onEditStartDate()
-                    }
-                else Modifier
-            ),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
 
@@ -54,13 +47,9 @@ fun StartDateSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier.weight(1f)
-                .then(
-                    if (isEditing)
-                        Modifier.clickable {
-                            onEditStartDate()
-                        }
-                    else Modifier
-                )
+                .clickable (enabled = isEditing) {
+                    onEditStartTime()
+                },
         ){
             Text(
                 text = date.toFormattedTime(),
@@ -82,6 +71,9 @@ fun StartDateSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier.weight(1f)
+                .clickable (enabled = isEditing) {
+                    onEditStartDate()
+                }
         ) {
             Text(
                 text = date.toFormattedDate(),

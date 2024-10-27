@@ -23,7 +23,7 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 @Composable
 fun DescriptionSection(
     modifier: Modifier = Modifier,
-    description: String ?,
+    description: String,
     isEditing: Boolean,
     onEditTitle: () -> Unit
 ){
@@ -42,13 +42,16 @@ fun DescriptionSection(
 
         ) {
         Text(
-            text = description ?: stringResource(id = R.string.no_description),
+            text = description.ifEmpty {
+                stringResource(id = R.string.no_description)
+            },
             style = MaterialTheme.typography.bodySmall,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
-            color = description?.let {
-                MaterialTheme.colorScheme.onSecondary
-            } ?: TaskyGray,
+            color = if (description.isEmpty())
+                TaskyGray
+            else
+                MaterialTheme.colorScheme.secondary,
             modifier = Modifier.weight(1f)
         )
         if (isEditing) {
