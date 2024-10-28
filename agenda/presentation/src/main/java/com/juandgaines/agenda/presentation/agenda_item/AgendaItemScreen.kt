@@ -39,7 +39,6 @@ import java.time.ZonedDateTime
 @Composable
 fun AgendaItemScreenRoot(
     viewModel: AgendaItemViewModel = hiltViewModel(),
-    navigateToEditDetail: () -> Unit,
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state

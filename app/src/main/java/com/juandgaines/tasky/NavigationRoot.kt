@@ -138,9 +138,6 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         composable<ScreenNav.AgendaItem> {
             AgendaItemScreenRoot(
                 viewModel = hiltViewModel(),
-                navigateToEditDetail = {
-
-                },
                 navigateBack = {
                     navController.navigateUp()
                 }
