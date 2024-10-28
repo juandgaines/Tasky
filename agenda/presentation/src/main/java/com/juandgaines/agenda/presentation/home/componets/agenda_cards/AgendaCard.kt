@@ -83,7 +83,10 @@ fun AgendaCard(
                 shape = RoundedCornerShape(16.dp)
             )
             .height(124.dp)
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable {
+                onClickItem()
+            },
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ){
         Box(

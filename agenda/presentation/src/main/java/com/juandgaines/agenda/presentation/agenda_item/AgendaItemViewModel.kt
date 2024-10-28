@@ -102,7 +102,11 @@ class AgendaItemViewModel @Inject constructor(
             SelectDateStart -> TODO()
             SelectTimeStart -> TODO()
             Delete -> TODO()
-            Edit -> TODO()
+            Edit -> {
+                state = state.copy(
+                    isEditing = true
+                )
+            }
             Save -> TODO()
             else -> Unit
         }

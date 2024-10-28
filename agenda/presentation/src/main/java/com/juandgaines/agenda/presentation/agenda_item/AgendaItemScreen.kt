@@ -2,6 +2,7 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -89,6 +90,9 @@ fun AgendaItemScreen(
                     Icon(
                         imageVector = CloseIcon,
                         contentDescription = "Close",
+                        modifier = Modifier.clickable {
+                            onAction(AgendaItemAction.Close)
+                        }
                     )
                 },
                 content = {
@@ -96,6 +100,7 @@ fun AgendaItemScreen(
                         text = state.title,
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 },
                 actions = {
@@ -110,6 +115,7 @@ fun AgendaItemScreen(
                         Icon(
                             imageVector = EditIcon,
                             contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -127,7 +133,8 @@ fun AgendaItemScreen(
                 agendaItemName = agendaItemName
             )
             TitleSection(
-                title = state.title
+                title = state.title,
+                isEditing = state.isEditing,
             )
             HorizontalDivider(
                 modifier = Modifier
