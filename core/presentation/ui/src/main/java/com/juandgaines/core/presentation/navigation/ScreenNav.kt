@@ -1,4 +1,4 @@
-package com.juandgaines.tasky.navigation
+package com.juandgaines.core.presentation.navigation
 
 import kotlinx.serialization.Serializable
 
@@ -13,4 +13,10 @@ sealed interface ScreenNav {
     data object HomeNav : ScreenNav
     @Serializable
     data object Agenda : ScreenNav
+
+    @Serializable
+    data class AgendaItem(
+        val id: String? = null,
+        val type:Int
+    ) : ScreenNav
 }

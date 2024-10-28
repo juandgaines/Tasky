@@ -35,11 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
-import com.juandgaines.agenda.presentation.home.componets.AgendaDatePicker
-import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
-import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
-import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
-import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
 import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
@@ -60,6 +55,11 @@ import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
 import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
+import com.juandgaines.agenda.presentation.home.componets.AgendaDatePicker
+import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
+import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
+import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
+import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -71,6 +71,8 @@ import com.juandgaines.core.presentation.ui.UiText
 @Composable
 fun AgendaScreenRoot(
     viewModel: AgendaViewModel,
+    navigateToCreateAgendaItem : (Int) -> Unit,
+    navigateToAgendaItem : (Int,Int) -> Unit,
     navigateToLogin: () -> Unit
 ){
     val state = viewModel.state
@@ -109,7 +111,24 @@ fun AgendaScreenRoot(
 
     AgendaScreen(
         stateAgenda = state,
-        agendaActions = viewModel::onAction
+        agendaActions = { action ->
+            when(action){
+                is CreateItem -> {
+                    when(action.option){
+                        REMINDER -> {
+                            navigateToCreateAgendaItem(REMINDER.ordinal)
+                        }
+                        TASK -> {
+                            navigateToCreateAgendaItem(TASK.ordinal)
+                        }
+                        EVENT -> {
+                            navigateToCreateAgendaItem(EVENT.ordinal)
+                        }
+                    }
+                }
+                else -> viewModel.onAction(action)
+            }
+        }
     )
 }
 
@@ -118,8 +137,6 @@ fun AgendaScreen(
     stateAgenda: AgendaState,
     agendaActions: (AgendaActions)->Unit
 ) {
-    val density = LocalDensity.current
-
 
     TaskyScaffold (
         fabPosition = FabPosition.End,

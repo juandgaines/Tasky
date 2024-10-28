@@ -21,7 +21,6 @@ import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
-import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
@@ -56,8 +55,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -168,10 +165,6 @@ class AgendaViewModel @Inject constructor(
                 DismissCreateContextMenu ->
                     state = state.copy(isCreateContextMenuVisible = false)
 
-                is CreateItem -> {
-
-                }
-
                 Logout ->{
                     state = state.copy(isLoading = true)
                     when(val result = authCoreService.logout()){
@@ -227,6 +220,8 @@ class AgendaViewModel @Inject constructor(
                             eventChannel.send(AgendaEvents.Error(it.asUiText()))
                         }
                 }
+
+                else -> Unit
             }
         }
     }

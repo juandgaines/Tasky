@@ -18,7 +18,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.juandgaines.agenda.presentation.R
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Saved
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
@@ -31,12 +33,38 @@ import com.juandgaines.core.presentation.designsystem.TaskyLight
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.designsystem.components.TaskyToolbar
+import com.juandgaines.core.presentation.ui.ObserveAsEvents
 import java.time.ZonedDateTime
 
 @Composable
 fun AgendaItemScreenRoot(
-
+    viewModel: AgendaItemViewModel = hiltViewModel(),
+    navigateToEditDetail: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
+    val state = viewModel.state
+    val events = viewModel.events
+
+    ObserveAsEvents(events) { agendaItemEvents->
+        when (agendaItemEvents){
+            Saved -> {
+                navigateBack()
+            }
+        }
+    }
+
+    AgendaItemScreen(
+        state = state,
+        onAction = {  action->
+            when(action){
+                is AgendaItemAction.Close -> {
+                    navigateBack()
+                }
+                else -> viewModel.onAction(action)
+            }
+
+        }
+    )
 
 }
 
@@ -49,6 +77,7 @@ fun AgendaItemScreen(
         is AgendaItemDetails.ReminderDetails -> stringResource(id = R.string.reminder)
         is AgendaItemDetails.EventDetails -> stringResource(id = R.string.event)
         is AgendaItemDetails.TaskDetails -> stringResource(id = R.string.task)
+        else -> ""
     }
     TaskyScaffold (
         topAppBar = {
@@ -95,7 +124,8 @@ fun AgendaItemScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ){
             AgendaItemTypeSection(
-                agendaItemDetails = state.details
+                agendaItemDetails = state.details,
+                agendaItemName = agendaItemName
             )
             TitleSection(
                 title = state.title

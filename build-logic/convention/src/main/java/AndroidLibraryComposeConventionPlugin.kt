@@ -11,6 +11,7 @@ class AndroidLibraryComposeConventionPlugin:Plugin<Project>{
             pluginManager.run {
                 apply("tasky.android.library")
                 apply("org.jetbrains.kotlin.plugin.compose")
+                apply("org.jetbrains.kotlin.plugin.serialization")
             }
 
             val extension = extensions.getByType<LibraryExtension>()

@@ -10,6 +10,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.activity.compose)
 
-    implementation(projects.agenda.domain)
     implementation(projects.core.domain)
+    implementation(projects.agenda.domain)
 }

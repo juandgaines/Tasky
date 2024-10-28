@@ -15,6 +15,7 @@ internal fun Project.configureAndroidCompose(
     dependencies {
         val bom = libs.findLibrary("androidx.compose.bom").get()
         val toolingPreview = libs.findLibrary("androidx.ui.tooling.preview").get()
+        "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
         "implementation"(platform(bom))
         "androidTestImplementation"(platform(bom))
         "debugImplementation"(toolingPreview)
