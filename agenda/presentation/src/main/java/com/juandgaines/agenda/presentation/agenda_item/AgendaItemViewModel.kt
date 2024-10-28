@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
@@ -29,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AgendaItemViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val reminderRepository: ReminderRepository
 ):ViewModel() {
 
     var state by mutableStateOf(AgendaItemState())
@@ -44,18 +46,31 @@ class AgendaItemViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val idItem = navParameters.id
-            if (idItem != null){
-                state = state.copy(
-                    isEditing = false
-                )
-                val type = AgendaItemOption.fromOrdinal(navParameters.type)
-                when (type){
-                    AgendaItemOption.REMINDER ->{
+            state = state.copy(
+                isEditing = navParameters.isEditing
+            )
+            val type = AgendaItemOption.fromOrdinal(navParameters.type)
+            when (type){
+                AgendaItemOption.REMINDER ->{
+                    if (idItem != null){
+                        val response = reminderRepository.getReminderById(idItem)
+                        response.onSuccess { reminder->
+                            state = state.copy(
+                                title = reminder.title,
+                                description = reminder.description,
+                                startDateTime = reminder.time,
+                                details = ReminderDetails
+                            )
+                        }
+                    }
+                    else {
                         state = state.copy(
                             details = ReminderDetails
                         )
                     }
-                    AgendaItemOption.TASK -> {
+                }
+                AgendaItemOption.TASK -> {
+                    if (idItem != null){
                         val response = taskRepository.getTaskById(idItem)
                         response.onSuccess { task->
                             state = state.copy(
@@ -66,30 +81,15 @@ class AgendaItemViewModel @Inject constructor(
                             )
                         }
                     }
-                    AgendaItemOption.EVENT ->{
-
-                    }
-                }
-            }
-            else{
-                state = state.copy(
-                    isEditing = true
-                )
-                val type = AgendaItemOption.fromOrdinal(navParameters.type)
-                when (type){
-                    AgendaItemOption.REMINDER ->{
-                        state = state.copy(
-                            details = ReminderDetails
-                        )
-                    }
-                    AgendaItemOption.TASK -> {
+                    else{
                         state = state.copy(
                             details = TaskDetails
                         )
                     }
-                    AgendaItemOption.EVENT ->{
 
-                    }
+                }
+                AgendaItemOption.EVENT ->{
+
                 }
             }
         }

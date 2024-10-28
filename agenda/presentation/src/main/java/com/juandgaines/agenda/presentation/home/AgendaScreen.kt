@@ -259,8 +259,8 @@ fun AgendaScreen(
                                             title = item.title,
                                             description = item.description ?: "",
                                             date = item.time.toFormattedSingleDateTime(),
-                                            onMenuItemClick = {
-
+                                            onMenuItemClick = { operation ->
+                                                agendaActions(AgendaOperation(operation))
                                             }
                                         )
                                     }
