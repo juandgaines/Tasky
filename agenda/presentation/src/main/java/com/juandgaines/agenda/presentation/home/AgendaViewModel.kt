@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -80,6 +81,18 @@ class AgendaViewModel @Inject constructor(
 
     init {
 
+        viewModelScope.launch {
+            taskRepository.insertTask(
+                Task(
+                    title = "Task 1",
+                    description = "Description 1",
+                    isDone = false,
+                    time = ZonedDateTime.now(),
+                    remindAt = ZonedDateTime.now(),
+                    id = "2"
+                )
+            )
+        }
         viewModelScope.launch {
             agendaSyncScheduler.scheduleSync(
                 AgendaSyncOperations.FetchAgendas(
