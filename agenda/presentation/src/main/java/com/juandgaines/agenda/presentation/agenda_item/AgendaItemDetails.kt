@@ -5,7 +5,7 @@ import java.time.ZonedDateTime
 sealed interface AgendaItemDetails {
 
     data class EventDetails(
-        val finishDate:ZonedDateTime
+        val finishDate:ZonedDateTime = ZonedDateTime.now(),
     ): AgendaItemDetails
 
     data object TaskDetails: AgendaItemDetails

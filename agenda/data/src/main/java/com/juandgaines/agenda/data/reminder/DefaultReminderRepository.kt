@@ -90,6 +90,12 @@ class DefaultReminderRepository @Inject constructor(
         } ?: Result.Error(LocalError.NOT_FOUND)
     }
 
+    override fun getReminderByIdFlow(reminderId: String): Flow<Reminder?> {
+        return reminderDao.getReminderByIdFlow(reminderId).map {
+            it?.toReminder()
+        }
+    }
+
     override suspend fun deleteReminder(reminder: Reminder): Result<Unit, DataError> {
         val reminderId = reminder.id
         reminderDao.deleteReminderById(reminderId)

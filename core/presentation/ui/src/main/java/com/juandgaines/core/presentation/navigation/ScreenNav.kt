@@ -20,4 +20,9 @@ sealed interface ScreenNav {
         val type:Int,
         val isEditing:Boolean = false
     ) : ScreenNav
+    {
+        companion object{
+
+        }
+    }
 }

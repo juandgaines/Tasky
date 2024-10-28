@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Saved
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
@@ -43,6 +44,7 @@ fun AgendaItemScreenRoot(
     navigateBack: () -> Unit,
 ) {
     val state = viewModel.state
+    val collection = viewModel.taskInfo.collectAsStateWithLifecycle()
     val events = viewModel.events
 
     ObserveAsEvents(events) { agendaItemEvents->
