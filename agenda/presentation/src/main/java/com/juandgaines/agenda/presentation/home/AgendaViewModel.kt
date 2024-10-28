@@ -13,6 +13,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
+import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.endOfDay
 import com.juandgaines.agenda.domain.utils.startOfDay
@@ -64,6 +65,7 @@ class AgendaViewModel @Inject constructor(
     private val authCoreService: AuthCoreService,
     private val agendaRepository: AgendaRepository,
     private val taskRepository: TaskRepository,
+    private val reminderRepository: ReminderRepository,
     private val agendaSyncScheduler: AgendaSyncScheduler
 ):ViewModel() {
 
@@ -195,15 +197,46 @@ class AgendaViewModel @Inject constructor(
                                        }
                                 }
                                 is Reminder -> {
-
+                                    reminderRepository.deleteReminder(agendaItem)
+                                        .onSuccess {
+                                            eventChannel.send(
+                                                AgendaEvents.Success(
+                                                    StringResource(R.string.reminder_deleted)
+                                                )
+                                            )
+                                        }.onError {
+                                            eventChannel.send(AgendaEvents.Error(it.asUiText()))
+                                        }
                                 }
                             }
                         }
                         is Edit -> {
-
+                            val item = action.agendaOperation.agendaItem
+                            val type =  when (item) {
+                                is Task -> {
+                                    AgendaItemOption.TASK
+                                }
+                                is Reminder -> {
+                                    AgendaItemOption.REMINDER
+                                }
+                            }
+                            eventChannel.send(
+                                AgendaEvents.GoToDetail(item.id, type, true)
+                            )
                         }
                         is Open -> {
-
+                            val item = action.agendaOperation.agendaItem
+                            val type =  when (item) {
+                                is Task -> {
+                                    AgendaItemOption.TASK
+                                }
+                                is Reminder -> {
+                                    AgendaItemOption.REMINDER
+                                }
+                            }
+                            eventChannel.send(
+                                AgendaEvents.GoToDetail(item.id, type, false)
+                            )
                         }
                     }
                 }

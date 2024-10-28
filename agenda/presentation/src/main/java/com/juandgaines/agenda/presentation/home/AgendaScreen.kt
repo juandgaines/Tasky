@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +47,7 @@ import com.juandgaines.agenda.presentation.home.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowProfileMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.ToggleDoneTask
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Error
+import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToDetail
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Success
 import com.juandgaines.agenda.presentation.home.AgendaItemOption.EVENT
@@ -66,13 +66,13 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyFAB
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.ui.ObserveAsEvents
-import com.juandgaines.core.presentation.ui.UiText
+import com.juandgaines.core.presentation.ui.UiText.StringResource
 
 @Composable
 fun AgendaScreenRoot(
     viewModel: AgendaViewModel,
     navigateToCreateAgendaItem : (Int) -> Unit,
-    navigateToAgendaItem : (Int,Int) -> Unit,
+    navigateToAgendaItem : (String,Int,Boolean) -> Unit,
     navigateToLogin: () -> Unit
 ){
     val state = viewModel.state
@@ -87,7 +87,7 @@ fun AgendaScreenRoot(
                 navigateToLogin()
                 Toast.makeText(
                     context,
-                     UiText.StringResource(R.string.logout_success).asString(context),
+                     StringResource(R.string.logout_success).asString(context),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -104,6 +104,10 @@ fun AgendaScreenRoot(
                     agendaEvents.message.asString(context),
                     Toast.LENGTH_SHORT
                 ).show()
+            }
+
+            is GoToDetail -> {
+                navigateToAgendaItem(agendaEvents.id, agendaEvents.type.ordinal, agendaEvents.isEditing)
             }
         }
 
@@ -228,7 +232,11 @@ fun AgendaScreen(
                                             agendaItem = item,
                                             isDone = item.isDone,
                                             onClickItem = {
-
+                                                agendaActions(
+                                                    AgendaOperation(
+                                                        AgendaCardMenuOperations.Open(item)
+                                                    )
+                                                )
                                             },
                                             title = item.title,
                                             description = item.description ?: "",
@@ -242,7 +250,11 @@ fun AgendaScreen(
                                         AgendaCard(
                                             agendaItem = item,
                                             onClickItem = {
-
+                                                agendaActions(
+                                                    AgendaOperation(
+                                                        AgendaCardMenuOperations.Open(item)
+                                                    )
+                                                )
                                             },
                                             title = item.title,
                                             description = item.description ?: "",

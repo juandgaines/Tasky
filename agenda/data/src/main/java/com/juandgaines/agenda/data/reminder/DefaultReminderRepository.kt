@@ -90,7 +90,8 @@ class DefaultReminderRepository @Inject constructor(
         } ?: Result.Error(LocalError.NOT_FOUND)
     }
 
-    override suspend fun deleteReminder(reminderId: String): Result<Unit, DataError> {
+    override suspend fun deleteReminder(reminder: Reminder): Result<Unit, DataError> {
+        val reminderId = reminder.id
         reminderDao.deleteReminderById(reminderId)
         val response = safeCall {
             reminderApi.deleteReminderById(reminderId)
