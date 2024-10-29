@@ -5,7 +5,6 @@ package com.juandgaines.agenda.presentation.agenda_item
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,23 +24,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.juandgaines.agenda.domain.utils.toUtcFromZonedDateTime
-import com.juandgaines.agenda.domain.utils.toUtcLocalDate
 import com.juandgaines.agenda.presentation.R
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Saved
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
 import com.juandgaines.agenda.presentation.agenda_item.components.StartDateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
-import com.juandgaines.agenda.presentation.home.componets.AgendaDatePicker
+import com.juandgaines.agenda.presentation.components.AgendaDatePicker
+import com.juandgaines.agenda.presentation.components.AgendaTimePicker
 import com.juandgaines.core.presentation.designsystem.CloseIcon
 import com.juandgaines.core.presentation.designsystem.EditIcon
 import com.juandgaines.core.presentation.designsystem.TaskyBrown
@@ -162,10 +161,10 @@ fun AgendaItemScreen(
                 if(state.isSelectDateDialog){
                     AgendaDatePicker(
                         onDateSelected = { date->
-                            onAction(AgendaItemAction.SelectDateStart(date))
+                            onAction(SelectDateStart(date))
                         },
                         onDismissDialog = {
-                            onAction(AgendaItemAction.DismissDateDialog)
+                            onAction(DismissDateDialog)
                         },
                         initialDate = state.startDateTime.toLocalDate()
                     )
@@ -174,64 +173,19 @@ fun AgendaItemScreen(
                 if (state.isSelectTimeDialog) {
                     val hour = state.startDateTime.hour
                     val minute = state.startDateTime.minute
-                    val timePickerState = rememberTimePickerState(
-                        initialHour = hour,
-                        initialMinute = minute,
-                        is24Hour = true,
-                    )
-
-                    Column (
-                        modifier = Modifier
-                            .background(
-                                TaskyLight, shape =
-                                MaterialTheme.shapes.medium
-                            )
-                            .padding(16.dp)
-                            .align(Alignment.Center),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ){
-                        TimePicker(
-                            state = timePickerState,
-                            colors = TimePickerDefaults.colors(
-                                clockDialColor = TaskyDarkGreen,
-                                clockDialSelectedContentColor =  TaskyOrange,
-                                clockDialUnselectedContentColor = TaskyLight2,
-                                selectorColor = TaskyGreen,
-                                containerColor = TaskyLight,
-                                periodSelectorBorderColor = TaskyGreen,
-                                periodSelectorUnselectedContainerColor = TaskyBrown,
-                                periodSelectorSelectedContainerColor = TaskyGreen,
-                                periodSelectorSelectedContentColor = TaskyOrange,
-                                periodSelectorUnselectedContentColor = TaskyLight2,
-                                timeSelectorSelectedContainerColor = TaskyGreen,
-                                timeSelectorUnselectedContainerColor = TaskyBrown,
-                                timeSelectorSelectedContentColor = TaskyOrange,
-                                timeSelectorUnselectedContentColor = TaskyLight2
-                            )
-                        )
-                        Button(onClick = {
+                    AgendaTimePicker(
+                        modifier = Modifier.align(
+                            Alignment.Center
+                        ),
+                        onTimeSelected = { h, m ->
+                            onAction(AgendaItemAction.SelectTimeStart(h, m))
+                        },
+                        onDismissDialog = {
                             onAction(AgendaItemAction.DismissTimeDialog)
-                        }) {
-                            Text(
-                                "Dismiss picker",
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        Button(
-                            onClick = {
-                            val selectedHour = timePickerState.hour
-                            val selectedMinute = timePickerState.minute
-
-                            onAction(
-                                AgendaItemAction.SelectTimeStart(
-                                    selectedHour,
-                                    selectedMinute
-                                )
-                            )
-                        }) {
-                            Text("Confirm selection",color = MaterialTheme.colorScheme.onSurface)
-                        }
-                    }
+                        },
+                        initialHour = hour,
+                        initialMinutes = minute
+                    )
 
                 }
             }

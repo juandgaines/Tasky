@@ -56,7 +56,8 @@ import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
 import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
-import com.juandgaines.agenda.presentation.home.componets.AgendaDatePicker
+import com.juandgaines.agenda.presentation.components.AgendaDatePicker
+import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
@@ -279,7 +280,7 @@ fun AgendaScreen(
             if (stateAgenda.isDatePickerOpened) {
                 AgendaDatePicker(
                     onDateSelected = { date->
-                        agendaActions(AgendaActions.SelectDate(date))
+                        agendaActions(SelectDate(date))
                     },
                     onDismissDialog = {
                         agendaActions(DismissDateDialog)

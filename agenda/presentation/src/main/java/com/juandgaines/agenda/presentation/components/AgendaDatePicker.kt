@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.juandgaines.agenda.presentation.home.componets
+package com.juandgaines.agenda.presentation.components
 
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.juandgaines.agenda.domain.utils.toEpochMilliUtc
-import com.juandgaines.agenda.presentation.home.AgendaActions
 import com.juandgaines.agenda.presentation.R
 import java.time.LocalDate
 
