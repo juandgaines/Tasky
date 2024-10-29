@@ -145,7 +145,10 @@ class AgendaItemViewModel @Inject constructor(
             is SelectTimeStart ->{
                 _state.update {
                     state.value.copy(
-                        startDateTime = state.value.startDateTime.withHour(action.hour).withMinute(action.minutes),
+                        startDateTime = state.value
+                            .startDateTime
+                            .withHour(action.hour)
+                            .withMinute(action.minutes),
                         isSelectTimeDialog = false
                     )
                 }
