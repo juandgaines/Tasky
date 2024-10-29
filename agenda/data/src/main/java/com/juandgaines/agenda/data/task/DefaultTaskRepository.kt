@@ -87,6 +87,12 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
+    override fun getTaskByIdFlow(taskId: String): Flow<Task?> {
+        return taskDao.getTaskByIdFlow(taskId).map {
+            it?.toTask()
+        }
+    }
+
     override suspend fun deleteTask(task: Task): Result<Unit, DataError> {
         taskDao.deleteTask(task.id)
         val response = safeCall {

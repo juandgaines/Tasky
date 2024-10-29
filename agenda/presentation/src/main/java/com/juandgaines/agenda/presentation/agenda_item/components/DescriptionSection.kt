@@ -51,7 +51,7 @@ fun DescriptionSection(
             color = if (description.isEmpty())
                 TaskyGray
             else
-                MaterialTheme.colorScheme.secondary,
+                MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.weight(1f)
         )
         if (isEditing) {

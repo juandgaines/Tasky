@@ -10,7 +10,8 @@ interface ReminderRepository {
     suspend fun updateReminder(reminder: Reminder): Result<Unit, DataError>
     suspend fun upsertReminders(list: List<Reminder>): Result<Unit, DataError>
     suspend fun getReminderById(reminderId: String): Result<Reminder, DataError>
-    suspend fun deleteReminder(reminderId: String):Result<Unit, DataError>
+    fun getReminderByIdFlow(reminderId: String): Flow<Reminder?>
+    suspend fun deleteReminder(reminder:Reminder):Result<Unit, DataError>
     fun getReminders(
         startDate: Long,
         endDay: Long

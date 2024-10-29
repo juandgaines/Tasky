@@ -16,14 +16,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemScreenRoot
 import com.juandgaines.agenda.presentation.home.AgendaScreenRoot
 import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
 import com.juandgaines.auth.presentation.register.RegisterScreenRoot
 import com.juandgaines.auth.presentation.register.RegisterViewModel
-import com.juandgaines.tasky.navigation.ScreenNav
-import com.juandgaines.tasky.navigation.ScreenNav.AuthNav
-import com.juandgaines.tasky.navigation.ScreenNav.HomeNav
+import com.juandgaines.core.presentation.navigation.ScreenNav
+import com.juandgaines.core.presentation.navigation.ScreenNav.AuthNav
+import com.juandgaines.core.presentation.navigation.ScreenNav.HomeNav
 
 @Composable
 fun NavigationRoot(
@@ -108,12 +109,37 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         composable<ScreenNav.Agenda> {
             AgendaScreenRoot(
                 viewModel = hiltViewModel(),
+                navigateToAgendaItem = { id,type, isEditing->
+                    navController.navigate(
+                        ScreenNav.AgendaItem(
+                            id = id,
+                            type = type,
+                            isEditing = isEditing
+                        )
+                    )
+                },
+                navigateToCreateAgendaItem = { type->
+                    navController.navigate(
+                        ScreenNav.AgendaItem(
+                        type = type
+                    ))
+
+                },
                 navigateToLogin = {
                     navController.navigate(AuthNav) {
                         popUpTo(HomeNav) {
                             inclusive = true
                         }
                     }
+                }
+            )
+        }
+
+        composable<ScreenNav.AgendaItem> {
+            AgendaItemScreenRoot(
+                viewModel = hiltViewModel(),
+                navigateBack = {
+                    navController.navigateUp()
                 }
             )
         }

@@ -10,6 +10,7 @@ interface TaskRepository {
     suspend fun updateTask(task: Task): Result<Unit, DataError>
     suspend fun upsertTasks(list: List<Task>): Result<Unit, DataError>
     suspend fun getTaskById(taskId: String): Result<Task, DataError>
+    fun getTaskByIdFlow(taskId: String): Flow<Task?>
     suspend fun deleteTask(task: Task):Result<Unit,DataError>
     fun getTasks(
         startDate: Long,

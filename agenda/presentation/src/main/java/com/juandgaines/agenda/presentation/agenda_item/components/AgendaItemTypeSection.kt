@@ -12,11 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails
 import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyGreen
@@ -26,7 +24,8 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 @Composable
 fun AgendaItemTypeSection(
     modifier: Modifier = Modifier,
-    agendaItemDetails: AgendaItemDetails
+    agendaItemDetails: AgendaItemDetails?,
+    agendaItemName:String
 ){
     Row (
         modifier = modifier,
@@ -41,24 +40,20 @@ fun AgendaItemTypeSection(
                 )
                 .then(
                     when (agendaItemDetails){
-                        AgendaItemDetails.ReminderDetails -> Modifier.background(
-                            color = TaskyGray
-                        )
                         is AgendaItemDetails.TaskDetails -> Modifier.background(
                             color = TaskyGreen
                         )
                         is AgendaItemDetails.EventDetails -> Modifier.background(
                             color = TaskyLightGreen
                         )
+                        else ->Modifier.background(
+                            color = TaskyGray
+                        )
                     }
                 )
         )
         Text(
-            text = when (agendaItemDetails){
-                is AgendaItemDetails.EventDetails -> stringResource(id = R.string.event)
-                AgendaItemDetails.ReminderDetails -> stringResource(id = R.string.reminder)
-                is AgendaItemDetails.TaskDetails-> stringResource(id = R.string.task)
-            },
+            text = agendaItemName,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onPrimary,
@@ -71,7 +66,10 @@ fun AgendaItemTypeSection(
 @Composable
 fun AgendaItemTypeSectionPreview() {
     TaskyTheme {
-        AgendaItemTypeSection(agendaItemDetails = AgendaItemDetails.ReminderDetails )
+        AgendaItemTypeSection(
+            agendaItemDetails = AgendaItemDetails.ReminderDetails ,
+            agendaItemName =""
+        )
     }
 }
 

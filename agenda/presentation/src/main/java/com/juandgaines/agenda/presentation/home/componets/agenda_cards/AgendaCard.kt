@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,7 +75,7 @@ fun AgendaCard(
         else -> MaterialTheme.colorScheme.surface
     }
 
-    var isMenuExpanded by remember { mutableStateOf(false) }
+    var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     Row (
         modifier
@@ -83,7 +84,10 @@ fun AgendaCard(
                 shape = RoundedCornerShape(16.dp)
             )
             .height(124.dp)
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable {
+                onClickItem()
+            },
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ){
         Box(
@@ -154,18 +158,21 @@ fun AgendaCard(
                     DropdownMenuItem(
                         onClick = {
                             onMenuItemClick(AgendaCardMenuOperations.Open(agendaItem))
+                            isMenuExpanded = false
                         },
                         text = { Text(stringResource(R.string.open)) }
                     )
                     DropdownMenuItem(
                         onClick = {
                             onMenuItemClick(AgendaCardMenuOperations.Edit(agendaItem))
+                            isMenuExpanded = false
                         },
                         text = { Text(stringResource(R.string.edit)) }
                     )
                     DropdownMenuItem(
                         onClick = {
                             onMenuItemClick(AgendaCardMenuOperations.Delete(agendaItem))
+                            isMenuExpanded = false
                         },
                         text = { Text(stringResource(R.string.delete)) }
                     )
