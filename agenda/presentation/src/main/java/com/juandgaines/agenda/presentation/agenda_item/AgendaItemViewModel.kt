@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
+import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
+import com.juandgaines.agenda.domain.utils.toZonedDateTime
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
@@ -62,41 +64,7 @@ class AgendaItemViewModel @Inject constructor(
 
     val state:StateFlow<AgendaItemState> = _state
         .onStart {
-            _isEditing.value = _navParameters.value.isEditing
-            val type = _navParameters.value.type
-            val idItem = _navParameters.value.id
-            val agendaType=AgendaItemOption.fromOrdinal(type)
-            if (idItem != null) {
-                when (agendaType) {
-                    REMINDER -> reminderRepository.getReminderById(idItem)
-                    TASK -> taskRepository.getTaskById(idItem)
-                    EVENT -> taskRepository.getTaskById(idItem)
-                }.onSuccess { item->
-                    _state.update {
-                        _state.value.copy(
-                            title = item.title,
-                            description = item.description,
-                            details = when (agendaType) {
-                                REMINDER -> ReminderDetails
-                                TASK-> TaskDetails
-                                EVENT-> EventDetails()
-                            },
-                            startDateTime = item.date
-                        )
-                    }
-                }
-            } else {
-                _state.update {
-                    _state.value.copy(
-                        startDateTime = ZonedDateTime.now(),
-                        details = when (AgendaItemOption.fromOrdinal(type)) {
-                            REMINDER -> ReminderDetails
-                            TASK -> TaskDetails
-                            EVENT -> EventDetails()
-                        }
-                    )
-                }
-            }
+            initState()
         }
         .combine(
             _isEditing
@@ -111,10 +79,43 @@ class AgendaItemViewModel @Inject constructor(
             AgendaItemState()
         )
 
-    private fun loadAgendaItemFlow(navParameters: AgendaItem) =
-        flow<AgendaItemState> {
-
+    private suspend fun initState() {
+        _isEditing.value = _navParameters.value.isEditing
+        val type = _navParameters.value.type
+        val idItem = _navParameters.value.id
+        val agendaType = AgendaItemOption.fromOrdinal(type)
+        if (idItem != null) {
+            when (agendaType) {
+                REMINDER -> reminderRepository.getReminderById(idItem)
+                TASK -> taskRepository.getTaskById(idItem)
+                EVENT -> taskRepository.getTaskById(idItem)
+            }.onSuccess { item ->
+                _state.update {
+                    _state.value.copy(
+                        title = item.title,
+                        description = item.description,
+                        details = when (agendaType) {
+                            REMINDER -> ReminderDetails
+                            TASK -> TaskDetails
+                            EVENT -> EventDetails()
+                        },
+                        startDateTime = item.date
+                    )
+                }
+            }
+        } else {
+            _state.update {
+                _state.value.copy(
+                    startDateTime = ZonedDateTime.now(),
+                    details = when (AgendaItemOption.fromOrdinal(type)) {
+                        REMINDER -> ReminderDetails
+                        TASK -> TaskDetails
+                        EVENT -> EventDetails()
+                    }
+                )
+            }
         }
+    }
 
     fun onAction(action: AgendaItemAction){
         when (action){
@@ -125,11 +126,24 @@ class AgendaItemViewModel @Inject constructor(
 
             }
             is SelectDateStart -> {
+                val zonedDate = action.dateMillis
+                    .toUtcLocalDateTime()
+                    .toZonedDateTime(
+                        LocalTime.of(
+                            _state.value.startDateTime.hour,
+                            _state.value.startDateTime.minute
+                        )
+                    )
+                _state.update {
+                    state.value.copy(
+                        startDateTime = zonedDate,
+                        isSelectDateDialog = false
+                    )
+                }
 
             }
             is SelectTimeStart ->{
                 _state.update {
-                    val newTime= state.value.startDateTime.withHour(action.hour).withMinute(action.minutes).toString()
                     state.value.copy(
                         startDateTime = state.value.startDateTime.withHour(action.hour).withMinute(action.minutes),
                         isSelectTimeDialog = false
