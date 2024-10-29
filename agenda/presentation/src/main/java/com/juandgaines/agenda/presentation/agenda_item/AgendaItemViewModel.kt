@@ -104,6 +104,7 @@ class AgendaItemViewModel @Inject constructor(
                 }
             }
         } else {
+            _isEditing.value = true
             _state.update {
                 _state.value.copy(
                     startDateTime = ZonedDateTime.now(),
