@@ -18,6 +18,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditDescription
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditTitle
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
@@ -38,8 +39,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -190,6 +189,14 @@ class AgendaItemViewModel @Inject constructor(
                 _state.update {
                     state.value.copy(
                         isSelectTimeDialog = true
+                    )
+                }
+            }
+
+            is SelectAlarm -> {
+                _state.update {
+                    state.value.copy(
+                        alarm = action.alarm
                     )
                 }
             }

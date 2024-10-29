@@ -237,7 +237,9 @@ fun AgendaItemScreen(
                 AlarmSection(
                     alarm = state.alarm,
                     isEditing = state.isEditing,
-                    onSelectAlarmTime = {}
+                    onSelectAlarmTime = { alarm->
+                        onAction(AgendaItemAction.SelectAlarm(alarm))
+                    }
                 )
 
                 Spacer(modifier = Modifier.weight(1f))

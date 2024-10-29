@@ -9,6 +9,7 @@ sealed interface AgendaItemAction{
     data object DismissDateDialog: AgendaItemAction
     data class SelectDateStart(val dateMillis:Long): AgendaItemAction
     data class SelectTimeStart(val hour:Int, val minutes:Int): AgendaItemAction
+    data class SelectAlarm(val alarm: AlarmOptions): AgendaItemAction
     data object Edit: AgendaItemAction
     data object Save: AgendaItemAction
     data object Close: AgendaItemAction
