@@ -98,7 +98,6 @@ fun AgendaItemScreen(
         is AgendaItemDetails.TaskDetails -> stringResource(id = R.string.task)
         else -> ""
     }
-
         TaskyScaffold (
             topAppBar = {
                 TaskyToolbar(
