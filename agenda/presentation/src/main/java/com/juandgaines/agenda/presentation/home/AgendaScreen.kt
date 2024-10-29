@@ -39,6 +39,7 @@ import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
 import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
@@ -277,7 +278,12 @@ fun AgendaScreen(
 
             if (stateAgenda.isDatePickerOpened) {
                 AgendaDatePicker(
-                    agendaActions = agendaActions,
+                    onDateSelected = { date->
+                        agendaActions(AgendaActions.SelectDate(date))
+                    },
+                    onDismissDialog = {
+                        agendaActions(DismissDateDialog)
+                    },
                     initialDate = stateAgenda.selectedLocalDate
                 )
             }

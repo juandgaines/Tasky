@@ -21,7 +21,8 @@ import java.time.LocalDate
 @Composable
 fun AgendaDatePicker(
     modifier: Modifier = Modifier,
-    agendaActions: (AgendaActions)->Unit,
+    onDateSelected: (Long)->Unit,
+    onDismissDialog:()->Unit,
     initialDate:LocalDate
 ) {
     val datePickerState = rememberDatePickerState(
@@ -30,13 +31,13 @@ fun AgendaDatePicker(
     DatePickerDialog(
         modifier = modifier,
         onDismissRequest = {
-            agendaActions(AgendaActions.DismissDateDialog)
+            onDismissDialog()
         },
         confirmButton = {
             TextButton(
                 onClick = {
                     datePickerState.selectedDateMillis?.let { date->
-                        agendaActions(AgendaActions.SelectDate(date))
+                        onDateSelected(date)
                     }
                 }
             ){
@@ -46,7 +47,7 @@ fun AgendaDatePicker(
         dismissButton = {
             TextButton(
                 onClick = {
-                    agendaActions(AgendaActions.DismissDateDialog)
+                    onDismissDialog()
                 }
             ) {
                 Text(stringResource(R.string.cancel))

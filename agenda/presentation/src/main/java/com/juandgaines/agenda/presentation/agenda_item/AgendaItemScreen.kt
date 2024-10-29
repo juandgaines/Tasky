@@ -2,29 +2,38 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.juandgaines.agenda.domain.utils.toUtcFromZonedDateTime
+import com.juandgaines.agenda.domain.utils.toUtcLocalDate
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Saved
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
@@ -32,10 +41,16 @@ import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
 import com.juandgaines.agenda.presentation.agenda_item.components.StartDateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
+import com.juandgaines.agenda.presentation.home.componets.AgendaDatePicker
 import com.juandgaines.core.presentation.designsystem.CloseIcon
 import com.juandgaines.core.presentation.designsystem.EditIcon
+import com.juandgaines.core.presentation.designsystem.TaskyBrown
+import com.juandgaines.core.presentation.designsystem.TaskyDarkGreen
 import com.juandgaines.core.presentation.designsystem.TaskyGray
+import com.juandgaines.core.presentation.designsystem.TaskyGreen
 import com.juandgaines.core.presentation.designsystem.TaskyLight
+import com.juandgaines.core.presentation.designsystem.TaskyLight2
+import com.juandgaines.core.presentation.designsystem.TaskyOrange
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.designsystem.components.TaskyToolbar
@@ -84,127 +99,209 @@ fun AgendaItemScreen(
         is AgendaItemDetails.TaskDetails -> stringResource(id = R.string.task)
         else -> ""
     }
-    TaskyScaffold (
-        topAppBar = {
-            TaskyToolbar(
-                modifier = Modifier
-                    .padding(
-                        horizontal = 16.dp
-                    ),
-                backNavigation = {
-                    Icon(
-                        imageVector = CloseIcon,
-                        contentDescription = "Close",
-                        modifier = Modifier.clickable {
-                            onAction(AgendaItemAction.Close)
-                        }
-                    )
-                },
-                content = {
-                    Row (
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Text(
-                            text = state.title,
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
 
-                },
-                actions = {
-                    if (state.isEditing) {
-                        Text(
-                            text = "Save",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.titleSmall,
-                            modifier = Modifier.clickable {
-                                onAction(AgendaItemAction.Save)
-                            }
-                        )
-                    }
-                    else {
+        TaskyScaffold (
+            topAppBar = {
+                TaskyToolbar(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 16.dp
+                        ),
+                    backNavigation = {
                         Icon(
-                            imageVector = EditIcon,
-                            contentDescription = "Edit",
-                            tint = MaterialTheme.colorScheme.onSurface,
+                            imageVector = CloseIcon,
+                            contentDescription = "Close",
                             modifier = Modifier.clickable {
-                                onAction(AgendaItemAction.Edit)
+                                onAction(AgendaItemAction.Close)
                             }
                         )
+                    },
+                    content = {
+                        Row (
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ){
+                            Text(
+                                text = state.title,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                    },
+                    actions = {
+                        if (state.isEditing) {
+                            Text(
+                                text = "Save",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.clickable {
+                                    onAction(AgendaItemAction.Save)
+                                }
+                            )
+                        }
+                        else {
+                            Icon(
+                                imageVector = EditIcon,
+                                contentDescription = "Edit",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.clickable {
+                                    onAction(AgendaItemAction.Edit)
+                                }
+                            )
+                        }
+                    },
+                )
+            },
+            loading = {
+                if(state.isSelectDateDialog){
+                    AgendaDatePicker(
+                        onDateSelected = { date->
+                            onAction(AgendaItemAction.SelectDateStart(date))
+                        },
+                        onDismissDialog = {
+                            onAction(AgendaItemAction.DismissDateDialog)
+                        },
+                        initialDate = state.startDateTime.toLocalDate()
+                    )
+                }
+
+                if (state.isSelectTimeDialog) {
+                    val hour = state.startDateTime.hour
+                    val minute = state.startDateTime.minute
+                    val timePickerState = rememberTimePickerState(
+                        initialHour = hour,
+                        initialMinute = minute,
+                        is24Hour = true,
+                    )
+
+                    Column (
+                        modifier = Modifier
+                            .background(
+                                TaskyLight, shape =
+                                MaterialTheme.shapes.medium
+                            )
+                            .padding(16.dp)
+                            .align(Alignment.Center),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ){
+                        TimePicker(
+                            state = timePickerState,
+                            colors = TimePickerDefaults.colors(
+                                clockDialColor = TaskyDarkGreen,
+                                clockDialSelectedContentColor =  TaskyOrange,
+                                clockDialUnselectedContentColor = TaskyLight2,
+                                selectorColor = TaskyGreen,
+                                containerColor = TaskyLight,
+                                periodSelectorBorderColor = TaskyGreen,
+                                periodSelectorUnselectedContainerColor = TaskyBrown,
+                                periodSelectorSelectedContainerColor = TaskyGreen,
+                                periodSelectorSelectedContentColor = TaskyOrange,
+                                periodSelectorUnselectedContentColor = TaskyLight2,
+                                timeSelectorSelectedContainerColor = TaskyGreen,
+                                timeSelectorUnselectedContainerColor = TaskyBrown,
+                                timeSelectorSelectedContentColor = TaskyOrange,
+                                timeSelectorUnselectedContentColor = TaskyLight2
+                            )
+                        )
+                        Button(onClick = {
+                            onAction(AgendaItemAction.DismissTimeDialog)
+                        }) {
+                            Text(
+                                "Dismiss picker",
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Button(
+                            onClick = {
+                            val selectedHour = timePickerState.hour
+                            val selectedMinute = timePickerState.minute
+
+                            onAction(
+                                AgendaItemAction.SelectTimeStart(
+                                    selectedHour,
+                                    selectedMinute
+                                )
+                            )
+                        }) {
+                            Text("Confirm selection",color = MaterialTheme.colorScheme.onSurface)
+                        }
                     }
-                },
-            )
-        }
-    ){
-        Column (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+
+                }
+            }
         ){
-            AgendaItemTypeSection(
-                agendaItemDetails = state.details,
-                agendaItemName = agendaItemName
-            )
-            TitleSection(
-                title = state.title,
-                isEditing = state.isEditing,
-            )
-            HorizontalDivider(
+            Column (
                 modifier = Modifier
-                    .fillMaxWidth(),
-                color = TaskyLight
-            )
-
-            DescriptionSection(
-                description = state.description,
-                isEditing = state.isEditing,
-                onEditTitle = {
-                    onAction(AgendaItemAction.EditDescription(state.description))
-                }
-            )
-
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                color = TaskyLight
-            )
-
-            StartDateSection(
-                date = state.startDateTime,
-                isEditing = state.isEditing,
-                onEditStartDate = {
-
-                },
-                onEditStartTime = {
-
-                }
-            )
-
-            AlarmSection(
-                alarm = state.alarm,
-                isEditing = state.isEditing,
-                onSelectAlarmTime = {}
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
-                style = MaterialTheme.typography.titleSmall,
-                color = TaskyGray,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(16.dp)
                     .fillMaxWidth()
-            )
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ){
+                AgendaItemTypeSection(
+                    agendaItemDetails = state.details,
+                    agendaItemName = agendaItemName
+                )
+                TitleSection(
+                    title = state.title,
+                    isEditing = state.isEditing,
+                )
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    color = TaskyLight
+                )
+
+                DescriptionSection(
+                    description = state.description,
+                    isEditing = state.isEditing,
+                    onEditTitle = {
+                        onAction(AgendaItemAction.EditDescription(state.description))
+                    }
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    color = TaskyLight
+                )
+
+                StartDateSection(
+                    date = state.startDateTime,
+                    isEditing = state.isEditing,
+                    onEditStartDate = {
+                        onAction(AgendaItemAction.ShowDateDialog)
+                    },
+                    onEditStartTime = {
+                        onAction(AgendaItemAction.ShowTimeDialog)
+                    }
+                )
+
+                AlarmSection(
+                    alarm = state.alarm,
+                    isEditing = state.isEditing,
+                    onSelectAlarmTime = {}
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = TaskyGray,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                )
+            }
+
         }
-    }
+
 }
 
 
