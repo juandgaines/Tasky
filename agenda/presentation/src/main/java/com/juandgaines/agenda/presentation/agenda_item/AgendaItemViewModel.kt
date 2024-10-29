@@ -53,7 +53,7 @@ class AgendaItemViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository
 ):ViewModel() {
-    private var _navParameters:MutableStateFlow<AgendaItem> = MutableStateFlow(savedStateHandle.toRoute<AgendaItem>())
+    private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
 
     private var eventChannel = Channel<AgendaItemEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -79,9 +79,9 @@ class AgendaItemViewModel @Inject constructor(
         )
 
     private suspend fun initState() {
-        _isEditing.value = _navParameters.value.isEditing
-        val type = _navParameters.value.type
-        val idItem = _navParameters.value.id
+        _isEditing.value = _navParameters.isEditing
+        val type = _navParameters.type
+        val idItem = _navParameters.id
         val agendaType = AgendaItemOption.fromOrdinal(type)
         if (idItem != null) {
             when (agendaType) {
