@@ -44,13 +44,6 @@ fun LocalDate.toFormattedDate(): String {
     }
 }
 
-//get hour from LocalDate to LocalDateTime
-fun LocalDate.toFormattedTime(): String {
-    DateTimeFormatter.ofPattern("HH:mm").let {
-        return this.format(it)
-    }
-}
-
 fun LocalDate.startOfDay(): Long {
     return this.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
