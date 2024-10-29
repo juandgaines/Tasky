@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -53,44 +54,11 @@ class AgendaItemViewModel @Inject constructor(
     val events = eventChannel.receiveAsFlow()
     private val _state = MutableStateFlow(AgendaItemState())
 
-    //private val navParameters = savedStateHandle.getStateFlow<ScreenNav.AgendaItem>("")
-
     private var _isEditing:MutableStateFlow<Boolean> = MutableStateFlow(_navParameters.value.isEditing)
 
     val state:StateFlow<AgendaItemState> = _navParameters
         .flatMapLatest { navParameters->
-            flow<AgendaItemState>{
-                val idItem = navParameters.id
-                if(idItem != null) {
-                    when (AgendaItemOption.fromOrdinal(navParameters.type)) {
-                        REMINDER -> reminderRepository.getReminderById(idItem)
-                        TASK -> taskRepository.getTaskById(idItem)
-                        EVENT -> null
-                    }?.onSuccess {
-                        _state.value = _state.value.copy(
-                            title = it.title,
-                            description = it.description,
-                            details = when(it){
-                                is Reminder -> ReminderDetails
-                                is Task -> TaskDetails
-                            },
-                            startDateTime = it.date
-                        )
-                        emit(_state.value)
-                    }
-                }
-                else {
-                     _state.value = _state.value.copy(
-                        startDateTime = ZonedDateTime.now(),
-                        details = when (AgendaItemOption.fromOrdinal(navParameters.type)) {
-                            REMINDER -> ReminderDetails
-                            TASK -> TaskDetails
-                            EVENT -> EventDetails()
-                        }
-                    )
-                    emit(_state.value)
-                }
-            }
+            loadAgendaItemFlow(navParameters)
         }
         .combine(
             _isEditing
@@ -104,6 +72,45 @@ class AgendaItemViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5_000),
             AgendaItemState()
         )
+
+    private fun loadAgendaItemFlow(navParameters: AgendaItem) =
+        flow<AgendaItemState> {
+            val idItem = navParameters.id
+            val agendaType=AgendaItemOption.fromOrdinal(navParameters.type)
+            if (idItem != null) {
+                when (agendaType) {
+                    REMINDER -> reminderRepository.getReminderById(idItem)
+                    TASK -> taskRepository.getTaskById(idItem)
+                    EVENT -> taskRepository.getTaskById(idItem)
+                }.onSuccess { item->
+                    _state.update {
+                        state.value.copy(
+                            title = item.title,
+                            description = item.description,
+                            details = when (agendaType) {
+                                REMINDER -> ReminderDetails
+                                TASK-> TaskDetails
+                                EVENT-> EventDetails()
+                            },
+                            startDateTime = item.date
+                        )
+                    }
+                    emit(_state.value)
+                }
+            } else {
+                _state.update {
+                    state.value.copy(
+                        startDateTime = ZonedDateTime.now(),
+                        details = when (AgendaItemOption.fromOrdinal(navParameters.type)) {
+                            REMINDER -> ReminderDetails
+                            TASK -> TaskDetails
+                            EVENT -> EventDetails()
+                        }
+                    )
+                }
+                emit(_state.value)
+            }
+        }
 
     fun onAction(action: AgendaItemAction){
         when (action){
@@ -122,20 +129,3 @@ class AgendaItemViewModel @Inject constructor(
         }
     }
 }
-
-/*
-            val idItem = navParameters.id
-            state = state.copy(
-                isEditing = navParameters.isEditing
-            )
-            val flow = if (idItem != null) {
-                when (AgendaItemOption.fromOrdinal( navParameters.type)) {
-                    REMINDER -> reminderRepository.getReminderByIdFlow(idItem)
-                    TASK ->  taskRepository.getTaskByIdFlow(idItem)
-                    EVENT -> flowOf()
-                }
-            } else {
-                flowOf(null)
-            }
-            flow
-            */

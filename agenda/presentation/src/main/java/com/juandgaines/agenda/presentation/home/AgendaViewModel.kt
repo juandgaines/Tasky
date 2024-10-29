@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -80,7 +81,7 @@ class AgendaViewModel @Inject constructor(
     private val _selectedDate = MutableStateFlow(state.selectedLocalDate)
 
     init {
-
+/*
         viewModelScope.launch {
             taskRepository.insertTask(
                 Task(
@@ -89,10 +90,12 @@ class AgendaViewModel @Inject constructor(
                     isDone = false,
                     time = ZonedDateTime.now(),
                     remindAt = ZonedDateTime.now(),
-                    id = "2"
+                    id = UUID.randomUUID().toString()
                 )
             )
         }
+        */
+
         viewModelScope.launch {
             agendaSyncScheduler.scheduleSync(
                 AgendaSyncOperations.FetchAgendas(

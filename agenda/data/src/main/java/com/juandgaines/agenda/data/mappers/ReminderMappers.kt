@@ -19,7 +19,7 @@ fun Reminder.toReminderRequest() = ReminderRequest(
 fun ReminderResponse.toReminder() = Reminder(
     id = id,
     title = title,
-    description = description ?: "",
+    description = description.orEmpty(),
     time = time
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
@@ -33,7 +33,7 @@ fun ReminderResponse.toReminder() = Reminder(
 fun ReminderEntity.toReminder() = Reminder(
     id = id,
     title = title,
-    description = description?: "",
+    description = description.orEmpty(),
     time = time
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()

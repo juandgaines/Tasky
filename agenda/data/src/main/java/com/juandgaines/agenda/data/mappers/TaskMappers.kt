@@ -19,7 +19,7 @@ fun Task.toTaskRequest() = TaskRequest(
 fun TaskResponse.toTask() = Task(
     id = id,
     title = title,
-    description = description?: "",
+    description = description.orEmpty(),
     time = time
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
@@ -34,7 +34,7 @@ fun TaskResponse.toTask() = Task(
 fun TaskEntity.toTask() = Task(
     id = id,
     title = title,
-    description = description?: "",
+    description = description.orEmpty(),
     time = time
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
