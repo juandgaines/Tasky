@@ -140,11 +140,11 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         composable<ScreenNav.AgendaItem> { entry ->
             val textTitle = entry
                 .savedStateHandle
-                .get<String>(AgendaItems.TITLE)
+                .get<String>(AgendaItems.EDIT_FIELD_TITLE_KEY)
 
             val textDescription = entry
                 .savedStateHandle
-                .get<String>(AgendaItems.DESCRIPTION)
+                .get<String>(AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION)
 
             AgendaItemScreenRoot(
                 viewModel = hiltViewModel(),

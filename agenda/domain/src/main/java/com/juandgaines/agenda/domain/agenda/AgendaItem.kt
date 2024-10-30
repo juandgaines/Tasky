@@ -30,9 +30,8 @@ sealed interface AgendaItems{
     }
 
     companion object{
-        const val EDIT_FIELD = "edit_field"
-        const val TITLE = "title"
-        const val DESCRIPTION = "description"
+        const val EDIT_FIELD_TITLE_KEY = "title"
+        const val EDIT_FIELD_TITLE_DESCRIPTION = "description"
     }
 }
 

@@ -209,7 +209,7 @@ fun AgendaItemScreen(
                     title = state.title,
                     isEditing = state.isEditing,
                     onEditTitle = {
-                        onAction(AgendaItemAction.EditField(AgendaItems.TITLE, state.title))
+                        onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_KEY, state.title))
                     }
                 )
                 HorizontalDivider(
@@ -222,7 +222,7 @@ fun AgendaItemScreen(
                     description = state.description,
                     isEditing = state.isEditing,
                     onEditDescription = {
-                        onAction(AgendaItemAction.EditField(AgendaItems.DESCRIPTION, state.description))
+                        onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION, state.description))
                     }
                 )
 

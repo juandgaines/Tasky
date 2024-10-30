@@ -107,7 +107,7 @@ fun EditFieldScreen(
         ){
             BasicTextField(
                 state = state.fieldValue,
-                textStyle = if(state.fieldName == AgendaItems.TITLE)
+                textStyle = if(state.fieldName == AgendaItems.EDIT_FIELD_TITLE_KEY)
                     MaterialTheme.typography.displaySmall
                 else
                     MaterialTheme.typography.bodySmall
