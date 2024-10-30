@@ -39,6 +39,7 @@ import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
 import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
@@ -55,7 +56,8 @@ import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
 import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
-import com.juandgaines.agenda.presentation.home.componets.AgendaDatePicker
+import com.juandgaines.agenda.presentation.components.AgendaDatePicker
+import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
@@ -277,7 +279,12 @@ fun AgendaScreen(
 
             if (stateAgenda.isDatePickerOpened) {
                 AgendaDatePicker(
-                    agendaActions = agendaActions,
+                    onDateSelected = { date->
+                        agendaActions(SelectDate(date))
+                    },
+                    onDismissDialog = {
+                        agendaActions(DismissDateDialog)
+                    },
                     initialDate = stateAgenda.selectedLocalDate
                 )
             }
