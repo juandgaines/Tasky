@@ -137,14 +137,14 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
             )
         }
 
-        composable<ScreenNav.AgendaItem> {
-            val textTitle = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<String>(AgendaItems.TITLE)
+        composable<ScreenNav.AgendaItem> { entry ->
+            val textTitle = entry
+                .savedStateHandle
+                .get<String>(AgendaItems.TITLE)
 
-            val textDescription = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<String>(AgendaItems.DESCRIPTION)
+            val textDescription = entry
+                .savedStateHandle
+                .get<String>(AgendaItems.DESCRIPTION)
 
             AgendaItemScreenRoot(
                 viewModel = hiltViewModel(),
@@ -172,7 +172,7 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set(fieldName, fieldValue)
-                    navController.navigateUp()
+                    navController.popBackStack()
                 },
                 navigateBack = {
                     navController.navigateUp()
