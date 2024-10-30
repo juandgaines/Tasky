@@ -23,6 +23,8 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDa
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowTimeDialog
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateDescription
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateTitle
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.ReminderDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.TaskDetails
@@ -198,6 +200,21 @@ class AgendaItemViewModel @Inject constructor(
                 updateState {
                     it.copy(
                         alarm = action.alarm
+                    )
+                }
+            }
+
+            is UpdateDescription -> {
+                updateState {
+                    it.copy(
+                        description = action.description
+                    )
+                }
+            }
+            is UpdateTitle -> {
+                updateState {
+                    it.copy(
+                        title = action.title
                     )
                 }
             }

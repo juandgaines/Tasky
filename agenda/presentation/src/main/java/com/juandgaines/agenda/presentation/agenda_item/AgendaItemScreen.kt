@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +50,8 @@ import java.time.ZonedDateTime
 fun AgendaItemScreenRoot(
     viewModel: AgendaItemViewModel,
     navigateBack: () -> Unit,
+    title: String?,
+    description: String?,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val events = viewModel.events
@@ -58,6 +61,15 @@ fun AgendaItemScreenRoot(
             Saved -> {
                 navigateBack()
             }
+        }
+    }
+
+    LaunchedEffect(title , description) {
+        title?.let {
+            viewModel.onAction(AgendaItemAction.UpdateTitle(title))
+        }
+        description?.let {
+            viewModel.onAction(AgendaItemAction.UpdateDescription(description))
         }
     }
 

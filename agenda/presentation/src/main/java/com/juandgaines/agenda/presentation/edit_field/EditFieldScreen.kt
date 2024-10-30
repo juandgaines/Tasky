@@ -2,6 +2,7 @@
 
 package com.juandgaines.agenda.presentation.edit_field
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,7 +31,9 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 
 @Composable
 fun EditFieldScreenRoot(
-    viewModel: EditFieldViewModel
+    viewModel: EditFieldViewModel,
+    onSave: (String,String) -> Unit,
+    navigateBack: () -> Boolean,
 ) {
     val state = viewModel.state
     val events = viewModel.events
@@ -71,10 +75,14 @@ fun EditFieldScreen(
                     Text(
                         text = stringResource(R.string.save),
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(16.dp),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clickable {
+                                onAction(EditFieldAction.Save)
+                            },
                     )
                 }
-
             )
         },
         modifier = Modifier.fillMaxSize()

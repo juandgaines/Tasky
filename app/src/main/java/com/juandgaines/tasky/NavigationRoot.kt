@@ -16,7 +16,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemScreenRoot
+import com.juandgaines.agenda.presentation.edit_field.EditFieldScreenRoot
 import com.juandgaines.agenda.presentation.home.AgendaScreenRoot
 import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
@@ -136,8 +138,34 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         }
 
         composable<ScreenNav.AgendaItem> {
+            val textTitle = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<String>(AgendaItems.TITLE)
+
+            val textDescription = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<String>(AgendaItems.DESCRIPTION)
+
             AgendaItemScreenRoot(
                 viewModel = hiltViewModel(),
+                title = textTitle,
+                description = textDescription,
+                navigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable<ScreenNav.EditField> {
+
+            EditFieldScreenRoot(
+                viewModel = hiltViewModel(),
+                onSave = { fieldName, fieldValue ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(fieldName, fieldValue)
+                    navController.popBackStack()
+                },
                 navigateBack = {
                     navController.navigateUp()
                 }
