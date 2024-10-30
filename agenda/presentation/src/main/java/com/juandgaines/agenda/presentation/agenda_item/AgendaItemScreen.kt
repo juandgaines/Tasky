@@ -68,10 +68,18 @@ fun AgendaItemScreenRoot(
 
     LaunchedEffect(title , description) {
         title?.let {
-            viewModel.onAction(AgendaItemAction.UpdateTitle(title))
+            viewModel.onAction(
+                AgendaItemAction.UpdateField(
+                    AgendaItems.EDIT_FIELD_TITLE_KEY,title
+                )
+            )
         }
         description?.let {
-            viewModel.onAction(AgendaItemAction.UpdateDescription(description))
+            viewModel.onAction(
+                AgendaItemAction.UpdateField(
+                    AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION,description
+                )
+            )
         }
     }
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
@@ -22,8 +23,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDa
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowTimeDialog
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateDescription
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateTitle
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateField
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.ReminderDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.TaskDetails
@@ -198,18 +198,19 @@ class AgendaItemViewModel @Inject constructor(
                 }
             }
 
-            is UpdateDescription -> {
-                updateState {
-                    it.copy(
-                        description = action.description
-                    )
-                }
-            }
-            is UpdateTitle -> {
-                updateState {
-                    it.copy(
-                        title = action.title
-                    )
+            is UpdateField -> {
+                if (action.key == AgendaItems.EDIT_FIELD_TITLE_KEY) {
+                    updateState {
+                        it.copy(
+                            title = action.value
+                        )
+                    }
+                } else {
+                    updateState {
+                        it.copy(
+                            description = action.value
+                        )
+                    }
                 }
             }
         }
