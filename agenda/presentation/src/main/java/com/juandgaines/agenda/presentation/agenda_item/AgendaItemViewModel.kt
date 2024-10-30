@@ -15,8 +15,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditDescription
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditTitle
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
@@ -122,12 +121,7 @@ class AgendaItemViewModel @Inject constructor(
 
     fun onAction(action: AgendaItemAction){
         when (action){
-            is EditTitle -> {
-
-            }
-            is EditDescription -> {
-
-            }
+            is EditField ->  Unit
             is SelectDateStart -> {
                 val zonedDate = action.dateMillis
                     .toUtcLocalDateTime()

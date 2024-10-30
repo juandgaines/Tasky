@@ -1,8 +1,7 @@
 package com.juandgaines.agenda.presentation.agenda_item
 
 sealed interface AgendaItemAction{
-    data class EditTitle (val title: String): AgendaItemAction
-    data class EditDescription (val description: String?): AgendaItemAction
+    data class EditField(val key:String, val value :String): AgendaItemAction
     data object ShowTimeDialog: AgendaItemAction
     data object ShowDateDialog: AgendaItemAction
     data object DismissTimeDialog: AgendaItemAction

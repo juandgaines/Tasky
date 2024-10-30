@@ -150,6 +150,14 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                 viewModel = hiltViewModel(),
                 title = textTitle,
                 description = textDescription,
+                navigateEditField = { fieldName, fieldValue ->
+                    navController.navigate(
+                        ScreenNav.EditField(
+                            fieldName = fieldName,
+                            fieldValue = fieldValue
+                        )
+                    )
+                },
                 navigateBack = {
                     navController.navigateUp()
                 }
@@ -164,7 +172,7 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set(fieldName, fieldValue)
-                    navController.popBackStack()
+                    navController.navigateUp()
                 },
                 navigateBack = {
                     navController.navigateUp()

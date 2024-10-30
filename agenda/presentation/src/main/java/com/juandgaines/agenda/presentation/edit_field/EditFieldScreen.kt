@@ -39,7 +39,16 @@ fun EditFieldScreenRoot(
     val events = viewModel.events
     EditFieldScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = {
+            when (it) {
+                EditFieldAction.Save -> {
+                    onSave(state.fieldName, state.fieldValue.text.toString())
+                }
+                EditFieldAction.Close -> {
+                    navigateBack()
+                }
+            }
+        }
     )
 }
 
@@ -61,6 +70,9 @@ fun EditFieldScreen(
                         contentDescription = "Back",
                         tint = MaterialTheme.colorScheme.onSecondary,
                         modifier = Modifier.padding(16.dp)
+                            .clickable {
+                                onAction(EditFieldAction.Close)
+                            }
                     )
                 },
                 title = {

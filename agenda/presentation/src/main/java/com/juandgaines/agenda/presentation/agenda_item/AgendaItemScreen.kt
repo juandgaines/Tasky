@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
@@ -50,6 +51,7 @@ import java.time.ZonedDateTime
 fun AgendaItemScreenRoot(
     viewModel: AgendaItemViewModel,
     navigateBack: () -> Unit,
+    navigateEditField: (String, String) -> Unit,
     title: String?,
     description: String?,
 ) {
@@ -77,6 +79,9 @@ fun AgendaItemScreenRoot(
         state = state,
         onAction = {  action->
             when(action){
+                is AgendaItemAction.EditField -> {
+                    navigateEditField(action.key, action.value)
+                }
                 is AgendaItemAction.Close -> {
                     navigateBack()
                 }
@@ -203,6 +208,9 @@ fun AgendaItemScreen(
                 TitleSection(
                     title = state.title,
                     isEditing = state.isEditing,
+                    onEditTitle = {
+                        onAction(AgendaItemAction.EditField(AgendaItems.TITLE, state.title))
+                    }
                 )
                 HorizontalDivider(
                     modifier = Modifier
@@ -213,8 +221,8 @@ fun AgendaItemScreen(
                 DescriptionSection(
                     description = state.description,
                     isEditing = state.isEditing,
-                    onEditTitle = {
-                        onAction(AgendaItemAction.EditDescription(state.description))
+                    onEditDescription = {
+                        onAction(AgendaItemAction.EditField(AgendaItems.DESCRIPTION, state.description))
                     }
                 )
 
