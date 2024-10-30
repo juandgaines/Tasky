@@ -11,7 +11,6 @@ fun DependencyHandlerScope.addUiLayerDependencies(project: Project) {
     "implementation"(project(":core:presentation:designsystem"))
 
     "implementation"(project.libs.findLibrary("androidx.navigation.compose").get())
-    "implementation"(project.libs.findLibrary("dagger.hilt.navigation.compose").get())
 
 
     "implementation"(project.libs.findBundle("compose").get())

@@ -2,7 +2,6 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,15 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDefaults
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -28,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
@@ -43,13 +37,8 @@ import com.juandgaines.agenda.presentation.components.AgendaDatePicker
 import com.juandgaines.agenda.presentation.components.AgendaTimePicker
 import com.juandgaines.core.presentation.designsystem.CloseIcon
 import com.juandgaines.core.presentation.designsystem.EditIcon
-import com.juandgaines.core.presentation.designsystem.TaskyBrown
-import com.juandgaines.core.presentation.designsystem.TaskyDarkGreen
 import com.juandgaines.core.presentation.designsystem.TaskyGray
-import com.juandgaines.core.presentation.designsystem.TaskyGreen
 import com.juandgaines.core.presentation.designsystem.TaskyLight
-import com.juandgaines.core.presentation.designsystem.TaskyLight2
-import com.juandgaines.core.presentation.designsystem.TaskyOrange
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.designsystem.components.TaskyToolbar
@@ -58,7 +47,7 @@ import java.time.ZonedDateTime
 
 @Composable
 fun AgendaItemScreenRoot(
-    viewModel: AgendaItemViewModel = hiltViewModel(),
+    viewModel: AgendaItemViewModel,
     navigateBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
