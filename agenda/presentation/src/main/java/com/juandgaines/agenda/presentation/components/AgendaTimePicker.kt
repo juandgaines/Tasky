@@ -80,7 +80,7 @@ fun AgendaTimePicker(
             onDismissDialog()
         }) {
             Text(
-                "Dismiss picker",
+                stringResource(R.string.dismiss),
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -90,8 +90,14 @@ fun AgendaTimePicker(
                 val selectedMinute = timePickerState.minute
 
                 onTimeSelected(selectedHour,selectedMinute)
-            }) {
-            Text("Confirm selection",color = MaterialTheme.colorScheme.onSurface)
+            }
+        ) {
+            Text(
+                stringResource(
+                    R.string.confirm
+                ),
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }

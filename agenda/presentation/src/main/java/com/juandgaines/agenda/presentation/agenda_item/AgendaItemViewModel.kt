@@ -90,8 +90,8 @@ class AgendaItemViewModel @Inject constructor(
                 TASK -> taskRepository.getTaskById(idItem)
                 EVENT -> taskRepository.getTaskById(idItem)
             }.onSuccess { item ->
-                _state.update {
-                    _state.value.copy(
+                updateState {
+                    it.copy(
                         title = item.title,
                         description = item.description,
                         details = when (agendaType) {
@@ -105,8 +105,8 @@ class AgendaItemViewModel @Inject constructor(
             }
         } else {
             _isEditing.value = true
-            _state.update {
-                _state.value.copy(
+            updateState {
+                it.copy(
                     startDateTime = ZonedDateTime.now(),
                     details = when (AgendaItemOption.fromOrdinal(type)) {
                         REMINDER -> ReminderDetails
@@ -135,8 +135,8 @@ class AgendaItemViewModel @Inject constructor(
                             _state.value.startDateTime.minute
                         )
                     )
-                _state.update {
-                    state.value.copy(
+                updateState {
+                    it.copy(
                         startDateTime = zonedDate,
                         isSelectDateDialog = false
                     )
@@ -144,10 +144,9 @@ class AgendaItemViewModel @Inject constructor(
 
             }
             is SelectTimeStart ->{
-                _state.update {
-                    state.value.copy(
-                        startDateTime = state.value
-                            .startDateTime
+                updateState {
+                    it.copy(
+                        startDateTime = it.startDateTime
                             .withHour(action.hour)
                             .withMinute(action.minutes),
                         isSelectTimeDialog = false
@@ -166,41 +165,46 @@ class AgendaItemViewModel @Inject constructor(
             }
             Close -> Unit
             DismissDateDialog -> {
-                _state.update {
-                    state.value.copy(
+                updateState {
+                    it.copy(
                         isSelectDateDialog = false
                     )
                 }
             }
             DismissTimeDialog -> {
-                _state.update {
-                    state.value.copy(
+
+                updateState {
+                    it.copy(
                         isSelectTimeDialog = false
                     )
                 }
             }
             ShowDateDialog -> {
-                _state.update {
-                    state.value.copy(
+                updateState {
+                    it.copy(
                         isSelectDateDialog = true
                     )
                 }
             }
             ShowTimeDialog -> {
-                _state.update {
-                    state.value.copy(
-                        isSelectTimeDialog = true
-                    )
-                }
+               updateState {
+                     it.copy(
+                          isSelectTimeDialog = true
+                     )
+               }
             }
 
             is SelectAlarm -> {
-                _state.update {
-                    state.value.copy(
+                updateState {
+                    it.copy(
                         alarm = action.alarm
                     )
                 }
             }
         }
+    }
+
+    private fun updateState(update: (AgendaItemState) -> AgendaItemState) {
+        _state.update { update(it) }
     }
 }

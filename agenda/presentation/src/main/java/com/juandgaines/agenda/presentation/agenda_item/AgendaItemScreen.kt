@@ -135,7 +135,7 @@ fun AgendaItemScreen(
                     actions = {
                         if (state.isEditing) {
                             Text(
-                                text = "Save",
+                                text = stringResource(R.string.save),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.titleSmall,
                                 modifier = Modifier.clickable {
