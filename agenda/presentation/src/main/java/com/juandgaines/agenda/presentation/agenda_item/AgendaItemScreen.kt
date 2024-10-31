@@ -2,6 +2,7 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,7 +29,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Saved
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
@@ -50,12 +54,22 @@ fun AgendaItemScreenRoot(
     viewModel: AgendaItemViewModel,
     navigateBack: () -> Unit,
 ) {
+    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val events = viewModel.events
 
     ObserveAsEvents(events) { agendaItemEvents->
         when (agendaItemEvents){
-            Saved -> {
+            Created -> {
+                Toast.makeText(context, "Item created", Toast.LENGTH_SHORT).show()
+                navigateBack()
+            }
+
+            is Error -> {
+
+            }
+            Updated -> {
+                Toast.makeText(context, "Item created", Toast.LENGTH_SHORT).show()
                 navigateBack()
             }
         }
