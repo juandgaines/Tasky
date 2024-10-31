@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
@@ -53,6 +55,9 @@ import java.time.ZonedDateTime
 fun AgendaItemScreenRoot(
     viewModel: AgendaItemViewModel,
     navigateBack: () -> Unit,
+    navigateEditField: (String, String) -> Unit,
+    title: String?,
+    description: String?,
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -75,10 +80,30 @@ fun AgendaItemScreenRoot(
         }
     }
 
+    LaunchedEffect(title , description) {
+        title?.let {
+            viewModel.onAction(
+                AgendaItemAction.UpdateField(
+                    AgendaItems.EDIT_FIELD_TITLE_KEY,title
+                )
+            )
+        }
+        description?.let {
+            viewModel.onAction(
+                AgendaItemAction.UpdateField(
+                    AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION,description
+                )
+            )
+        }
+    }
+
     AgendaItemScreen(
         state = state,
         onAction = {  action->
             when(action){
+                is AgendaItemAction.EditField -> {
+                    navigateEditField(action.key, action.value)
+                }
                 is AgendaItemAction.Close -> {
                     navigateBack()
                 }
@@ -205,6 +230,9 @@ fun AgendaItemScreen(
                 TitleSection(
                     title = state.title,
                     isEditing = state.isEditing,
+                    onEditTitle = {
+                        onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_KEY, state.title))
+                    }
                 )
                 HorizontalDivider(
                     modifier = Modifier
@@ -215,8 +243,8 @@ fun AgendaItemScreen(
                 DescriptionSection(
                     description = state.description,
                     isEditing = state.isEditing,
-                    onEditTitle = {
-                        onAction(AgendaItemAction.EditDescription(state.description))
+                    onEditDescription = {
+                        onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION, state.description))
                     }
                 )
 

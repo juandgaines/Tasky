@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
@@ -17,14 +18,14 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditDescription
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditTitle
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowTimeDialog
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateField
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.ReminderDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.TaskDetails
@@ -131,28 +132,23 @@ class AgendaItemViewModel @Inject constructor(
 
     fun onAction(action: AgendaItemAction){
         viewModelScope.launch {
-            when (action){
-                is EditTitle -> {
-
-                }
-                is EditDescription -> {
-
-                }
-                is SelectDateStart -> {
-                    val zonedDate = action.dateMillis
-                        .toUtcLocalDateTime()
-                        .toZonedDateTime(
-                            LocalTime.of(
-                                _state.value.startDateTime.hour,
-                                _state.value.startDateTime.minute
-                            )
+        when (action){
+            is EditField ->  Unit
+            is SelectDateStart -> {
+                val zonedDate = action.dateMillis
+                    .toUtcLocalDateTime()
+                    .toZonedDateTime(
+                        LocalTime.of(
+                            _state.value.startDateTime.hour,
+                            _state.value.startDateTime.minute
                         )
-                    updateState {
-                        it.copy(
-                            startDateTime = zonedDate,
-                            isSelectDateDialog = false
-                        )
-                    }
+                    )
+                updateState {
+                    it.copy(
+                        startDateTime = zonedDate,
+                        isSelectDateDialog = false
+                    )
+                }
 
                 }
                 is SelectTimeStart ->{
@@ -313,15 +309,31 @@ class AgendaItemViewModel @Inject constructor(
                     }
                 }
 
-                is SelectAlarm -> {
+            is SelectAlarm -> {
+                updateState {
+                    it.copy(
+                        alarm = action.alarm
+                    )
+                }
+            }
+
+            is UpdateField -> {
+                if (action.key == AgendaItems.EDIT_FIELD_TITLE_KEY) {
                     updateState {
                         it.copy(
-                            alarm = action.alarm
+                            title = action.value
+                        )
+                    }
+                } else {
+                    updateState {
+                        it.copy(
+                            description = action.value
                         )
                     }
                 }
             }
         }
+    }
 
     }
 

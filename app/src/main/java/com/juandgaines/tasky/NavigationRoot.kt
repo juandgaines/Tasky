@@ -16,7 +16,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemScreenRoot
+import com.juandgaines.agenda.presentation.edit_field.EditFieldScreenRoot
 import com.juandgaines.agenda.presentation.home.AgendaScreenRoot
 import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
@@ -135,9 +137,43 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
             )
         }
 
-        composable<ScreenNav.AgendaItem> {
+        composable<ScreenNav.AgendaItem> { entry ->
+            val textTitle = entry
+                .savedStateHandle
+                .get<String>(AgendaItems.EDIT_FIELD_TITLE_KEY)
+
+            val textDescription = entry
+                .savedStateHandle
+                .get<String>(AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION)
+
             AgendaItemScreenRoot(
                 viewModel = hiltViewModel(),
+                title = textTitle,
+                description = textDescription,
+                navigateEditField = { fieldName, fieldValue ->
+                    navController.navigate(
+                        ScreenNav.EditField(
+                            fieldName = fieldName,
+                            fieldValue = fieldValue
+                        )
+                    )
+                },
+                navigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable<ScreenNav.EditField> {
+
+            EditFieldScreenRoot(
+                viewModel = hiltViewModel(),
+                onSave = { fieldName, fieldValue ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(fieldName, fieldValue)
+                    navController.popBackStack()
+                },
                 navigateBack = {
                     navController.navigateUp()
                 }

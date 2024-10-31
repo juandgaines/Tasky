@@ -25,7 +25,7 @@ fun DescriptionSection(
     modifier: Modifier = Modifier,
     description: String,
     isEditing: Boolean,
-    onEditTitle: () -> Unit
+    onEditDescription: () -> Unit
 ){
     Row (
         modifier = modifier
@@ -33,7 +33,7 @@ fun DescriptionSection(
             .then(
                 if (isEditing)
                     Modifier.clickable {
-                        onEditTitle()
+                        onEditDescription()
                     }
                 else Modifier
             ),
@@ -72,7 +72,7 @@ fun DescriptionSectionPreview() {
         DescriptionSection(
             description = "This is a description",
             isEditing = true,
-            onEditTitle = {}
+            onEditDescription = {}
         )
     }
 }
