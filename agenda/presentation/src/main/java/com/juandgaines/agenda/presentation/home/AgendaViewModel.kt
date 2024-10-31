@@ -81,7 +81,7 @@ class AgendaViewModel @Inject constructor(
     private val _selectedDate = MutableStateFlow(state.selectedLocalDate)
 
     init {
-/*
+
         viewModelScope.launch {
             taskRepository.insertTask(
                 Task(
@@ -94,7 +94,6 @@ class AgendaViewModel @Inject constructor(
                 )
             )
         }
-        */
 
         viewModelScope.launch {
             agendaSyncScheduler.scheduleSync(

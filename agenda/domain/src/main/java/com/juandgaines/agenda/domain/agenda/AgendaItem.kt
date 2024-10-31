@@ -28,6 +28,11 @@ sealed interface AgendaItems{
     ):AgendaItems {
         override val date = time
     }
+
+    companion object{
+        const val EDIT_FIELD_TITLE_KEY = "title"
+        const val EDIT_FIELD_TITLE_DESCRIPTION = "description"
+    }
 }
 
 

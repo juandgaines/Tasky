@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
@@ -15,14 +16,14 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditDescription
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditTitle
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowTimeDialog
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateField
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.ReminderDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.TaskDetails
@@ -120,12 +121,7 @@ class AgendaItemViewModel @Inject constructor(
 
     fun onAction(action: AgendaItemAction){
         when (action){
-            is EditTitle -> {
-
-            }
-            is EditDescription -> {
-
-            }
+            is EditField ->  Unit
             is SelectDateStart -> {
                 val zonedDate = action.dateMillis
                     .toUtcLocalDateTime()
@@ -199,6 +195,22 @@ class AgendaItemViewModel @Inject constructor(
                     it.copy(
                         alarm = action.alarm
                     )
+                }
+            }
+
+            is UpdateField -> {
+                if (action.key == AgendaItems.EDIT_FIELD_TITLE_KEY) {
+                    updateState {
+                        it.copy(
+                            title = action.value
+                        )
+                    }
+                } else {
+                    updateState {
+                        it.copy(
+                            description = action.value
+                        )
+                    }
                 }
             }
         }
