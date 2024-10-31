@@ -19,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,7 +37,7 @@ fun EditFieldScreenRoot(
     onSave: (String,String) -> Unit,
     navigateBack: () -> Boolean,
 ) {
-    val state = viewModel.state
+    val state by  viewModel.state.collectAsState()
     val events = viewModel.events
     EditFieldScreen(
         state = state,
