@@ -86,12 +86,12 @@ class AgendaViewModel @Inject constructor(
         _state.update { update(it) }
     }
     private val _selectedDate = MutableStateFlow(LocalDate.now())
-    private val _isFirstLoaded = MutableStateFlow(false)
+    private var _isInit:Boolean = false
 
     val state = _state
         .onStart {
-            if (!_isFirstLoaded.value) {
-                _isFirstLoaded.value = true
+            if (!_isInit) {
+                _isInit = true
                 initialsCalculator.getInitials().let { initials ->
                     updateState {
                         it.copy(userInitials = initials)

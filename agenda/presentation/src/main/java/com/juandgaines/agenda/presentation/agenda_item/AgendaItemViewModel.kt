@@ -73,13 +73,13 @@ class AgendaItemViewModel @Inject constructor(
     private val _state = MutableStateFlow(AgendaItemState())
     private var _isEditing:MutableStateFlow<Boolean> = MutableStateFlow(false)
     private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
-    private var _isInit: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private var _isInit: Boolean = false
 
     val state:StateFlow<AgendaItemState> = _state
         .onStart {
-            if (!_isInit.value){
+            if (!_isInit){
                 initState()
-                _isInit.value = true
+                _isInit = true
             }
         }
         .combine(
