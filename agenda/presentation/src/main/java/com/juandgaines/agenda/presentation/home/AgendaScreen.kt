@@ -25,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,9 +53,9 @@ import com.juandgaines.agenda.presentation.home.AgendaEvents.Error
 import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Success
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.EVENT
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
@@ -65,6 +64,7 @@ import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
+import com.juandgaines.core.presentation.agenda.AgendaItemOption
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -76,7 +76,7 @@ import com.juandgaines.core.presentation.ui.UiText.StringResource
 @Composable
 fun AgendaScreenRoot(
     viewModel: AgendaViewModel,
-    navigateToAgendaItem : (String? ,Int,Boolean, Long?) -> Unit,
+    navigateToAgendaItem : (String?,AgendaItemOption,Boolean, Long?) -> Unit,
     navigateToLogin: () -> Unit
 ){
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -113,7 +113,7 @@ fun AgendaScreenRoot(
             is GoToItemScreen -> {
                 navigateToAgendaItem(
                     agendaEvents.id,
-                    agendaEvents.type.ordinal,
+                    agendaEvents.type,
                     agendaEvents.isEditing,
                     agendaEvents.dateEpochMilli
                 )

@@ -1,6 +1,7 @@
 package com.juandgaines.agenda.data.reminder
 
 import android.database.sqlite.SQLiteException
+import android.util.Log
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toReminderEntity
 import com.juandgaines.agenda.data.mappers.toReminderRequest
@@ -48,6 +49,8 @@ class DefaultReminderRepository @Inject constructor(
         return try {
             val entity = reminder.toReminderEntity()
             reminderDao.upsertReminder(entity)
+
+            Log.d("Repository Update", "updateReminder: $reminder")
 
             val response = safeCall {
                 reminderApi.updateReminder(reminder.toReminderRequest())

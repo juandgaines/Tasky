@@ -35,10 +35,11 @@ import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_SIX
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_TEN
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_THIRTY
-import com.juandgaines.agenda.presentation.home.AgendaItemOption
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.EVENT
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
+import com.juandgaines.core.presentation.agenda.AgendaItemOption
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
@@ -72,10 +73,14 @@ class AgendaItemViewModel @Inject constructor(
     private val _state = MutableStateFlow(AgendaItemState())
     private var _isEditing:MutableStateFlow<Boolean> = MutableStateFlow(false)
     private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
+    private var _isInit: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     val state:StateFlow<AgendaItemState> = _state
         .onStart {
-            initState()
+            if (!_isInit.value){
+                initState()
+                _isInit.value = true
+            }
         }
         .combine(
             _isEditing
@@ -86,7 +91,7 @@ class AgendaItemViewModel @Inject constructor(
         }
         .stateIn(
             viewModelScope,
-            SharingStarted.Lazily,
+            SharingStarted.WhileSubscribed(5_000),
             AgendaItemState()
         )
 
@@ -94,9 +99,8 @@ class AgendaItemViewModel @Inject constructor(
         _isEditing.value = _navParameters.isEditing
         val type = _navParameters.type
         val idItem = _navParameters.id
-        val agendaType = AgendaItemOption.fromOrdinal(type)
         if (idItem != null) {
-            when (agendaType) {
+            when (type) {
                 REMINDER -> reminderRepository.getReminderById(idItem)
                 TASK -> taskRepository.getTaskById(idItem)
                 EVENT -> taskRepository.getTaskById(idItem)
@@ -105,7 +109,7 @@ class AgendaItemViewModel @Inject constructor(
                     it.copy(
                         title = item.title,
                         description = item.description,
-                        details = when (agendaType) {
+                        details = when (type) {
                             REMINDER -> ReminderDetails
                             TASK -> TaskDetails(
                                 isCompleted = (item as Task).isDone
@@ -130,7 +134,7 @@ class AgendaItemViewModel @Inject constructor(
                 }
                 it.copy(
                     startDateTime =initialDate ?: ZonedDateTime.now(),
-                    details = when (AgendaItemOption.fromOrdinal(type)) {
+                    details = when (type) {
                         REMINDER -> ReminderDetails
                         TASK -> TaskDetails()
                         EVENT -> EventDetails()
@@ -167,7 +171,7 @@ class AgendaItemViewModel @Inject constructor(
                             startDateTime = it.startDateTime
                                 .withHour(action.hour)
                                 .withMinute(action.minutes),
-                            isSelectTimeDialog = false
+                            isSelectTimeDialogVisible = false
                         )
                     }
 
@@ -176,7 +180,7 @@ class AgendaItemViewModel @Inject constructor(
                     val agendaItemId = _navParameters.id
                     if (agendaItemId != null) {
                         when (_navParameters.type) {
-                            REMINDER.ordinal -> reminderRepository.deleteReminder(
+                            REMINDER -> reminderRepository.deleteReminder(
                                 Reminder(
                                     id = agendaItemId,
                                     title = _state.value.title,
@@ -185,7 +189,7 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = _state.value.startDateTime
                                 )
                             )
-                            TASK.ordinal -> taskRepository.deleteTask(
+                            TASK -> taskRepository.deleteTask(
                                 Task(
                                     id = agendaItemId,
                                     title = _state.value.title,
@@ -195,7 +199,7 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = _state.value.startDateTime
                                 )
                             )
-                            EVENT.ordinal -> {
+                            EVENT -> {
                             }
                         }
                     }
@@ -209,7 +213,7 @@ class AgendaItemViewModel @Inject constructor(
                     val desiredAlarmDate = calculateTimeAlarm()
 
                     if (agendaItemId != null) {
-                        val type =  AgendaItemOption.fromOrdinal(_navParameters.type)
+                        val type =  _navParameters.type
                         val response = when (type) {
                             REMINDER -> reminderRepository.updateReminder(
                                 Reminder(
@@ -230,16 +234,10 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = desiredAlarmDate
                                 )
                             )
-                            EVENT -> taskRepository.updateTask(
-                                Task(
-                                    id = agendaItemId,
-                                    title = _state.value.title,
-                                    description = _state.value.description,
-                                    time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as TaskDetails).isCompleted,
-                                    remindAt = desiredAlarmDate
-                                )
-                            )
+                            EVENT -> {
+                                //TODO: Implement update event
+                                Result.Success(Unit)
+                            }
                         }
                         response
                             .onSuccess {
@@ -248,7 +246,7 @@ class AgendaItemViewModel @Inject constructor(
 
                             }
                     } else {
-                        val type =  AgendaItemOption.fromOrdinal(_navParameters.type)
+                        val type = _navParameters.type
                         val response = when (type) {
                             REMINDER -> reminderRepository.insertReminder(
                                 Reminder(
@@ -300,7 +298,7 @@ class AgendaItemViewModel @Inject constructor(
 
                     updateState {
                         it.copy(
-                            isSelectTimeDialog = false
+                            isSelectTimeDialogVisible = false
                         )
                     }
                 }
@@ -314,7 +312,7 @@ class AgendaItemViewModel @Inject constructor(
                 ShowTimeDialog -> {
                     updateState {
                         it.copy(
-                            isSelectTimeDialog = true
+                            isSelectTimeDialogVisible = true
                         )
                     }
                 }

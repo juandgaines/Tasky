@@ -205,7 +205,7 @@ fun AgendaItemScreen(
                     )
                 }
 
-                if (state.isSelectTimeDialog) {
+                if (state.isSelectTimeDialogVisible) {
                     val hour = state.startDateTime.hour
                     val minute = state.startDateTime.minute
                     AgendaTimePicker(

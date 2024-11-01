@@ -4,7 +4,7 @@ import java.time.ZonedDateTime
 
 data class AgendaItemState(
     val isEditing: Boolean = false,
-    val isSelectTimeDialog: Boolean = false,
+    val isSelectTimeDialogVisible: Boolean = false,
     val isSelectDateDialog: Boolean = false,
     val description: String = "",
     val startDateTime: ZonedDateTime = ZonedDateTime.now(),

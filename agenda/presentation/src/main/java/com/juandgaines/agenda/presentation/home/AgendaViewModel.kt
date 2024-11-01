@@ -18,7 +18,6 @@ import com.juandgaines.agenda.domain.utils.toEpochMilli
 import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.presentation.R
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemState
 import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
 import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
@@ -38,8 +37,8 @@ import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Edit
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Open
 import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.home.AgendaState.Companion.calculateRangeDays
@@ -87,22 +86,26 @@ class AgendaViewModel @Inject constructor(
         _state.update { update(it) }
     }
     private val _selectedDate = MutableStateFlow(LocalDate.now())
+    private val _isFirstLoaded = MutableStateFlow(false)
 
     val state = _state
         .onStart {
-            initialsCalculator.getInitials().let { initials ->
-                updateState {
-                    it.copy(userInitials = initials)
-                }
+            if (!_isFirstLoaded.value) {
+                _isFirstLoaded.value = true
+                initialsCalculator.getInitials().let { initials ->
+                    updateState {
+                        it.copy(userInitials = initials)
+                    }
 
-            }
-            agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
-            agendaSyncScheduler.scheduleSync(
-                AgendaSyncOperations.FetchAgendas(
-                    30.minutes
+                }
+                agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
+                agendaSyncScheduler.scheduleSync(
+                    AgendaSyncOperations.FetchAgendas(
+                        30.minutes
+                    )
                 )
-            )
-            agendaRepository.syncPendingAgendaItem()
+                agendaRepository.syncPendingAgendaItem()
+            }
         }
         .combine(_selectedDate){ state, selectedDate->
             state.copy(selectedLocalDate = selectedDate)
@@ -127,7 +130,7 @@ class AgendaViewModel @Inject constructor(
         _state.value.copy(agendaItems = it)
         }.stateIn(
             viewModelScope,
-            started = SharingStarted.Lazily,
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = AgendaState()
         )
 
