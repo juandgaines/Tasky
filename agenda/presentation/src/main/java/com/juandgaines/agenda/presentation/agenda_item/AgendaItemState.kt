@@ -10,10 +10,5 @@ data class AgendaItemState(
     val startDateTime: ZonedDateTime = ZonedDateTime.now(),
     val alarm: AlarmOptions = AlarmOptions.MINUTES_TEN,
     val details: AgendaItemDetails?  = null,
-    val title: String = when (details) {
-        is AgendaItemDetails.ReminderDetails -> "Reminder"
-        is AgendaItemDetails.EventDetails -> "Event"
-        is AgendaItemDetails.TaskDetails -> "Task"
-        else -> "Meeting"
-    },
+    val title: String = "",
 )

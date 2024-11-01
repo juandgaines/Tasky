@@ -86,7 +86,7 @@ class AgendaItemViewModel @Inject constructor(
         }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
+            SharingStarted.Lazily,
             AgendaItemState()
         )
 

@@ -2,9 +2,6 @@
 
 package com.juandgaines.agenda.presentation.home
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
@@ -21,6 +18,7 @@ import com.juandgaines.agenda.domain.utils.toEpochMilli
 import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.presentation.R
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemState
 import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
 import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
@@ -40,7 +38,6 @@ import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Edit
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Open
 import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.EVENT
 import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
 import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
@@ -56,15 +53,17 @@ import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -78,56 +77,59 @@ class AgendaViewModel @Inject constructor(
     private val agendaSyncScheduler: AgendaSyncScheduler
 ):ViewModel() {
 
-
-    var state by mutableStateOf(AgendaState())
-        private set
+    private val _state = MutableStateFlow(AgendaState())
 
     private val eventChannel = Channel<AgendaEvents>()
     val events = eventChannel.receiveAsFlow()
 
-    private val _selectedDate = MutableStateFlow(state.selectedLocalDate)
 
-    init {
+    private fun updateState(update: (AgendaState) -> AgendaState) {
+        _state.update { update(it) }
+    }
+    private val _selectedDate = MutableStateFlow(LocalDate.now())
 
-        viewModelScope.launch {
+    val state = _state
+        .onStart {
+            initialsCalculator.getInitials().let { initials ->
+                updateState {
+                    it.copy(userInitials = initials)
+                }
+
+            }
+            agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
             agendaSyncScheduler.scheduleSync(
                 AgendaSyncOperations.FetchAgendas(
                     30.minutes
                 )
             )
-        }
-        viewModelScope.launch {
-            initialsCalculator.getInitials().let {
-                state = state.copy(userInitials = it)
-                agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
-            }
-        }
-
-        viewModelScope.launch {
             agendaRepository.syncPendingAgendaItem()
         }
-
-        _selectedDate.flatMapLatest { date->
+        .combine(_selectedDate){ state, selectedDate->
+            state.copy(selectedLocalDate = selectedDate)
+        }
+        .flatMapLatest { state->
             agendaRepository.getItems(
-                date.startOfDay(),
-                date.endOfDay()
+                state.selectedLocalDate.startOfDay(),
+                state.selectedLocalDate.endOfDay()
+        )
+    }.map {agendaItems->
+        agendaItems
+            .map {
+                Item(it)
+            }
+            .plus(
+                Needle()
             )
-        }.map {agendaItems->
-            agendaItems
-                .map {
-                    Item(it)
-                }
-                .plus(
-                    Needle()
-                )
-                .sortedBy {
-                    it.date
-                }
-        }.onEach { agendaItems ->
-            state = state.copy(agendaItems = agendaItems)
-        }.launchIn(viewModelScope)
-
-    }
+            .sortedBy {
+                it.date
+            }
+    }.map {
+        _state.value.copy(agendaItems = it)
+        }.stateIn(
+            viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = AgendaState()
+        )
 
     fun onAction(action: AgendaActions) {
         viewModelScope.launch {
@@ -139,44 +141,62 @@ class AgendaViewModel @Inject constructor(
                         ZoneId.systemDefault()
                     )
                     _selectedDate.value = newDate
-                    state = state.copy(
-                        selectedLocalDate = newDate,
-                        isDatePickerOpened = false,
-                        dateRange = calculateRangeDays(newDate)
-                    )
+                    updateState {
+                        it.copy(
+                            selectedLocalDate = newDate,
+                            isDatePickerOpened = false,
+                            dateRange = calculateRangeDays(newDate)
+                        )
+                    }
                 }
                 is SelectDateWithingRange -> {
                     val date = action.date
                     _selectedDate.value = date
-                    val range = state.dateRange.map {
+                    val range = _state.value.dateRange.map {
                         it.copy(isSelected = it.dayTime == date)
                     }
-                    state = state.copy(dateRange = range)
+                    updateState {
+                        it.copy(dateRange = range)
+                    }
                 }
                 ShowProfileMenu -> {
-                    state = state.copy(isProfileMenuVisible = true)
+                    updateState {
+                        it.copy(isProfileMenuVisible = true)
+                    }
                 }
 
                 DismissProfileMenu -> {
-                    state = state.copy(isProfileMenuVisible = false)
+                    updateState {
+                        it.copy(isProfileMenuVisible = false)
+                    }
                 }
 
                 DismissDateDialog -> {
-                    state = state.copy(isDatePickerOpened = false)
+                    updateState {
+                        it.copy(isDatePickerOpened = false)
+                    }
                 }
                 ShowDateDialog -> {
-                    state = state.copy(isDatePickerOpened = true)
+                    updateState {
+                        it.copy(isDatePickerOpened = true)
+                    }
                 }
 
                 ShowCreateContextMenu ->{
-                    state = state.copy(isCreateContextMenuVisible = true)
+                    updateState {
+                        it.copy(isCreateContextMenuVisible = true)
+                    }
                 }
 
                 DismissCreateContextMenu ->
-                    state = state.copy(isCreateContextMenuVisible = false)
+                    updateState {
+                        it.copy(isCreateContextMenuVisible = false)
+                    }
 
                 Logout ->{
-                    state = state.copy(isLoading = true)
+                    updateState {
+                        it.copy(isLoading = true)
+                    }
                     when(val result = authCoreService.logout()){
                         is Success -> {
                             eventChannel.send(LogOut)
@@ -185,7 +205,9 @@ class AgendaViewModel @Inject constructor(
                             eventChannel.send(AgendaEvents.Error(result.error.asUiText()))
                         }
                     }
-                    state = state.copy(isLoading = false)
+                    updateState {
+                        it.copy(isLoading = false)
+                    }
                 }
 
                 is AgendaOperation -> {
@@ -276,4 +298,5 @@ class AgendaViewModel @Inject constructor(
             }
         }
     }
+
 }
