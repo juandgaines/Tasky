@@ -12,11 +12,9 @@ fun Long.toUtcLocalDateTime(): LocalDate {
     return Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 }
 
-//Check if a date is today ZonedDateTime
 fun ZonedDateTime.isToday(): Boolean {
     return this.toLocalDate() == LocalDate.now()
 }
-
 
 fun LocalDate.toLocalDateWithZoneId(zone: ZoneId): LocalDate {
     return this.atStartOfDay(zone).toLocalDate()
@@ -82,7 +80,6 @@ fun ZonedDateTime.toFormattedSingleDateTime(): String {
     }
 }
 
-//Get time from ZonedDateTime
 fun ZonedDateTime.toFormattedTime(): String {
     DateTimeFormatter.ofPattern("HH:mm").let {
         return this.format(it)
