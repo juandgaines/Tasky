@@ -22,10 +22,13 @@ import com.juandgaines.agenda.domain.utils.toLocalDateWithZoneId
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.home.AgendaActions.AgendaOperation
+import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
+import com.juandgaines.agenda.presentation.home.AgendaActions.EditItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
+import com.juandgaines.agenda.presentation.home.AgendaActions.OpenItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowCreateContextMenu
@@ -35,7 +38,11 @@ import com.juandgaines.agenda.presentation.home.AgendaActions.ToggleDoneTask
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Delete
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Edit
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Open
+import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
+import com.juandgaines.agenda.presentation.home.AgendaItemOption.EVENT
+import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
+import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.home.AgendaState.Companion.calculateRangeDays
@@ -159,7 +166,6 @@ class AgendaViewModel @Inject constructor(
                     }
                     state = state.copy(dateRange = range)
                 }
-
                 ShowProfileMenu -> {
                     state = state.copy(isProfileMenuVisible = true)
                 }
@@ -229,28 +235,28 @@ class AgendaViewModel @Inject constructor(
                             val item = action.agendaOperation.agendaItem
                             val type =  when (item) {
                                 is Task -> {
-                                    AgendaItemOption.TASK
+                                    TASK
                                 }
                                 is Reminder -> {
-                                    AgendaItemOption.REMINDER
+                                    REMINDER
                                 }
                             }
                             eventChannel.send(
-                                AgendaEvents.GoToDetail(item.id, type, true)
+                                GoToItemScreen(item.id, type, true)
                             )
                         }
                         is Open -> {
                             val item = action.agendaOperation.agendaItem
                             val type =  when (item) {
                                 is Task -> {
-                                    AgendaItemOption.TASK
+                                    TASK
                                 }
                                 is Reminder -> {
-                                    AgendaItemOption.REMINDER
+                                    REMINDER
                                 }
                             }
                             eventChannel.send(
-                                AgendaEvents.GoToDetail(item.id, type, false)
+                                GoToItemScreen(item.id, type, false)
                             )
                         }
                     }
@@ -269,7 +275,17 @@ class AgendaViewModel @Inject constructor(
                         }
                 }
 
-                else -> Unit
+                is CreateItem -> {
+                    eventChannel.send(
+                        AgendaEvents.GoToItemScreen(
+                            type = action.option,
+                            isEditing = true,
+                            dateEpochMilli = _selectedDate.value.toEpochMilli()
+                        )
+                    )
+                }
+                is EditItem -> TODO()
+                is OpenItem -> TODO()
             }
         }
     }

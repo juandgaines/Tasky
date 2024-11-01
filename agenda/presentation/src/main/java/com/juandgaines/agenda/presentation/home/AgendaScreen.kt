@@ -48,7 +48,7 @@ import com.juandgaines.agenda.presentation.home.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowProfileMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.ToggleDoneTask
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Error
-import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToDetail
+import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Success
 import com.juandgaines.agenda.presentation.home.AgendaItemOption.EVENT
@@ -73,8 +73,7 @@ import com.juandgaines.core.presentation.ui.UiText.StringResource
 @Composable
 fun AgendaScreenRoot(
     viewModel: AgendaViewModel,
-    navigateToCreateAgendaItem : (Int) -> Unit,
-    navigateToAgendaItem : (String,Int,Boolean) -> Unit,
+    navigateToAgendaItem : (String? ,Int,Boolean, Long?) -> Unit,
     navigateToLogin: () -> Unit
 ){
     val state = viewModel.state
@@ -108,33 +107,20 @@ fun AgendaScreenRoot(
                 ).show()
             }
 
-            is GoToDetail -> {
-                navigateToAgendaItem(agendaEvents.id, agendaEvents.type.ordinal, agendaEvents.isEditing)
+            is GoToItemScreen -> {
+                navigateToAgendaItem(
+                    agendaEvents.id,
+                    agendaEvents.type.ordinal,
+                    agendaEvents.isEditing,
+                    agendaEvents.dateEpochMilli
+                )
             }
         }
-
     }
 
     AgendaScreen(
         stateAgenda = state,
-        agendaActions = { action ->
-            when(action){
-                is CreateItem -> {
-                    when(action.option){
-                        REMINDER -> {
-                            navigateToCreateAgendaItem(REMINDER.ordinal)
-                        }
-                        TASK -> {
-                            navigateToCreateAgendaItem(TASK.ordinal)
-                        }
-                        EVENT -> {
-                            navigateToCreateAgendaItem(EVENT.ordinal)
-                        }
-                    }
-                }
-                else -> viewModel.onAction(action)
-            }
-        }
+        agendaActions =viewModel::onAction
     )
 }
 

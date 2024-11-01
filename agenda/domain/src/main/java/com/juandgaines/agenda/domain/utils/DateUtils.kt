@@ -12,6 +12,12 @@ fun Long.toUtcLocalDateTime(): LocalDate {
     return Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 }
 
+//Check if a date is today ZonedDateTime
+fun ZonedDateTime.isToday(): Boolean {
+    return this.toLocalDate() == LocalDate.now()
+}
+
+
 fun LocalDate.toLocalDateWithZoneId(zone: ZoneId): LocalDate {
     return this.atStartOfDay(zone).toLocalDate()
 }
@@ -51,6 +57,7 @@ fun LocalDate.startOfDay(): Long {
 fun LocalDate.endOfDay(): Long {
     return this.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
+
 
 fun Long.toZonedDateTime(zoneId: ZoneId = ZoneId.systemDefault()): ZonedDateTime {
     return Instant.ofEpochMilli(this) // Convert Long to Instant

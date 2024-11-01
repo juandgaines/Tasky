@@ -18,7 +18,8 @@ sealed interface ScreenNav {
     data class AgendaItem(
         val id: String? = null,
         val type:Int,
-        val isEditing:Boolean = false
+        val isEditing:Boolean = false,
+        val dateEpochMillis:Long? = null
     ) : ScreenNav
 
     @Serializable

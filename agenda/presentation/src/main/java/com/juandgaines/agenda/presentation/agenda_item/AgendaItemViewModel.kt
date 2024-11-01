@@ -11,6 +11,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
+import com.juandgaines.agenda.domain.utils.isToday
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
@@ -118,8 +119,17 @@ class AgendaItemViewModel @Inject constructor(
         } else {
             _isEditing.value = true
             updateState {
+                val isToday = _navParameters.dateEpochMillis?.toZonedDateTime()?.isToday()
+                val initialDate = if (isToday == true) {
+                    ZonedDateTime.now()
+                } else {
+                    _navParameters.dateEpochMillis
+                        ?.toZonedDateTime()
+                        ?.withHour(0)
+                        ?.withMinute(0)
+                }
                 it.copy(
-                    startDateTime = ZonedDateTime.now(),
+                    startDateTime =initialDate ?: ZonedDateTime.now(),
                     details = when (AgendaItemOption.fromOrdinal(type)) {
                         REMINDER -> ReminderDetails
                         TASK -> TaskDetails()
