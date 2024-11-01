@@ -66,7 +66,9 @@ fun AgendaItemScreenRoot(
     ObserveAsEvents(events) { agendaItemEvents->
         when (agendaItemEvents){
             Created -> {
-                Toast.makeText(context, "Item created", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.item_created)
+                    , Toast.LENGTH_SHORT).show()
                 navigateBack()
             }
 
@@ -74,7 +76,9 @@ fun AgendaItemScreenRoot(
 
             }
             Updated -> {
-                Toast.makeText(context, "Item created", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.item_updated)
+                    , Toast.LENGTH_SHORT).show()
                 navigateBack()
             }
         }
