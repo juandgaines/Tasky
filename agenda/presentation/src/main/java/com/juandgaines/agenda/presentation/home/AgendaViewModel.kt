@@ -90,19 +90,6 @@ class AgendaViewModel @Inject constructor(
     init {
 
         viewModelScope.launch {
-            taskRepository.insertTask(
-                Task(
-                    title = "Task 1",
-                    description = "Description 1",
-                    isDone = false,
-                    time = ZonedDateTime.now(),
-                    remindAt = ZonedDateTime.now(),
-                    id = UUID.randomUUID().toString()
-                )
-            )
-        }
-
-        viewModelScope.launch {
             agendaSyncScheduler.scheduleSync(
                 AgendaSyncOperations.FetchAgendas(
                     30.minutes
