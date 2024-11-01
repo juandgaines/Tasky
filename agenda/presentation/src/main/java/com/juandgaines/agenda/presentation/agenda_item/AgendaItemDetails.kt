@@ -8,7 +8,7 @@ sealed interface AgendaItemDetails {
         val finishDate:ZonedDateTime = ZonedDateTime.now(),
     ): AgendaItemDetails
 
-    data object TaskDetails: AgendaItemDetails
+    data class TaskDetails(val isCompleted:Boolean = false): AgendaItemDetails
 
     data object ReminderDetails: AgendaItemDetails
 }

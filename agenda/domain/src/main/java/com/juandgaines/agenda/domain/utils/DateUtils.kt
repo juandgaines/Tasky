@@ -12,6 +12,10 @@ fun Long.toUtcLocalDateTime(): LocalDate {
     return Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 }
 
+fun ZonedDateTime.isToday(): Boolean {
+    return this.toLocalDate() == LocalDate.now()
+}
+
 fun LocalDate.toLocalDateWithZoneId(zone: ZoneId): LocalDate {
     return this.atStartOfDay(zone).toLocalDate()
 }
@@ -52,6 +56,7 @@ fun LocalDate.endOfDay(): Long {
     return this.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
 
+
 fun Long.toZonedDateTime(zoneId: ZoneId = ZoneId.systemDefault()): ZonedDateTime {
     return Instant.ofEpochMilli(this) // Convert Long to Instant
         .atZone(zoneId) // Apply the desired ZoneId to get ZonedDateTime
@@ -75,7 +80,6 @@ fun ZonedDateTime.toFormattedSingleDateTime(): String {
     }
 }
 
-//Get time from ZonedDateTime
 fun ZonedDateTime.toFormattedTime(): String {
     DateTimeFormatter.ofPattern("HH:mm").let {
         return this.format(it)

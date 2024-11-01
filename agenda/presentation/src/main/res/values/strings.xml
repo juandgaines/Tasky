@@ -26,4 +26,6 @@
   <string name="dismiss">Dismiss</string>
   <string name="confirm">Confirm</string>
   <string name="edit_title">EDIT %S</string>
+  <string name="item_created">Item created</string>
+  <string name="item_updated">Item updated</string>
 </resources>

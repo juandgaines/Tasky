@@ -1,6 +1,7 @@
 package com.juandgaines.agenda.data.task
 
 import android.database.sqlite.SQLiteException
+import android.util.Log
 import com.juandgaines.agenda.data.mappers.toTask
 import com.juandgaines.agenda.data.mappers.toTaskEntity
 import com.juandgaines.agenda.data.mappers.toTaskRequest
@@ -48,7 +49,7 @@ class DefaultTaskRepository @Inject constructor(
         return try {
             val entity = task.toTaskEntity()
             taskDao.upsertTask(entity)
-
+            Log.d("Repository Update", "updateReminder: $task")
             val response = safeCall {
                 taskApi.updateTask(task.toTaskRequest())
             }.onError {

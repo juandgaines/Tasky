@@ -111,21 +111,15 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         composable<ScreenNav.Agenda> {
             AgendaScreenRoot(
                 viewModel = hiltViewModel(),
-                navigateToAgendaItem = { id,type, isEditing->
+                navigateToAgendaItem = { id,type, isEditing,epochMillis->
                     navController.navigate(
                         ScreenNav.AgendaItem(
                             id = id,
                             type = type,
-                            isEditing = isEditing
+                            isEditing = isEditing,
+                            dateEpochMillis = epochMillis
                         )
                     )
-                },
-                navigateToCreateAgendaItem = { type->
-                    navController.navigate(
-                        ScreenNav.AgendaItem(
-                        type = type
-                    ))
-
                 },
                 navigateToLogin = {
                     navController.navigate(AuthNav) {

@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
@@ -48,12 +50,12 @@ import com.juandgaines.agenda.presentation.home.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowProfileMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.ToggleDoneTask
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Error
-import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToDetail
+import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Success
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.EVENT
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.REMINDER
-import com.juandgaines.agenda.presentation.home.AgendaItemOption.TASK
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
@@ -62,6 +64,7 @@ import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
+import com.juandgaines.core.presentation.agenda.AgendaItemOption
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -73,11 +76,10 @@ import com.juandgaines.core.presentation.ui.UiText.StringResource
 @Composable
 fun AgendaScreenRoot(
     viewModel: AgendaViewModel,
-    navigateToCreateAgendaItem : (Int) -> Unit,
-    navigateToAgendaItem : (String,Int,Boolean) -> Unit,
+    navigateToAgendaItem : (String?,AgendaItemOption,Boolean, Long?) -> Unit,
     navigateToLogin: () -> Unit
 ){
-    val state = viewModel.state
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val events = viewModel.events
 
     val context= LocalContext.current
@@ -108,33 +110,20 @@ fun AgendaScreenRoot(
                 ).show()
             }
 
-            is GoToDetail -> {
-                navigateToAgendaItem(agendaEvents.id, agendaEvents.type.ordinal, agendaEvents.isEditing)
+            is GoToItemScreen -> {
+                navigateToAgendaItem(
+                    agendaEvents.id,
+                    agendaEvents.type,
+                    agendaEvents.isEditing,
+                    agendaEvents.dateEpochMilli
+                )
             }
         }
-
     }
 
     AgendaScreen(
         stateAgenda = state,
-        agendaActions = { action ->
-            when(action){
-                is CreateItem -> {
-                    when(action.option){
-                        REMINDER -> {
-                            navigateToCreateAgendaItem(REMINDER.ordinal)
-                        }
-                        TASK -> {
-                            navigateToCreateAgendaItem(TASK.ordinal)
-                        }
-                        EVENT -> {
-                            navigateToCreateAgendaItem(EVENT.ordinal)
-                        }
-                    }
-                }
-                else -> viewModel.onAction(action)
-            }
-        }
+        agendaActions =viewModel::onAction
     )
 }
 

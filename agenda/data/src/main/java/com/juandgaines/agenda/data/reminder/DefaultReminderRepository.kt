@@ -1,9 +1,11 @@
 package com.juandgaines.agenda.data.reminder
 
 import android.database.sqlite.SQLiteException
+import android.util.Log
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toReminderEntity
 import com.juandgaines.agenda.data.mappers.toReminderRequest
+import com.juandgaines.agenda.data.mappers.toTask
 import com.juandgaines.agenda.data.reminder.remote.ReminderApi
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
@@ -48,6 +50,8 @@ class DefaultReminderRepository @Inject constructor(
             val entity = reminder.toReminderEntity()
             reminderDao.upsertReminder(entity)
 
+            Log.d("Repository Update", "updateReminder: $reminder")
+
             val response = safeCall {
                 reminderApi.updateReminder(reminder.toReminderRequest())
             }.onError {
@@ -73,21 +77,11 @@ class DefaultReminderRepository @Inject constructor(
     }
 
     override suspend fun getReminderById(reminderId: String): Result<Reminder, DataError> {
-        val reminder = reminderDao.getReminderById(reminderId)?.toReminder()
-        return reminder?.let {
-            val response = safeCall {
-                reminderApi.getReminderById(reminderId)
-            }.map { data->
-                data.toReminder()
-            }.onError {
-                //TODO: Add to queue to get task later
-            }.onSuccess {
-                applicationScope.async {
-                    reminderDao.upsertReminder(it.toReminderEntity())
-                }.await()
-            }
-            return response
-        } ?: Result.Error(LocalError.NOT_FOUND)
+        return reminderDao.getReminderById(reminderId)?.toReminder()?.let {
+            Result.Success(it)
+        } ?: run {
+            Result.Error(LocalError.NOT_FOUND)
+        }
     }
 
     override fun getReminderByIdFlow(reminderId: String): Flow<Reminder?> {
