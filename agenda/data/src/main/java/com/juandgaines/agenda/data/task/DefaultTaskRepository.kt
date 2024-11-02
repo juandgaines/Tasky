@@ -37,7 +37,11 @@ class DefaultTaskRepository @Inject constructor(
             val response = safeCall {
                 taskApi.createTask(task.toTaskRequest())
             }.onError {
-                //TODO: Add to queue to create task later
+                agendaSyncScheduler.scheduleSync(
+                    AgendaSyncOperations.CreateAgendaItem(
+                        task
+                    )
+                )
             }.asEmptyDataResult()
             return response
         } catch (e: SQLiteException) {

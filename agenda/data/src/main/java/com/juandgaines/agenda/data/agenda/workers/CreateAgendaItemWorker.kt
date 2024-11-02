@@ -32,27 +32,27 @@ class CreateAgendaItemWorker @AssistedInject constructor(
 
         return when (agendaType) {
             Task::class.simpleName -> {
-                val updatedPendingAgendaItem = agendaSyncDao.getUpdateTaskSync(agendaId)
-                updatedPendingAgendaItem?.let {
-                    val response = taskRepository.updateTask(updatedPendingAgendaItem.task.toTask())
+                val createTaskSync = agendaSyncDao.getCreateTaskSync(agendaId)
+                createTaskSync?.let {
+                    val response = taskRepository.insertTask(createTaskSync.task.toTask())
 
                     return if (response is com.juandgaines.core.domain.util.Result.Error) {
                         response.error.toWorkerResult()
                     } else {
-                        agendaSyncDao.deleteUpdateTaskSync(updatedPendingAgendaItem.taskId)
+                        agendaSyncDao.deleteCreateTaskSync(createTaskSync.taskId)
                         Result.success()
                     }
                 } ?: Result.failure()
             }
             Reminder::class.simpleName -> {
-                val updatedPendingAgendaItem = agendaSyncDao.getUpdateReminderSync(agendaId)
-                updatedPendingAgendaItem?.let {
-                    val response = reminderRepository.updateReminder(updatedPendingAgendaItem.reminder.toReminder())
+                val createReminderSync = agendaSyncDao.getCreateReminderSync(agendaId)
+                createReminderSync?.let {
+                    val response = reminderRepository.insertReminder(createReminderSync.reminder.toReminder())
 
                     return if (response is com.juandgaines.core.domain.util.Result.Error) {
                         response.error.toWorkerResult()
                     } else {
-                        agendaSyncDao.deleteUpdateReminderSync(updatedPendingAgendaItem.reminderId)
+                        agendaSyncDao.deleteCreateReminderSync(createReminderSync.reminderId)
                         Result.success()
                     }
                 } ?: Result.failure()

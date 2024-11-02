@@ -1,13 +1,13 @@
 package com.juandgaines.agenda.data.reminder
 
 import android.database.sqlite.SQLiteException
-import android.util.Log
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toReminderEntity
 import com.juandgaines.agenda.data.mappers.toReminderRequest
-import com.juandgaines.agenda.data.mappers.toTask
 import com.juandgaines.agenda.data.reminder.remote.ReminderApi
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
+import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.core.data.database.reminder.ReminderDao
 import com.juandgaines.core.data.network.safeCall
@@ -15,9 +15,7 @@ import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.LocalError
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.asEmptyDataResult
-import com.juandgaines.core.domain.util.map
 import com.juandgaines.core.domain.util.onError
-import com.juandgaines.core.domain.util.onSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +25,8 @@ import javax.inject.Inject
 class DefaultReminderRepository @Inject constructor(
     private val reminderDao: ReminderDao,
     private val reminderApi: ReminderApi,
-    private val applicationScope: CoroutineScope
+    private val applicationScope: CoroutineScope,
+    private val agendaItemScheduler: AgendaSyncScheduler
 ):ReminderRepository {
     override suspend fun insertReminder(reminder: Reminder): Result<Unit, DataError> {
         return try {
@@ -36,7 +35,11 @@ class DefaultReminderRepository @Inject constructor(
             val response = safeCall {
                 reminderApi.createReminder(reminder.toReminderRequest())
             }.onError {
-                //TODO: Add to queue to create reminder later
+                agendaItemScheduler.scheduleSync(
+                    AgendaSyncOperations.CreateAgendaItem(
+                        reminder
+                    )
+                )
             }.asEmptyDataResult()
             return response
         }
@@ -50,12 +53,14 @@ class DefaultReminderRepository @Inject constructor(
             val entity = reminder.toReminderEntity()
             reminderDao.upsertReminder(entity)
 
-            Log.d("Repository Update", "updateReminder: $reminder")
-
             val response = safeCall {
                 reminderApi.updateReminder(reminder.toReminderRequest())
             }.onError {
-                //TODO: Add to queue to update reminder later
+                agendaItemScheduler.scheduleSync(
+                    AgendaSyncOperations.UpdateAgendaItem(
+                        reminder
+                    )
+                )
             }.asEmptyDataResult()
             return response
         }
@@ -96,7 +101,11 @@ class DefaultReminderRepository @Inject constructor(
         val response = safeCall {
             reminderApi.deleteReminderById(reminderId)
         }.onError {
-                // TODO: Add to queue to delete reminder later
+            agendaItemScheduler.scheduleSync(
+                AgendaSyncOperations.DeleteAgendaItem(
+                    reminder
+                )
+            )
             }.asEmptyDataResult()
         return response
     }

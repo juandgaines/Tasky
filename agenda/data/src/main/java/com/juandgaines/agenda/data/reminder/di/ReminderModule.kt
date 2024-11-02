@@ -2,6 +2,7 @@ package com.juandgaines.agenda.data.reminder.di
 
 import com.juandgaines.agenda.data.reminder.DefaultReminderRepository
 import com.juandgaines.agenda.data.reminder.remote.ReminderApi
+import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.core.data.database.reminder.ReminderDao
 import dagger.Module
@@ -26,8 +27,9 @@ class ReminderModule {
     fun provideReminderRepository(
         reminderDao: ReminderDao,
         reminderApi: ReminderApi,
-        applicationScope: CoroutineScope
+        applicationScope: CoroutineScope,
+        agendaSyncScheduler: AgendaSyncScheduler
     ): ReminderRepository {
-        return DefaultReminderRepository(reminderDao, reminderApi, applicationScope)
+        return DefaultReminderRepository(reminderDao, reminderApi,applicationScope,agendaSyncScheduler)
     }
 }

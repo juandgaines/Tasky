@@ -16,6 +16,7 @@ import com.juandgaines.agenda.data.agenda.workers.UpdateAgendaItemWorker
 import com.juandgaines.agenda.data.mappers.toReminderEntity
 import com.juandgaines.agenda.data.mappers.toTaskEntity
 import com.juandgaines.agenda.domain.agenda.AgendaItems
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
@@ -116,6 +117,7 @@ class AgendaPendingSyncScheduler (
                 )
                 Task::class.java.simpleName
             }
+            is Event -> Event::class.java.simpleName
         }
 
         val workRequest = OneTimeWorkRequestBuilder<UpdateAgendaItemWorker>()
@@ -168,6 +170,7 @@ class AgendaPendingSyncScheduler (
                 )
                 Task::class.java.simpleName
             }
+            is Event -> Event::class.java.simpleName
         }
 
         val workRequest = OneTimeWorkRequestBuilder<CreateAgendaItemWorker>()
@@ -218,6 +221,7 @@ class AgendaPendingSyncScheduler (
                 )
                 Task::class.java.simpleName
             }
+            is Event -> Event::class.java.simpleName
         }
 
         val workRequest = OneTimeWorkRequestBuilder<DeleteAgendaItemWorker>()

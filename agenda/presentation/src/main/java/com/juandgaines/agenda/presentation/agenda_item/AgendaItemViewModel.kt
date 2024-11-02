@@ -10,8 +10,6 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
-import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
-import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.isToday
@@ -67,7 +65,6 @@ class AgendaItemViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
-    private val agendaItemScheduler: AgendaSyncScheduler
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -261,11 +258,7 @@ class AgendaItemViewModel @Inject constructor(
                             .onSuccess {
                                 eventChannel.send(AgendaItemEvent.Updated)
                             }.onError {
-                                agendaItemScheduler.scheduleSync(
-                                    AgendaSyncOperations.UpdateAgendaItem(
-                                        data
-                                    )
-                                )
+                                eventChannel.send(AgendaItemEvent.UpdateScheduled)
                             }
                     } else {
                         val type = _navParameters.type
@@ -310,11 +303,7 @@ class AgendaItemViewModel @Inject constructor(
                             .onSuccess {
                                 eventChannel.send(AgendaItemEvent.Created)
                             }.onError {
-                                agendaItemScheduler.scheduleSync(
-                                    AgendaSyncOperations.CreateAgendaItem(
-                                        data
-                                    )
-                                )
+                                eventChannel.send(AgendaItemEvent.CreationScheduled)
                             }
                     }
                 }

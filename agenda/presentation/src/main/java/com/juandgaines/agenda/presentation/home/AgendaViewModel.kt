@@ -4,6 +4,7 @@ package com.juandgaines.agenda.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
@@ -43,6 +44,7 @@ import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.presentation.ui.UiText.StringResource
@@ -224,6 +226,7 @@ class AgendaViewModel @Inject constructor(
                                                  )
                                              )
                                        }.onError {
+
                                             eventChannel.send(AgendaEvents.Error(it.asUiText()))
                                        }
                                 }
@@ -239,6 +242,9 @@ class AgendaViewModel @Inject constructor(
                                             eventChannel.send(AgendaEvents.Error(it.asUiText()))
                                         }
                                 }
+                                is Event -> {
+
+                                }
                             }
                         }
                         is Edit -> {
@@ -249,6 +255,9 @@ class AgendaViewModel @Inject constructor(
                                 }
                                 is Reminder -> {
                                     REMINDER
+                                }
+                                is Event -> {
+                                    EVENT
                                 }
                             }
                             eventChannel.send(
@@ -263,6 +272,9 @@ class AgendaViewModel @Inject constructor(
                                 }
                                 is Reminder -> {
                                     REMINDER
+                                }
+                                is Event -> {
+                                    EVENT
                                 }
                             }
                             eventChannel.send(

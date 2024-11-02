@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
@@ -250,6 +251,24 @@ fun AgendaScreen(
                                             title = item.title,
                                             description = item.description ?: "",
                                             date = item.time.toFormattedSingleDateTime(),
+                                            onMenuItemClick = { operation ->
+                                                agendaActions(AgendaOperation(operation))
+                                            }
+                                        )
+                                    }
+                                    is Event->{
+                                        AgendaCard(
+                                            agendaItem = item,
+                                            onClickItem = {
+                                                agendaActions(
+                                                    AgendaOperation(
+                                                        AgendaCardMenuOperations.Open(item)
+                                                    )
+                                                )
+                                            },
+                                            title = item.title,
+                                            description = item.description ?: "",
+                                            date = item.date.toFormattedSingleDateTime(),
                                             onMenuItemClick = { operation ->
                                                 agendaActions(AgendaOperation(operation))
                                             }
