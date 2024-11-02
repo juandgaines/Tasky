@@ -95,7 +95,7 @@ class AgendaPendingSyncScheduler (
     private suspend fun scheduleUpdateAgendaItem(agendaItem: AgendaItems) {
         val userId = sessionStorage.get()?.userId ?: return
 
-        when (agendaItem) {
+        val type =when (agendaItem) {
             is Reminder -> {
                 agendaSyncDao.upsertUpdateReminderSync(
                     UpdateReminderSyncEntity(
@@ -104,16 +104,17 @@ class AgendaPendingSyncScheduler (
                         reminderId = agendaItem.id
                     )
                 )
+                Reminder::class.java.simpleName
             }
             is Task -> {
-                val task = agendaItem as Task
                 agendaSyncDao.upsertUpdateTaskSync(
                     UpdateTaskSyncEntity(
-                        task = task.toTaskEntity(),
+                        task = agendaItem.toTaskEntity(),
                         userId = userId,
-                        taskId = task.id
+                        taskId = agendaItem.id
                     )
                 )
+                Task::class.java.simpleName
             }
         }
 
@@ -132,6 +133,7 @@ class AgendaPendingSyncScheduler (
             .setInputData(
                 Data.Builder()
                     .putString(UpdateAgendaItemWorker.AGENDA_ITEM_ID, agendaItem.id)
+                    .putString(UpdateAgendaItemWorker.AGENDA_ITEM_TYPE, type)
                     .build()
             )
             .build()
@@ -143,7 +145,7 @@ class AgendaPendingSyncScheduler (
     private suspend fun scheduleCreateAgendaItem(agendaItem: AgendaItems) {
         val userId = sessionStorage.get()?.userId ?: return
 
-        when (agendaItem) {
+        val type = when (agendaItem) {
             is Reminder -> {
                 agendaSyncDao.upsertCreateReminderSync(
                     CreateReminderSyncEntity(
@@ -152,6 +154,8 @@ class AgendaPendingSyncScheduler (
                         reminderId = agendaItem.id
                     )
                 )
+                Reminder::class.java.simpleName
+
             }
             is Task -> {
                 val task = agendaItem as Task
@@ -162,6 +166,7 @@ class AgendaPendingSyncScheduler (
                         taskId = task.id
                     )
                 )
+                Task::class.java.simpleName
             }
         }
 
@@ -179,7 +184,8 @@ class AgendaPendingSyncScheduler (
             )
             .setInputData(
                 Data.Builder()
-                    .putString(UpdateAgendaItemWorker.AGENDA_ITEM_ID, agendaItem.id)
+                    .putString(CreateAgendaItemWorker.AGENDA_ITEM_ID, agendaItem.id)
+                    .putString(CreateAgendaItemWorker.AGENDA_ITEM_TYPE, type)
                     .build()
             )
             .build()
@@ -192,7 +198,7 @@ class AgendaPendingSyncScheduler (
     private suspend fun scheduleDeleteAgendaItem(agendaItem: AgendaItems) {
         val userId = sessionStorage.get()?.userId ?: return
 
-        when (agendaItem) {
+        val type = when (agendaItem) {
 
             is Reminder ->{
                 agendaSyncDao.upsertDeleteReminderSync(
@@ -201,6 +207,7 @@ class AgendaPendingSyncScheduler (
                         userId = userId
                     )
                 )
+                Reminder::class.java.simpleName
             }
             is Task -> {
                 agendaSyncDao.upsertDeleteTaskSync(
@@ -209,6 +216,7 @@ class AgendaPendingSyncScheduler (
                         userId = userId
                     )
                 )
+                Task::class.java.simpleName
             }
         }
 
@@ -217,6 +225,12 @@ class AgendaPendingSyncScheduler (
             .setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(CONNECTED)
+                    .build()
+            )
+            .setInputData(
+                Data.Builder()
+                    .putString(DeleteAgendaItemWorker.AGENDA_ITEM_ID, agendaItem.id)
+                    .putString(DeleteAgendaItemWorker.AGENDA_ITEM_TYPE, type)
                     .build()
             )
             .setBackoffCriteria(

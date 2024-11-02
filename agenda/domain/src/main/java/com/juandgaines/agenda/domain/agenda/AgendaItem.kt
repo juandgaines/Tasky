@@ -29,6 +29,13 @@ sealed interface AgendaItems{
         override val date = time
     }
 
+    data object Event:AgendaItems{
+        override val id = ""
+        override val title = ""
+        override val description = ""
+        override val date = ZonedDateTime.now()
+    }
+
     companion object{
         const val EDIT_FIELD_TITLE_KEY = "title"
         const val EDIT_FIELD_TITLE_DESCRIPTION = "description"

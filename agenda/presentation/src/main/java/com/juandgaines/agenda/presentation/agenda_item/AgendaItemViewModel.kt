@@ -7,8 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.juandgaines.agenda.domain.agenda.AgendaItems
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
+import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
+import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.isToday
@@ -35,13 +38,12 @@ import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_SIX
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_TEN
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_THIRTY
-import com.juandgaines.core.presentation.agenda.AgendaItemOption
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,7 +66,8 @@ import javax.inject.Inject
 class AgendaItemViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
-    private val reminderRepository: ReminderRepository
+    private val reminderRepository: ReminderRepository,
+    private val agendaItemScheduler: AgendaSyncScheduler
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -202,6 +205,7 @@ class AgendaItemViewModel @Inject constructor(
                                 )
                             )
                             EVENT -> {
+                                Event
                             }
                         }
                     }
@@ -216,17 +220,17 @@ class AgendaItemViewModel @Inject constructor(
 
                     if (agendaItemId != null) {
                         val type =  _navParameters.type
-                        val response = when (type) {
-                            REMINDER -> reminderRepository.updateReminder(
+                        val data = when (type) {
+                            REMINDER -> {
                                 Reminder(
                                     id = agendaItemId,
                                     title = _state.value.title,
                                     description = _state.value.description,
-                                    time =  _state.value.startDateTime,
-                                    remindAt =  desiredAlarmDate
+                                    time = _state.value.startDateTime,
+                                    remindAt = desiredAlarmDate
                                 )
-                            )
-                            TASK -> taskRepository.updateTask(
+                            }
+                            TASK -> {
                                 Task(
                                     id = agendaItemId,
                                     title = _state.value.title,
@@ -235,8 +239,20 @@ class AgendaItemViewModel @Inject constructor(
                                     isDone = (_state.value.details as TaskDetails).isCompleted,
                                     remindAt = desiredAlarmDate
                                 )
-                            )
+                            }
                             EVENT -> {
+                                Event
+                            }
+                        }
+
+                        val response = when (data) {
+                            is Reminder -> reminderRepository.updateReminder(
+                                data
+                            )
+                            is Task -> taskRepository.updateTask(
+                                data
+                            )
+                            Event -> {
                                 //TODO: Implement update event
                                 Result.Success(Unit)
                             }
@@ -245,12 +261,16 @@ class AgendaItemViewModel @Inject constructor(
                             .onSuccess {
                                 eventChannel.send(AgendaItemEvent.Updated)
                             }.onError {
-
+                                agendaItemScheduler.scheduleSync(
+                                    AgendaSyncOperations.UpdateAgendaItem(
+                                        data
+                                    )
+                                )
                             }
                     } else {
                         val type = _navParameters.type
-                        val response = when (type) {
-                            REMINDER -> reminderRepository.insertReminder(
+                        val data = when (type) {
+                            REMINDER -> {
                                 Reminder(
                                     id = UUID.randomUUID().toString(),
                                     title = _state.value.title,
@@ -258,18 +278,8 @@ class AgendaItemViewModel @Inject constructor(
                                     time = _state.value.startDateTime,
                                     remindAt = desiredAlarmDate
                                 )
-                            )
-                            TASK -> taskRepository.insertTask(
-                               Task(
-                                   id = UUID.randomUUID().toString(),
-                                   title = _state.value.title,
-                                   description = _state.value.description,
-                                   time = _state.value.startDateTime,
-                                   isDone = (_state.value.details as TaskDetails).isCompleted,
-                                   remindAt = desiredAlarmDate
-                               )
-                            )
-                            EVENT -> taskRepository.insertTask(
+                            }
+                            TASK -> {
                                 Task(
                                     id = UUID.randomUUID().toString(),
                                     title = _state.value.title,
@@ -278,13 +288,33 @@ class AgendaItemViewModel @Inject constructor(
                                     isDone = (_state.value.details as TaskDetails).isCompleted,
                                     remindAt = desiredAlarmDate
                                 )
+                            }
+                            EVENT -> {
+                                Event
+                            }
+                        }
+                        val response = when (data) {
+                            is Reminder -> reminderRepository.insertReminder(
+                                data
                             )
+                            is Task -> taskRepository.insertTask(
+                               data
+                            )
+
+                            Event -> {
+                                //TODO: Implement update event
+                                Result.Success(Unit)
+                            }
                         }
                         response
                             .onSuccess {
                                 eventChannel.send(AgendaItemEvent.Created)
                             }.onError {
-
+                                agendaItemScheduler.scheduleSync(
+                                    AgendaSyncOperations.CreateAgendaItem(
+                                        data
+                                    )
+                                )
                             }
                     }
                 }
