@@ -23,9 +23,7 @@ import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
-import com.juandgaines.agenda.presentation.home.AgendaActions.EditItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
-import com.juandgaines.agenda.presentation.home.AgendaActions.OpenItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowCreateContextMenu
@@ -37,8 +35,6 @@ import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Edit
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Open
 import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.home.AgendaState.Companion.calculateRangeDays
@@ -47,6 +43,8 @@ import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.presentation.ui.UiText.StringResource
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -275,7 +273,6 @@ class AgendaViewModel @Inject constructor(
                 }
 
                 is ToggleDoneTask -> {
-
                     val task = action.task
                     taskRepository.updateTask(task.copy(isDone = !task.isDone))
                         .onSuccess {
@@ -296,8 +293,6 @@ class AgendaViewModel @Inject constructor(
                         )
                     )
                 }
-                is EditItem -> TODO()
-                is OpenItem -> TODO()
             }
         }
     }

@@ -157,7 +157,9 @@ fun AgendaCard(
                 ) {
                     DropdownMenuItem(
                         onClick = {
-                            onMenuItemClick(AgendaCardMenuOperations.Open(agendaItem))
+                            onMenuItemClick(AgendaCardMenuOperations.Open(
+                                agendaItem
+                            ))
                             isMenuExpanded = false
                         },
                         text = { Text(stringResource(R.string.open)) }

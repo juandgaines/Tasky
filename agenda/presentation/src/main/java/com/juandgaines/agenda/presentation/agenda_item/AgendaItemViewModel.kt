@@ -107,6 +107,7 @@ class AgendaItemViewModel @Inject constructor(
             }.onSuccess { item ->
                 updateState {
                     it.copy(
+                        isNew = false,
                         title = item.title,
                         description = item.description,
                         details = when (type) {
@@ -133,6 +134,7 @@ class AgendaItemViewModel @Inject constructor(
                         ?.withMinute(0)
                 }
                 it.copy(
+                    isNew = true,
                     startDateTime =initialDate ?: ZonedDateTime.now(),
                     details = when (type) {
                         REMINDER -> ReminderDetails
