@@ -9,9 +9,11 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.await
+import com.juandgaines.agenda.data.agenda.workers.CreateAgendaItemWorker
 import com.juandgaines.agenda.data.agenda.workers.DeleteAgendaItemWorker
 import com.juandgaines.agenda.data.agenda.workers.FetchAgendaWorker
 import com.juandgaines.agenda.data.agenda.workers.UpdateAgendaItemWorker
+import com.juandgaines.agenda.data.mappers.toReminderEntity
 import com.juandgaines.agenda.data.mappers.toTaskEntity
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
@@ -23,8 +25,11 @@ import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations.FetchAgendas
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations.UpdateAgendaItem
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
+import com.juandgaines.core.data.database.agenda.CreateReminderSyncEntity
+import com.juandgaines.core.data.database.agenda.CreateTaskSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteTaskSyncEntity
+import com.juandgaines.core.data.database.agenda.UpdateReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateTaskSyncEntity
 import com.juandgaines.core.domain.auth.SessionManager
 import kotlinx.coroutines.CoroutineScope
@@ -46,7 +51,7 @@ class AgendaPendingSyncScheduler (
 
     override suspend fun scheduleSync(syncType: AgendaSyncOperations) {
         when (syncType) {
-            is CreateAgendaItem -> TODO()
+            is CreateAgendaItem -> scheduleCreateAgendaItem(syncType.agendaItem)
             is DeleteAgendaItem -> scheduleDeleteAgendaItem(syncType.agendaItem)
             is FetchAgendas -> scheduleFetchAgendas(syncType.interval)
             is UpdateAgendaItem -> scheduleUpdateAgendaItem(syncType.agendaItem)
@@ -92,7 +97,13 @@ class AgendaPendingSyncScheduler (
 
         when (agendaItem) {
             is Reminder -> {
-                //TODO update reminder
+                agendaSyncDao.upsertUpdateReminderSync(
+                    UpdateReminderSyncEntity(
+                        reminder = agendaItem.toReminderEntity(),
+                        userId = userId,
+                        reminderId = agendaItem.id
+                    )
+                )
             }
             is Task -> {
                 val task = agendaItem as Task
@@ -108,6 +119,54 @@ class AgendaPendingSyncScheduler (
 
         val workRequest = OneTimeWorkRequestBuilder<UpdateAgendaItemWorker>()
             .addTag("update_work")
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(CONNECTED)
+                    .build()
+            )
+            .setBackoffCriteria(
+                backoffPolicy = EXPONENTIAL,
+                backoffDelay = 2000L,
+                timeUnit = TimeUnit.MILLISECONDS
+            )
+            .setInputData(
+                Data.Builder()
+                    .putString(UpdateAgendaItemWorker.AGENDA_ITEM_ID, agendaItem.id)
+                    .build()
+            )
+            .build()
+        applicationScope.launch {
+            workManager.enqueue(workRequest).await()
+        }.join()
+    }
+
+    private suspend fun scheduleCreateAgendaItem(agendaItem: AgendaItems) {
+        val userId = sessionStorage.get()?.userId ?: return
+
+        when (agendaItem) {
+            is Reminder -> {
+                agendaSyncDao.upsertCreateReminderSync(
+                    CreateReminderSyncEntity(
+                        reminder = agendaItem.toReminderEntity(),
+                        userId = userId,
+                        reminderId = agendaItem.id
+                    )
+                )
+            }
+            is Task -> {
+                val task = agendaItem as Task
+                agendaSyncDao.upsertCreateTaskSync(
+                    CreateTaskSyncEntity(
+                        task = task.toTaskEntity(),
+                        userId = userId,
+                        taskId = task.id
+                    )
+                )
+            }
+        }
+
+        val workRequest = OneTimeWorkRequestBuilder<CreateAgendaItemWorker>()
+            .addTag("create_work")
             .setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(CONNECTED)

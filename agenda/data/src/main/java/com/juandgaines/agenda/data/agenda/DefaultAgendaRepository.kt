@@ -2,6 +2,7 @@ package com.juandgaines.agenda.data.agenda
 
 import com.juandgaines.agenda.data.agenda.remote.AgendaApi
 import com.juandgaines.agenda.data.mappers.toReminder
+import com.juandgaines.agenda.data.mappers.toReminderRequest
 import com.juandgaines.agenda.data.mappers.toTask
 import com.juandgaines.agenda.data.mappers.toTaskRequest
 import com.juandgaines.agenda.data.reminder.remote.ReminderApi
@@ -76,15 +77,23 @@ class DefaultAgendaRepository @Inject constructor(
             val pendingDeleteReminders = async {
                 agendaSyncDao.getAllDeleteReminderSync(userId)
             }
-
             val pendingDeleteTasks = async{
                 agendaSyncDao.getAllDeleteTaskSync(userId)
             }
             val pendingUpdatedTasks = async{
                 agendaSyncDao.getAllUpdateTaskSync(userId)
             }
+            val pendingUpdatedReminders = async{
+                agendaSyncDao.getAllUpdateReminderSync(userId)
+            }
+            val pendingCreateTasks = async{
+                agendaSyncDao.getAllCreateTaskSync(userId)
+            }
+            val pendingCreateReminders = async{
+                agendaSyncDao.getAllCreateReminderSync(userId)
+            }
 
-            val pendingDeleteJobs = pendingDeleteTasks
+            val pendingDeleteTaskJobs = pendingDeleteTasks
                 .await()
                 .map {
                     launch {
@@ -96,20 +105,6 @@ class DefaultAgendaRepository @Inject constructor(
                                  agendaSyncDao.deleteDeleteTaskSync(taskId)
                              }.join()
                          }
-                    }
-                }
-            val pendingUpdateJobs = pendingUpdatedTasks
-                .await()
-                .map {
-                    launch {
-                        val task = it.task.toTask()
-                        safeCall {
-                            taskApi.updateTask(task.toTaskRequest())
-                        }.onSuccess {
-                            applicationScope.launch {
-                                agendaSyncDao.deleteUpdateTaskSync(task.id)
-                            }.join()
-                        }
                     }
                 }
 
@@ -128,10 +123,79 @@ class DefaultAgendaRepository @Inject constructor(
                     }
                 }
 
-            pendingUpdateJobs.forEach {
+            val pendingCreateTaskJobs = pendingCreateTasks
+                .await()
+                .map {
+                    launch {
+                        val task = it.task.toTask()
+                        safeCall {
+                            taskApi.createTask(task.toTaskRequest())
+                        }.onSuccess {
+                            applicationScope.launch {
+                                agendaSyncDao.deleteCreateTaskSync(task.id)
+                            }.join()
+                        }
+                    }
+                }
+
+            val pendingCreateReminderJobs = pendingCreateReminders
+                .await()
+                .map {
+                    launch {
+                        val reminder = it.reminder.toReminder()
+                        safeCall {
+                            reminderApi.createReminder(reminder.toReminderRequest())
+                        }.onSuccess {
+                            applicationScope.launch {
+                                agendaSyncDao.deleteCreateReminderSync(reminder.id)
+                            }.join()
+                        }
+                    }
+                }
+
+            val pendingUpdateTasksJobs = pendingUpdatedTasks
+                .await()
+                .map {
+                    launch {
+                        val task = it.task.toTask()
+                        safeCall {
+                            taskApi.updateTask(task.toTaskRequest())
+                        }.onSuccess {
+                            applicationScope.launch {
+                                agendaSyncDao.deleteUpdateTaskSync(task.id)
+                            }.join()
+                        }
+                    }
+                }
+
+            val pendingUpdateReminderJobs = pendingUpdatedReminders
+                .await()
+                .map {
+                    launch {
+                        val reminder = it.reminder.toReminder()
+                        safeCall {
+                            reminderApi.updateReminder(reminder.toReminderRequest())
+                        }.onSuccess {
+                            applicationScope.launch {
+                                agendaSyncDao.deleteUpdateReminderSync(reminder.id)
+                            }.join()
+                        }
+                    }
+                }
+
+            pendingCreateReminderJobs.forEach {
                 it.join()
             }
-            pendingDeleteJobs.forEach {
+            pendingCreateTaskJobs.forEach {
+                it.join()
+            }
+            pendingUpdateReminderJobs.forEach {
+                it.join()
+            }
+            pendingUpdateTasksJobs.forEach {
+                it.join()
+            }
+            pendingDeleteTaskJobs.forEach {
                 it.join()
             }
             pendingDeleteReminderJobs.forEach {
