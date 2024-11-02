@@ -153,7 +153,7 @@ fun AgendaItemScreen(
                     },
                     content = {
                         Row (
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .size(56.dp),
