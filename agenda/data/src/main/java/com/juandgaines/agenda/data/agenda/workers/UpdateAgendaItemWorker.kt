@@ -11,6 +11,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
+import com.juandgaines.core.domain.util.Result.Error
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -32,34 +33,67 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
 
         return  when (agendaType) {
             Task::class.simpleName-> {
-                val updatedPendingAgendaItem = agendaSyncDao.getUpdateTaskSync(agendaId)
-                updatedPendingAgendaItem?.let {
-                    val response = taskRepository.updateTask(updatedPendingAgendaItem.task.toTask())
+                val taskCreated= agendaSyncDao.getCreateTaskSync(agendaId)
 
-                return if (response is com.juandgaines.core.domain.util.Result.Error) {
-                    response.error.toWorkerResult()
-                } else {
-                    agendaSyncDao.deleteUpdateTaskSync(updatedPendingAgendaItem.taskId)
-                    Result.success()
-                }} ?: Result.failure()
-            }
-            Reminder::class.simpleName -> {
-                val updatedPendingAgendaItem = agendaSyncDao.getUpdateReminderSync(agendaId)
-                updatedPendingAgendaItem?.let {
-                    val response = reminderRepository.updateReminder(
-                        updatedPendingAgendaItem.reminder.toReminder()
-                    )
-
+                taskCreated?.let {
+                    val response = taskRepository.insertTask(taskCreated.task.toTask())
                     return if (response is com.juandgaines.core.domain.util.Result.Error) {
                         response.error.toWorkerResult()
                     } else {
-                        agendaSyncDao.deleteUpdateReminderSync(updatedPendingAgendaItem.reminderId)
-                        Result.success()
+                        agendaSyncDao.deleteCreateTaskSync(taskCreated.taskId)
+                        updateAgendaItemTaskPendingSync(agendaId)
                     }
-                }?:Result.failure()
+                }?:run {
+                    updateAgendaItemTaskPendingSync(agendaId)
+                }
+            }
+            Reminder::class.simpleName -> {
+                val reminderCreated = agendaSyncDao.getCreateReminderSync(agendaId)
+                reminderCreated?.let {
+                    val response = reminderRepository.insertReminder(reminderCreated.reminder.toReminder())
+                    return if (response is com.juandgaines.core.domain.util.Result.Error) {
+                        response.error.toWorkerResult()
+                    } else {
+                        agendaSyncDao.deleteCreateReminderSync(reminderCreated.reminderId)
+                        updateAgendaItemReminderSync(agendaId)
+                    }
+                }?:run {
+                    updateAgendaItemReminderSync(agendaId)
+                }
+                updateAgendaItemReminderSync(agendaId)
             }
             else -> Result.failure()
         }
+    }
+
+    private suspend fun updateAgendaItemReminderSync(agendaId: String): Result {
+        val updatedPendingAgendaItem = agendaSyncDao.getUpdateReminderSync(agendaId)
+        return updatedPendingAgendaItem?.let {
+            val response = reminderRepository.updateReminder(
+                updatedPendingAgendaItem.reminder.toReminder()
+            )
+
+            return if (response is Error) {
+                response.error.toWorkerResult()
+            } else {
+                agendaSyncDao.deleteUpdateReminderSync(updatedPendingAgendaItem.reminderId)
+                Result.success()
+            }
+        } ?: Result.failure()
+    }
+
+    private suspend fun updateAgendaItemTaskPendingSync(agendaId: String): Result {
+        val updatedPendingAgendaItem = agendaSyncDao.getUpdateTaskSync(agendaId)
+        return updatedPendingAgendaItem?.let {
+            val response = taskRepository.updateTask(updatedPendingAgendaItem.task.toTask())
+
+            return if (response is Error) {
+                response.error.toWorkerResult()
+            } else {
+                agendaSyncDao.deleteUpdateTaskSync(updatedPendingAgendaItem.taskId)
+                Result.success()
+            }
+        } ?: Result.failure()
     }
 
     companion object {
