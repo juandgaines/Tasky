@@ -44,9 +44,9 @@ import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.presentation.ui.UiText.StringResource
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel

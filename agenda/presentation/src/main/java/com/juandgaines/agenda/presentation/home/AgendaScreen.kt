@@ -54,9 +54,9 @@ import com.juandgaines.agenda.presentation.home.AgendaEvents.Error
 import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Success
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
@@ -65,7 +65,7 @@ import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
-import com.juandgaines.core.presentation.agenda.AgendaItemOption
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -77,7 +77,7 @@ import com.juandgaines.core.presentation.ui.UiText.StringResource
 @Composable
 fun AgendaScreenRoot(
     viewModel: AgendaViewModel,
-    navigateToAgendaItem : (String?,AgendaItemOption,Boolean, Long?) -> Unit,
+    navigateToAgendaItem : (String?, AgendaItemOption,Boolean, Long?) -> Unit,
     navigateToLogin: () -> Unit
 ){
     val state by viewModel.state.collectAsStateWithLifecycle()

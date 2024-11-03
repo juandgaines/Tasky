@@ -1,7 +1,7 @@
 package com.juandgaines.agenda.presentation.home
 
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
-import com.juandgaines.core.presentation.agenda.AgendaItemOption
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import java.time.LocalDate
 
 sealed interface AgendaActions{

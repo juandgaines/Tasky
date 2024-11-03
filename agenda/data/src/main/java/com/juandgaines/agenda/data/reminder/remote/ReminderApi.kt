@@ -18,6 +18,6 @@ interface ReminderApi {
     @GET("/reminder")
     suspend fun getReminderById(@Query("reminderId") id:String): Response<ReminderResponse>
 
-    @DELETE
+    @DELETE("/reminder")
     suspend fun deleteReminderById(@Query("reminderId") id:String): Response<Unit>
 }

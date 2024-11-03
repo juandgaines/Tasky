@@ -39,9 +39,9 @@ import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_THIR
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
