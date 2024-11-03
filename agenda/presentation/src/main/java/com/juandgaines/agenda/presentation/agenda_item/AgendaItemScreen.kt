@@ -320,7 +320,7 @@ fun AgendaItemScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                if(state.isNew.not()){
+                if(!state.isNew){
                     Text(
                         text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
                         style = MaterialTheme.typography.titleSmall,
