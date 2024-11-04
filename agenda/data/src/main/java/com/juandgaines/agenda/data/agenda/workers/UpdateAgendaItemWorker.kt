@@ -61,19 +61,25 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
 
             }
             AgendaItemOption.REMINDER -> {
-                val reminderCreated = agendaSyncDao.getCreateReminderSync(agendaId)
-                reminderCreated?.let {
-                    val response = reminderRepository.insertReminder(reminderCreated.reminder.toReminder())
+                val reminderResponse = reminderRepository.getReminderById(agendaId)
+
+                if (reminderResponse is Error) {
+                    val reminderCreated = agendaSyncDao.getCreateReminderSync(agendaId) ?: return Result.failure()
+                    val updateReminder = agendaSyncDao.getUpdateReminderSync(agendaId) ?: return Result.failure()
+                    val reminder = updateReminder.reminder
+                    val response = reminderRepository.insertReminder(reminder.toReminder())
+
                     return if (response is Error) {
                         response.error.toWorkerResult()
                     } else {
                         agendaSyncDao.deleteCreateReminderSync(reminderCreated.reminderId)
-                        updateAgendaItemReminderSync(agendaId)
+                        agendaSyncDao.deleteUpdateReminderSync(updateReminder.reminderId)
+                        Result.success()
                     }
-                }?:run {
+                }
+                else{
                     updateAgendaItemReminderSync(agendaId)
                 }
-                updateAgendaItemReminderSync(agendaId)
             }
             else -> Result.failure()
         }
