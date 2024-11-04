@@ -1,6 +1,7 @@
 package com.juandgaines.agenda.data.agenda.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -11,6 +12,7 @@ import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.util.Result.Error
+import com.juandgaines.core.domain.util.onSuccess
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -35,42 +37,49 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
         return  when (agendaType) {
             AgendaItemOption.TASK-> {
 
-                val taskCreated= agendaSyncDao.getCreateTaskSync(agendaId)
+                val taskResponse = taskRepository.getTaskById(agendaId)
 
-                taskCreated?.let {
+                if (taskResponse is Error) {
+                   // needs to be created
+                    val taskCreated = agendaSyncDao.getCreateTaskSync(agendaId) ?: return Result.failure()
+                    val updateTask = agendaSyncDao.getUpdateTaskSync(agendaId) ?: return Result.failure()
+                    val task = updateTask.task
+                    val response = taskRepository.insertTask(task.toTask())
 
-                    val response = taskRepository.insertTask(taskCreated.task.toTask())
-
-                    return if (response is com.juandgaines.core.domain.util.Result.Error) {
-                        val task = taskRepository.getTaskById(taskCreated.taskId)
-                        if (task is com.juandgaines.core.domain.util.Result.Success) {
-                            agendaSyncDao.deleteCreateTaskSync(taskCreated.taskId)
-                            updateAgendaItemTaskPendingSync(agendaId)
-                        }else{
-                            response.error.toWorkerResult()
-                        }
+                    return if (response is Error) {
+                        response.error.toWorkerResult()
                     } else {
                         agendaSyncDao.deleteCreateTaskSync(taskCreated.taskId)
-                        updateAgendaItemTaskPendingSync(agendaId)
+                        agendaSyncDao.deleteUpdateTaskSync(updateTask.taskId)
+                        Result.success()
                     }
-                }?:run {
+                }
+                else{
+                    Log.d("UpdateAgendaItemWorker", "Task already exists")
                     updateAgendaItemTaskPendingSync(agendaId)
                 }
+
             }
             AgendaItemOption.REMINDER -> {
-                val reminderCreated = agendaSyncDao.getCreateReminderSync(agendaId)
-                reminderCreated?.let {
-                    val response = reminderRepository.insertReminder(reminderCreated.reminder.toReminder())
-                    return if (response is com.juandgaines.core.domain.util.Result.Error) {
+                val reminderResponse = reminderRepository.getReminderById(agendaId)
+
+                if (reminderResponse is Error) {
+                    val reminderCreated = agendaSyncDao.getCreateReminderSync(agendaId) ?: return Result.failure()
+                    val updateReminder = agendaSyncDao.getUpdateReminderSync(agendaId) ?: return Result.failure()
+                    val reminder = updateReminder.reminder
+                    val response = reminderRepository.insertReminder(reminder.toReminder())
+
+                    return if (response is Error) {
                         response.error.toWorkerResult()
                     } else {
                         agendaSyncDao.deleteCreateReminderSync(reminderCreated.reminderId)
-                        updateAgendaItemReminderSync(agendaId)
+                        agendaSyncDao.deleteUpdateReminderSync(updateReminder.reminderId)
+                        Result.success()
                     }
-                }?:run {
+                }
+                else{
                     updateAgendaItemReminderSync(agendaId)
                 }
-                updateAgendaItemReminderSync(agendaId)
             }
             else -> Result.failure()
         }
