@@ -14,6 +14,7 @@ import com.juandgaines.core.data.database.task.TaskDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.LocalError
+import com.juandgaines.core.domain.util.DataError.Network.NO_INTERNET
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.asEmptyDataResult
 import com.juandgaines.core.domain.util.onError
@@ -36,12 +37,17 @@ class DefaultTaskRepository @Inject constructor(
             taskDao.upsertTask(entity)
             val response = safeCall {
                 taskApi.createTask(task.toTaskRequest())
-            }.onError {
-                agendaSyncScheduler.scheduleSync(
-                    AgendaSyncOperations.CreateAgendaItem(
-                        task
-                    )
-                )
+            }.onError { error->
+               when (error){
+                   NO_INTERNET -> {
+                          agendaSyncScheduler.scheduleSync(
+                            AgendaSyncOperations.CreateAgendaItem(
+                                 task
+                            )
+                          )
+                   }
+                   else-> Unit
+               }
             }.asEmptyDataResult()
             return response
         } catch (e: SQLiteException) {
@@ -57,11 +63,16 @@ class DefaultTaskRepository @Inject constructor(
             val response = safeCall {
                 taskApi.updateTask(task.toTaskRequest())
             }.onError {
-                agendaSyncScheduler.scheduleSync(
-                    AgendaSyncOperations.UpdateAgendaItem(
-                        task
-                    )
-                )
+                when (it) {
+                    NO_INTERNET -> {
+                        agendaSyncScheduler.scheduleSync(
+                            AgendaSyncOperations.UpdateAgendaItem(
+                                task
+                            )
+                        )
+                    }
+                    else -> Unit
+                }
             }.asEmptyDataResult()
 
             return response
@@ -103,13 +114,19 @@ class DefaultTaskRepository @Inject constructor(
         val response = safeCall {
             taskApi.deleteTask(task.id)
         }.onError {
-            applicationScope.launch {
-                agendaSyncScheduler.scheduleSync(
-                    AgendaSyncOperations.DeleteAgendaItem(
-                        task
-                    )
-                )
-            }.join()
+            when (it) {
+                NO_INTERNET -> {
+                    applicationScope.launch {
+                        agendaSyncScheduler.scheduleSync(
+                            AgendaSyncOperations.DeleteAgendaItem(
+                                task
+                            )
+                        )
+                    }.join()
+                }
+                else -> Unit
+            }
+
         }.asEmptyDataResult()
 
         return response

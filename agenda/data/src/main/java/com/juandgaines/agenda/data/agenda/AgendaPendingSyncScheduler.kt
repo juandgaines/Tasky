@@ -32,6 +32,7 @@ import com.juandgaines.core.data.database.agenda.DeleteReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteTaskSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateTaskSyncEntity
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.auth.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -105,7 +106,7 @@ class AgendaPendingSyncScheduler (
                         reminderId = agendaItem.id
                     )
                 )
-                Reminder::class.java.simpleName
+                agendaItem.agendaItemOption
             }
             is Task -> {
                 agendaSyncDao.upsertUpdateTaskSync(
@@ -115,9 +116,9 @@ class AgendaPendingSyncScheduler (
                         taskId = agendaItem.id
                     )
                 )
-                Task::class.java.simpleName
+                agendaItem.agendaItemOption
             }
-            is Event -> Event::class.java.simpleName
+            is Event -> agendaItem.agendaItemOption
         }
 
         val workRequest = OneTimeWorkRequestBuilder<UpdateAgendaItemWorker>()
@@ -135,7 +136,7 @@ class AgendaPendingSyncScheduler (
             .setInputData(
                 Data.Builder()
                     .putString(UpdateAgendaItemWorker.AGENDA_ITEM_ID, agendaItem.id)
-                    .putString(UpdateAgendaItemWorker.AGENDA_ITEM_TYPE, type)
+                    .putInt(UpdateAgendaItemWorker.AGENDA_ITEM_TYPE, type.ordinal)
                     .build()
             )
             .build()
@@ -156,7 +157,7 @@ class AgendaPendingSyncScheduler (
                         reminderId = agendaItem.id
                     )
                 )
-                Reminder::class.java.simpleName
+                agendaItem.agendaItemOption
 
             }
             is Task -> {
@@ -168,9 +169,9 @@ class AgendaPendingSyncScheduler (
                         taskId = task.id
                     )
                 )
-                Task::class.java.simpleName
+                agendaItem.agendaItemOption
             }
-            is Event -> Event::class.java.simpleName
+            is Event -> agendaItem.agendaItemOption
         }
 
         val workRequest = OneTimeWorkRequestBuilder<CreateAgendaItemWorker>()
@@ -188,7 +189,7 @@ class AgendaPendingSyncScheduler (
             .setInputData(
                 Data.Builder()
                     .putString(CreateAgendaItemWorker.AGENDA_ITEM_ID, agendaItem.id)
-                    .putString(CreateAgendaItemWorker.AGENDA_ITEM_TYPE, type)
+                    .putInt(CreateAgendaItemWorker.AGENDA_ITEM_TYPE, type.ordinal)
                     .build()
             )
             .build()
@@ -210,7 +211,7 @@ class AgendaPendingSyncScheduler (
                         userId = userId
                     )
                 )
-                Reminder::class.java.simpleName
+                agendaItem.agendaItemOption
             }
             is Task -> {
                 agendaSyncDao.upsertDeleteTaskSync(
@@ -219,9 +220,9 @@ class AgendaPendingSyncScheduler (
                         userId = userId
                     )
                 )
-                Task::class.java.simpleName
+                agendaItem.agendaItemOption
             }
-            is Event -> Event::class.java.simpleName
+            is Event -> agendaItem.agendaItemOption
         }
 
         val workRequest = OneTimeWorkRequestBuilder<DeleteAgendaItemWorker>()
@@ -234,7 +235,7 @@ class AgendaPendingSyncScheduler (
             .setInputData(
                 Data.Builder()
                     .putString(DeleteAgendaItemWorker.AGENDA_ITEM_ID, agendaItem.id)
-                    .putString(DeleteAgendaItemWorker.AGENDA_ITEM_TYPE, type)
+                    .putInt(DeleteAgendaItemWorker.AGENDA_ITEM_TYPE, type.ordinal)
                     .build()
             )
             .setBackoffCriteria(

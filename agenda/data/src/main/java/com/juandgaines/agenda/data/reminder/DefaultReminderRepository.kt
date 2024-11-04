@@ -35,11 +35,16 @@ class DefaultReminderRepository @Inject constructor(
             val response = safeCall {
                 reminderApi.createReminder(reminder.toReminderRequest())
             }.onError {
-                agendaItemScheduler.scheduleSync(
-                    AgendaSyncOperations.CreateAgendaItem(
-                        reminder
-                    )
-                )
+                when (it) {
+                    DataError.Network.NO_INTERNET -> {
+                        agendaItemScheduler.scheduleSync(
+                            AgendaSyncOperations.CreateAgendaItem(
+                                reminder
+                            )
+                        )
+                    }
+                    else -> Unit
+                }
             }.asEmptyDataResult()
             return response
         }
@@ -56,11 +61,16 @@ class DefaultReminderRepository @Inject constructor(
             val response = safeCall {
                 reminderApi.updateReminder(reminder.toReminderRequest())
             }.onError {
-                agendaItemScheduler.scheduleSync(
-                    AgendaSyncOperations.UpdateAgendaItem(
-                        reminder
-                    )
-                )
+                when (it) {
+                    DataError.Network.NO_INTERNET -> {
+                        agendaItemScheduler.scheduleSync(
+                            AgendaSyncOperations.UpdateAgendaItem(
+                                reminder
+                            )
+                        )
+                    }
+                    else -> Unit
+                }
             }.asEmptyDataResult()
             return response
         }
@@ -101,12 +111,16 @@ class DefaultReminderRepository @Inject constructor(
         val response = safeCall {
             reminderApi.deleteReminderById(reminderId)
         }.onError {
-            agendaItemScheduler.scheduleSync(
-                AgendaSyncOperations.DeleteAgendaItem(
-                    reminder
-                )
-            )
-            }.asEmptyDataResult()
+            when (it) {
+                DataError.Network.NO_INTERNET ->
+                    agendaItemScheduler.scheduleSync(
+                        AgendaSyncOperations.DeleteAgendaItem(
+                            reminder
+                        )
+                    )
+                else -> Unit
+            }
+        }.asEmptyDataResult()
         return response
     }
 

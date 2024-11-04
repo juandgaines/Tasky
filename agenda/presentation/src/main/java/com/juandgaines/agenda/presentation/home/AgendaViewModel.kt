@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -91,6 +92,15 @@ class AgendaViewModel @Inject constructor(
     val state = _state
         .onStart {
             if (!_isInit) {
+                reminderRepository.insertReminder(
+                    Reminder(
+                        id = "1",
+                        title = "Reminder",
+                        description = "Description",
+                        time = ZonedDateTime.now(),
+                        remindAt = ZonedDateTime.now()
+                    )
+                )
                 _isInit = true
                 initialsCalculator.getInitials().let { initials ->
                     updateState {

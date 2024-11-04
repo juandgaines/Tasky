@@ -6,11 +6,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toTask
-import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
-import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.util.Result.Error
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -29,16 +28,27 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
             return Result.failure()
         }
         val agendaId = params.inputData.getString(AGENDA_ITEM_ID) ?: return Result.failure()
-        val agendaType = params.inputData.getString(AGENDA_ITEM_TYPE) ?: return Result.failure()
+        val type = params.inputData.getInt(AGENDA_ITEM_TYPE,-1)
+        if (type == -1) return Result.failure()
+        val agendaType= AgendaItemOption.fromOrdinal(type)
 
         return  when (agendaType) {
-            Task::class.simpleName-> {
+            AgendaItemOption.TASK-> {
+
                 val taskCreated= agendaSyncDao.getCreateTaskSync(agendaId)
 
                 taskCreated?.let {
+
                     val response = taskRepository.insertTask(taskCreated.task.toTask())
+
                     return if (response is com.juandgaines.core.domain.util.Result.Error) {
-                        response.error.toWorkerResult()
+                        val task = taskRepository.getTaskById(taskCreated.taskId)
+                        if (task is com.juandgaines.core.domain.util.Result.Success) {
+                            agendaSyncDao.deleteCreateTaskSync(taskCreated.taskId)
+                            updateAgendaItemTaskPendingSync(agendaId)
+                        }else{
+                            response.error.toWorkerResult()
+                        }
                     } else {
                         agendaSyncDao.deleteCreateTaskSync(taskCreated.taskId)
                         updateAgendaItemTaskPendingSync(agendaId)
@@ -47,7 +57,7 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
                     updateAgendaItemTaskPendingSync(agendaId)
                 }
             }
-            Reminder::class.simpleName -> {
+            AgendaItemOption.REMINDER -> {
                 val reminderCreated = agendaSyncDao.getCreateReminderSync(agendaId)
                 reminderCreated?.let {
                     val response = reminderRepository.insertReminder(reminderCreated.reminder.toReminder())
@@ -83,10 +93,10 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
     }
 
     private suspend fun updateAgendaItemTaskPendingSync(agendaId: String): Result {
+
         val updatedPendingAgendaItem = agendaSyncDao.getUpdateTaskSync(agendaId)
         return updatedPendingAgendaItem?.let {
             val response = taskRepository.updateTask(updatedPendingAgendaItem.task.toTask())
-
             return if (response is Error) {
                 response.error.toWorkerResult()
             } else {
