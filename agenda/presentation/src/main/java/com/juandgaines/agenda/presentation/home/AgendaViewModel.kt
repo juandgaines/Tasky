@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -99,7 +100,6 @@ class AgendaViewModel @Inject constructor(
                     }
 
                 }
-                agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
                 agendaSyncScheduler.scheduleSync(
                     AgendaSyncOperations.FetchAgendas(
                         30.minutes
@@ -109,6 +109,7 @@ class AgendaViewModel @Inject constructor(
             }
         }
         .combine(_selectedDate){ state, selectedDate->
+            agendaRepository.fetchItems(selectedDate.toEpochMilli())
             state.copy(selectedLocalDate = selectedDate)
         }
         .flatMapLatest { state->
