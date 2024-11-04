@@ -92,15 +92,6 @@ class AgendaViewModel @Inject constructor(
     val state = _state
         .onStart {
             if (!_isInit) {
-                reminderRepository.insertReminder(
-                    Reminder(
-                        id = "1",
-                        title = "Reminder",
-                        description = "Description",
-                        time = ZonedDateTime.now(),
-                        remindAt = ZonedDateTime.now()
-                    )
-                )
                 _isInit = true
                 initialsCalculator.getInitials().let { initials ->
                     updateState {
