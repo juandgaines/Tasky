@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
@@ -53,9 +54,9 @@ import com.juandgaines.agenda.presentation.home.AgendaEvents.Error
 import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.home.AgendaEvents.Success
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.EVENT
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
@@ -64,7 +65,7 @@ import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
-import com.juandgaines.core.presentation.agenda.AgendaItemOption
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
@@ -76,7 +77,7 @@ import com.juandgaines.core.presentation.ui.UiText.StringResource
 @Composable
 fun AgendaScreenRoot(
     viewModel: AgendaViewModel,
-    navigateToAgendaItem : (String?,AgendaItemOption,Boolean, Long?) -> Unit,
+    navigateToAgendaItem : (String?, AgendaItemOption,Boolean, Long?) -> Unit,
     navigateToLogin: () -> Unit
 ){
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -250,6 +251,24 @@ fun AgendaScreen(
                                             title = item.title,
                                             description = item.description ?: "",
                                             date = item.time.toFormattedSingleDateTime(),
+                                            onMenuItemClick = { operation ->
+                                                agendaActions(AgendaOperation(operation))
+                                            }
+                                        )
+                                    }
+                                    is Event->{
+                                        AgendaCard(
+                                            agendaItem = item,
+                                            onClickItem = {
+                                                agendaActions(
+                                                    AgendaOperation(
+                                                        AgendaCardMenuOperations.Open(item)
+                                                    )
+                                                )
+                                            },
+                                            title = item.title,
+                                            description = item.description ?: "",
+                                            date = item.date.toFormattedSingleDateTime(),
                                             onMenuItemClick = { operation ->
                                                 agendaActions(AgendaOperation(operation))
                                             }

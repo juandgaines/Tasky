@@ -30,7 +30,7 @@ fun DataError.toWorkerResult(): ListenableWorker.Result{
         TOO_MANY_REQUESTS -> Result.retry()
         NO_INTERNET -> Result.retry()
         PAYLOAD_TOO_LARGE -> Result.failure()
-        SERVER_ERROR -> Result.retry()
+        SERVER_ERROR -> Result.failure()
         SERIALIZATION -> Result.failure()
         Network.UNKNOWN -> Result.failure()
         NOT_FOUND -> Result.failure()

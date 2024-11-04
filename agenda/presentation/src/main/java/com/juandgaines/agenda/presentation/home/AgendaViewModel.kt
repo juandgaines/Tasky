@@ -4,6 +4,7 @@ package com.juandgaines.agenda.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
@@ -23,9 +24,7 @@ import com.juandgaines.agenda.presentation.home.AgendaActions.CreateItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissCreateContextMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
-import com.juandgaines.agenda.presentation.home.AgendaActions.EditItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
-import com.juandgaines.agenda.presentation.home.AgendaActions.OpenItem
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowCreateContextMenu
@@ -37,8 +36,6 @@ import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Edit
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations.Open
 import com.juandgaines.agenda.presentation.home.AgendaEvents.GoToItemScreen
 import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.REMINDER
-import com.juandgaines.core.presentation.agenda.AgendaItemOption.TASK
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.home.AgendaState.Companion.calculateRangeDays
@@ -47,6 +44,9 @@ import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
+import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.presentation.ui.UiText.StringResource
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -63,6 +64,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -98,7 +100,15 @@ class AgendaViewModel @Inject constructor(
                     }
 
                 }
-                agendaRepository.fetchItems(_selectedDate.value.toEpochMilli())
+                reminderRepository.insertReminder(
+                    Reminder(
+                        "1",
+                        "Reminder",
+                        "Description",
+                        ZonedDateTime.now(),
+                        ZonedDateTime.now()
+                    )
+                )
                 agendaSyncScheduler.scheduleSync(
                     AgendaSyncOperations.FetchAgendas(
                         30.minutes
@@ -108,6 +118,7 @@ class AgendaViewModel @Inject constructor(
             }
         }
         .combine(_selectedDate){ state, selectedDate->
+            agendaRepository.fetchItems(selectedDate.toEpochMilli())
             state.copy(selectedLocalDate = selectedDate)
         }
         .flatMapLatest { state->
@@ -226,6 +237,7 @@ class AgendaViewModel @Inject constructor(
                                                  )
                                              )
                                        }.onError {
+
                                             eventChannel.send(AgendaEvents.Error(it.asUiText()))
                                        }
                                 }
@@ -241,6 +253,9 @@ class AgendaViewModel @Inject constructor(
                                             eventChannel.send(AgendaEvents.Error(it.asUiText()))
                                         }
                                 }
+                                is Event -> {
+
+                                }
                             }
                         }
                         is Edit -> {
@@ -251,6 +266,9 @@ class AgendaViewModel @Inject constructor(
                                 }
                                 is Reminder -> {
                                     REMINDER
+                                }
+                                is Event -> {
+                                    EVENT
                                 }
                             }
                             eventChannel.send(
@@ -266,6 +284,9 @@ class AgendaViewModel @Inject constructor(
                                 is Reminder -> {
                                     REMINDER
                                 }
+                                is Event -> {
+                                    EVENT
+                                }
                             }
                             eventChannel.send(
                                 GoToItemScreen(item.id, type, false)
@@ -275,7 +296,6 @@ class AgendaViewModel @Inject constructor(
                 }
 
                 is ToggleDoneTask -> {
-
                     val task = action.task
                     taskRepository.updateTask(task.copy(isDone = !task.isDone))
                         .onSuccess {
@@ -296,8 +316,6 @@ class AgendaViewModel @Inject constructor(
                         )
                     )
                 }
-                is EditItem -> TODO()
-                is OpenItem -> TODO()
             }
         }
     }

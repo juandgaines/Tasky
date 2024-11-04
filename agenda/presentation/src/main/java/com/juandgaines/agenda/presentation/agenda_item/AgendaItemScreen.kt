@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,7 +33,11 @@ import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.DeletionScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
@@ -81,6 +86,39 @@ fun AgendaItemScreenRoot(
                 Toast.makeText(
                     context,
                     context.getString(R.string.item_updated),
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateBack()
+            }
+
+            CreationScheduled -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.item_created_scheduled),
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateBack()
+            }
+            Deleted -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.item_deleted),
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateBack()
+            }
+            DeletionScheduled -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.item_deleted_scheduled),
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateBack()
+            }
+            UpdateScheduled -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.item_updated_scheduled),
                     Toast.LENGTH_SHORT
                 ).show()
                 navigateBack()
@@ -152,11 +190,10 @@ fun AgendaItemScreen(
                     },
                     content = {
                         Row (
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                                .size(56.dp),
                         ){
                             Text(
                                 text = state.title,
@@ -227,7 +264,7 @@ fun AgendaItemScreen(
         ){
             Column (
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ){
@@ -283,15 +320,18 @@ fun AgendaItemScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Text(
-                    text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = TaskyGray,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                )
+                if(!state.isNew){
+                    Text(
+                        text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = TaskyGray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                            .clickable { onAction(AgendaItemAction.Delete) }
+                    )
+                }
             }
 
         }

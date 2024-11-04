@@ -27,6 +27,7 @@ class DeleteAgendaItemWorker @AssistedInject constructor(
             return Result.failure()
         }
         val userId = sessionManager.get()?.userId ?: return Result.failure()
+
         val reminderDeleteList = agendaSyncDao.getAllDeleteReminderSync(userId)
         val taskDeleteList = agendaSyncDao.getAllDeleteTaskSync(userId)
 
@@ -48,5 +49,10 @@ class DeleteAgendaItemWorker @AssistedInject constructor(
         } else {
             Result.success()
         }
+    }
+
+    companion object {
+        const val AGENDA_ITEM_ID = "itemId"
+        const val AGENDA_ITEM_TYPE = "itemType"
     }
 }

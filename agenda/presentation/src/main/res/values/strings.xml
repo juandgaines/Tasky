@@ -28,4 +28,8 @@
   <string name="edit_title">EDIT %S</string>
   <string name="item_created">Item created</string>
   <string name="item_updated">Item updated</string>
+  <string name="item_deleted">Agenda item deleted</string>
+  <string name="item_deleted_scheduled">Item deletion scheduled for later</string>
+  <string name="item_updated_scheduled">Item update scheduled for later</string>
+  <string name="item_created_scheduled">Item creation scheduled for later</string>
 </resources>

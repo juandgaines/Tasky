@@ -1,5 +1,6 @@
 package com.juandgaines.agenda.domain.agenda
 
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import java.time.ZonedDateTime
 
 sealed interface AgendaItems{
@@ -7,6 +8,7 @@ sealed interface AgendaItems{
     val title: String
     val description: String
     val date:ZonedDateTime
+    val agendaItemOption: AgendaItemOption
 
     data class Task(
         override val id:String,
@@ -17,6 +19,7 @@ sealed interface AgendaItems{
         val isDone:Boolean
     ):AgendaItems {
         override val date = time
+        override val agendaItemOption = AgendaItemOption.TASK
     }
 
     data class Reminder(
@@ -27,6 +30,15 @@ sealed interface AgendaItems{
         val remindAt:ZonedDateTime
     ):AgendaItems {
         override val date = time
+        override val agendaItemOption = AgendaItemOption.REMINDER
+    }
+
+    data object Event:AgendaItems{
+        override val id = ""
+        override val title = ""
+        override val description = ""
+        override val date = ZonedDateTime.now()
+        override val agendaItemOption = AgendaItemOption.EVENT
     }
 
     companion object{

@@ -1,6 +1,6 @@
 package com.juandgaines.agenda.presentation.home
 
-import com.juandgaines.core.presentation.agenda.AgendaItemOption
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.presentation.ui.UiText
 
 sealed interface AgendaEvents {
