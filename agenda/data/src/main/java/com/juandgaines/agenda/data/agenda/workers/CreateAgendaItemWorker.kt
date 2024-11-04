@@ -38,17 +38,18 @@ class CreateAgendaItemWorker @AssistedInject constructor(
 
                 val createTaskSync = agendaSyncDao.getCreateTaskSync(agendaId)
                 createTaskSync?.let {
-                    val response = taskRepository.insertTask(createTaskSync.task.toTask())
+                    val updateTaskSync = agendaSyncDao.getUpdateTaskSync(createTaskSync.taskId)
+
+                    val createdTask = updateTaskSync?.task ?: createTaskSync.task
+
+                    val response = taskRepository.insertTask(createdTask.toTask())
                     return if (response is com.juandgaines.core.domain.util.Result.Error) {
-                        val task = taskRepository.getTaskById(createTaskSync.taskId)
-                        if (task is com.juandgaines.core.domain.util.Result.Success) {
-                            agendaSyncDao.deleteCreateTaskSync(createTaskSync.taskId)
-                            Result.success()
-                        }
-                        else
-                            response.error.toWorkerResult()
+                        response.error.toWorkerResult()
                     } else {
                         agendaSyncDao.deleteCreateTaskSync(createTaskSync.taskId)
+                        updateTaskSync?.let {
+                            agendaSyncDao.deleteUpdateTaskSync(it.taskId)
+                        }
                         Result.success()
                     }
                 } ?: Result.failure()
@@ -56,12 +57,21 @@ class CreateAgendaItemWorker @AssistedInject constructor(
             REMINDER -> {
                 val createReminderSync = agendaSyncDao.getCreateReminderSync(agendaId)
                 createReminderSync?.let {
-                    val response = reminderRepository.insertReminder(createReminderSync.reminder.toReminder())
+
+                    val updatedReminderSync = agendaSyncDao.getUpdateReminderSync(createReminderSync.reminderId)
+
+                    val createReminder = updatedReminderSync?.reminder ?: createReminderSync.reminder
+
+
+                    val response = reminderRepository.insertReminder(createReminder.toReminder())
 
                     return if (response is com.juandgaines.core.domain.util.Result.Error) {
                         response.error.toWorkerResult()
                     } else {
                         agendaSyncDao.deleteCreateReminderSync(createReminderSync.reminderId)
+                        updatedReminderSync?.let {
+                            agendaSyncDao.deleteUpdateReminderSync(it.reminderId)
+                        }
                         Result.success()
                     }
                 } ?: Result.failure()

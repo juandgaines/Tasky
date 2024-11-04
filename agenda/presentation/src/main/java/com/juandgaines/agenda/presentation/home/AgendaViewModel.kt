@@ -100,15 +100,6 @@ class AgendaViewModel @Inject constructor(
                     }
 
                 }
-                reminderRepository.insertReminder(
-                    Reminder(
-                        "1",
-                        "Reminder",
-                        "Description",
-                        ZonedDateTime.now(),
-                        ZonedDateTime.now()
-                    )
-                )
                 agendaSyncScheduler.scheduleSync(
                     AgendaSyncOperations.FetchAgendas(
                         30.minutes
