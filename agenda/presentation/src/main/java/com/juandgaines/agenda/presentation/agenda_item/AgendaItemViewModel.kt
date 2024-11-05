@@ -261,6 +261,8 @@ class AgendaItemViewModel @Inject constructor(
                         }
                         response
                             .onSuccess {
+                                alarmScheduler.cancelAlarm(data, AlarmReceiver::class.java)
+                                alarmScheduler.scheduleAlarm(data, AlarmReceiver::class.java)
                                 eventChannel.send(AgendaItemEvent.Updated)
                             }.onError {
                                 eventChannel.send(AgendaItemEvent.UpdateScheduled)
