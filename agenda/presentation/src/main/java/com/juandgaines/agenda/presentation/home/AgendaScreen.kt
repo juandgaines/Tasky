@@ -2,7 +2,17 @@
 
 package com.juandgaines.agenda.presentation.home
 
+import android.app.AlarmManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +44,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ComponentActivity
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
@@ -61,10 +75,13 @@ import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
+import com.juandgaines.agenda.presentation.home.AgendaActions.SendNotificationPermission
+import com.juandgaines.agenda.presentation.home.AgendaActions.SendScheduleAlarmPermission
 import com.juandgaines.agenda.presentation.home.componets.CurrentTimeDivider
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
+import com.juandgaines.agenda.presentation.utils.shouldShowPostNotificationPermissionRationale
 import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.presentation.designsystem.AddIcon
 import com.juandgaines.core.presentation.designsystem.ArrowDownIcon
@@ -133,7 +150,69 @@ fun AgendaScreen(
     stateAgenda: AgendaState,
     agendaActions: (AgendaActions)->Unit
 ) {
+    val activity = LocalContext.current as ComponentActivity
+    val launcherPermission = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { perms ->
 
+        val hasNotificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            && perms[android.Manifest.permission.POST_NOTIFICATIONS] != null
+        ) {
+            perms[android.Manifest.permission.POST_NOTIFICATIONS] == true
+        } else {
+            true
+        }
+
+        val showAskNotificationRationale = activity.shouldShowPostNotificationPermissionRationale()
+        agendaActions(
+            SendNotificationPermission(hasNotificationPermission, showAskNotificationRationale)
+        )
+
+    }
+
+
+    DisposableEffect(key1 = true) {
+
+        var receiver: BroadcastReceiver? = null
+
+        if (VERSION.SDK_INT >= VERSION_CODES.S) {
+
+            val filter =
+                IntentFilter(AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED)
+
+            receiver = object : BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context?,
+                    intent: Intent?,
+                ) {
+                    if (intent?.action == AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED) {
+                        context?.let {
+                            val alarmManager =
+                                it.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                            val isGranted = alarmManager.canScheduleExactAlarms()
+                            agendaActions(SendScheduleAlarmPermission(isGranted, false, null))
+                        }
+                    }
+                }
+            }
+
+            ContextCompat.registerReceiver(
+                activity,
+                receiver,
+                filter,
+                ContextCompat.RECEIVER_EXPORTED
+            )
+        }
+
+
+        onDispose {
+            if (VERSION.SDK_INT >= VERSION_CODES.S) {
+                receiver?.run {
+                    activity.unregisterReceiver(this)
+                }
+            }
+        }
+    }
     TaskyScaffold (
         fabPosition = FabPosition.End,
         topAppBar = {

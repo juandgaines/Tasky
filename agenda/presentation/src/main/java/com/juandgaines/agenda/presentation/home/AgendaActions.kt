@@ -16,5 +16,14 @@ sealed interface AgendaActions{
     data class CreateItem(val option: AgendaItemOption) : AgendaActions
     data class AgendaOperation(val agendaOperation: AgendaCardMenuOperations) : AgendaActions
     data class ToggleDoneTask(val task: Task) : AgendaActions
+    data class SendNotificationPermission(
+        val permission: Boolean,
+        val needRationale: Boolean
+    ) : AgendaActions
+    data class SendScheduleAlarmPermission(
+        val permission: Boolean,
+        val needRationale: Boolean,
+        val shouldAskAgain: Boolean?,
+    ):AgendaActions
     data object Logout : AgendaActions
 }
