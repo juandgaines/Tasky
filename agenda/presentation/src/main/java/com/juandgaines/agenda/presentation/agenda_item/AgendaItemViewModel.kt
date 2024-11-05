@@ -2,6 +2,7 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,11 +11,13 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
+import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.isToday
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
+import com.juandgaines.agenda.presentation.AlarmReceiver
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
@@ -36,12 +39,12 @@ import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_SIX
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_TEN
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_THIRTY
-import com.juandgaines.core.domain.util.Result
-import com.juandgaines.core.domain.util.onError
-import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.util.Result
+import com.juandgaines.core.domain.util.onError
+import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -65,6 +68,7 @@ class AgendaItemViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
+    private val alarmScheduler: AlarmScheduler
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -215,6 +219,7 @@ class AgendaItemViewModel @Inject constructor(
                     val agendaItemId = _navParameters.id
                     val desiredAlarmDate = calculateTimeAlarm()
 
+
                     if (agendaItemId != null) {
                         val type =  _navParameters.type
                         val data = when (type) {
@@ -286,6 +291,9 @@ class AgendaItemViewModel @Inject constructor(
                                 Event
                             }
                         }
+                            .also {
+                                Log.d("AgendaItemViewModel", "alarm date  ${it.alarmDate}")
+                            }
                         val response = when (data) {
                             is Reminder -> reminderRepository.insertReminder(
                                 data
@@ -301,6 +309,7 @@ class AgendaItemViewModel @Inject constructor(
                         }
                         response
                             .onSuccess {
+                                alarmScheduler.scheduleAlarm(data, AlarmReceiver::class.java)
                                 eventChannel.send(AgendaItemEvent.Created)
                             }.onError {
                                 eventChannel.send(AgendaItemEvent.CreationScheduled)
@@ -374,11 +383,11 @@ class AgendaItemViewModel @Inject constructor(
         val alarm = _state.value.alarm
         val startDateTime = _state.value.startDateTime
         val newDateTime = when (alarm) {
-            MINUTES_TEN -> startDateTime.plusDays(10)
-            MINUTES_THIRTY -> startDateTime.plusMinutes(30)
-            HOUR_ONE -> startDateTime.plusHours(1)
-            HOUR_SIX -> startDateTime.plusHours(6)
-            DAY_ONE -> startDateTime.plusDays(1)
+            MINUTES_TEN -> startDateTime.minusMinutes(10)
+            MINUTES_THIRTY -> startDateTime.minusMinutes(30)
+            HOUR_ONE -> startDateTime.minusHours(1)
+            HOUR_SIX -> startDateTime.minusHours(6)
+            DAY_ONE -> startDateTime.minusDays(1)
         }
         return newDateTime
     }
