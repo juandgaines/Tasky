@@ -14,9 +14,9 @@ class DefaultAlarmScheduler @Inject constructor(
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    override fun scheduleAlarm(agendaItem: AgendaItems, clazz: Class<*>) {
-        val intent = Intent(context, clazz)
-        alarmManager.setAndAllowWhileIdle(
+    override fun scheduleAlarm(agendaItem: AgendaItems) {
+        val intent = Intent(context, AlarmReceiver::class.java)
+        alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             agendaItem.alarmDate.toInstant().toEpochMilli(),
             PendingIntent.getBroadcast(
@@ -28,12 +28,12 @@ class DefaultAlarmScheduler @Inject constructor(
         )
     }
 
-    override fun cancelAlarm(agendaItem: AgendaItems, clazz: Class<*>) {
+    override fun cancelAlarm(agendaItem: AgendaItems) {
         alarmManager.cancel(
             PendingIntent.getBroadcast(
                 context,
                 agendaItem.id.toInt(),
-                Intent(context, clazz),
+                Intent(context, AlarmReceiver::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )

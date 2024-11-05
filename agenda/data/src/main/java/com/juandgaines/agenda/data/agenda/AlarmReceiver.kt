@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.presentation
+package com.juandgaines.agenda.data.agenda
 
 import android.content.BroadcastReceiver
 import android.content.Context

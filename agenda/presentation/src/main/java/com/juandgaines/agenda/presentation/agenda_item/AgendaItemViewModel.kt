@@ -17,7 +17,7 @@ import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.isToday
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
-import com.juandgaines.agenda.presentation.AlarmReceiver
+import com.juandgaines.agenda.data.agenda.AlarmReceiver
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
@@ -261,8 +261,8 @@ class AgendaItemViewModel @Inject constructor(
                         }
                         response
                             .onSuccess {
-                                alarmScheduler.cancelAlarm(data, AlarmReceiver::class.java)
-                                alarmScheduler.scheduleAlarm(data, AlarmReceiver::class.java)
+                                alarmScheduler.cancelAlarm(data, com.juandgaines.agenda.data.agenda.AlarmReceiver::class.java)
+                                alarmScheduler.scheduleAlarm(data, com.juandgaines.agenda.data.agenda.AlarmReceiver::class.java)
                                 eventChannel.send(AgendaItemEvent.Updated)
                             }.onError {
                                 eventChannel.send(AgendaItemEvent.UpdateScheduled)
@@ -311,7 +311,7 @@ class AgendaItemViewModel @Inject constructor(
                         }
                         response
                             .onSuccess {
-                                alarmScheduler.scheduleAlarm(data, AlarmReceiver::class.java)
+                                alarmScheduler.scheduleAlarm(data, com.juandgaines.agenda.data.agenda.AlarmReceiver::class.java)
                                 eventChannel.send(AgendaItemEvent.Created)
                             }.onError {
                                 eventChannel.send(AgendaItemEvent.CreationScheduled)

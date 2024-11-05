@@ -40,7 +40,7 @@
         tools:node="remove" />
   </provider>
 
-    <receiver android:name="com.juandgaines.agenda.presentation.AlarmReceiver"/>
+    <receiver android:name="com.juandgaines.agenda.data.agenda.AlarmReceiver"/>
 
   </application>
 
