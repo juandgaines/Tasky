@@ -389,6 +389,6 @@ class AgendaItemViewModel @Inject constructor(
             HOUR_SIX -> startDateTime.minusHours(6)
             DAY_ONE -> startDateTime.minusDays(1)
         }
-        return newDateTime
+        return newDateTime.withSecond(0)
     }
 }

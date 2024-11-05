@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import javax.inject.Inject
@@ -16,11 +15,7 @@ class DefaultAlarmScheduler @Inject constructor(
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     override fun scheduleAlarm(agendaItem: AgendaItems, clazz: Class<*>) {
-        Log.d("AlarmReceiver", "Scheduling alarm for ${clazz.simpleName}")
-        val intent = Intent(context, clazz).apply {
-            putExtra(AlarmScheduler.EXTRA, agendaItem.alarmDate.toString())
-        }
-
+        val intent = Intent(context, clazz)
         alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             agendaItem.alarmDate.toInstant().toEpochMilli(),
@@ -31,7 +26,6 @@ class DefaultAlarmScheduler @Inject constructor(
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )
-        Log.d("AlarmReceiver", "Alarm scheduled for ${agendaItem.alarmDate}")
     }
 
     override fun cancelAlarm(agendaItem: AgendaItems, clazz: Class<*>) {
