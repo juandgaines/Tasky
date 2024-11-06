@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -158,6 +159,7 @@ fun AgendaScreen(
     stateAgenda: AgendaState,
     agendaActions: (AgendaActions)->Unit
 ) {
+    val context = LocalContext.current
     val activity = LocalContext.current as ComponentActivity
     val alarmManager =
         activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -199,48 +201,6 @@ fun AgendaScreen(
         }
     }
 
-
-    DisposableEffect(key1 = true) {
-
-        var receiver: BroadcastReceiver? = null
-
-        if (VERSION.SDK_INT >= VERSION_CODES.S) {
-
-            val filter =
-                IntentFilter(AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED)
-
-            receiver = object : BroadcastReceiver() {
-                override fun onReceive(
-                    context: Context?,
-                    intent: Intent?,
-                ) {
-                    if (intent?.action == AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED) {
-                        context?.let {
-
-                            val isGranted = alarmManager.canScheduleExactAlarms()
-                            agendaActions(SendScheduleAlarmPermission(isGranted))
-                        }
-                    }
-                }
-            }
-
-            ContextCompat.registerReceiver(
-                activity,
-                receiver,
-                filter,
-                ContextCompat.RECEIVER_EXPORTED
-            )
-        }
-
-
-        onDispose {
-            if (VERSION.SDK_INT >= VERSION_CODES.S) {
-                receiver?.run {
-                    activity.unregisterReceiver(this)
-                }
-            }
-        }
-    }
     TaskyScaffold (
         fabPosition = FabPosition.End,
         topAppBar = {

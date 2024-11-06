@@ -10,6 +10,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
+import com.juandgaines.agenda.domain.agenda.AlarmProvider
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
@@ -77,7 +78,8 @@ class AgendaViewModel @Inject constructor(
     private val agendaRepository: AgendaRepository,
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
-    private val agendaSyncScheduler: AgendaSyncScheduler
+    private val agendaSyncScheduler: AgendaSyncScheduler,
+    private val alarmProvider: AlarmProvider
 ):ViewModel() {
 
     private val _state = MutableStateFlow(AgendaState())
@@ -94,6 +96,7 @@ class AgendaViewModel @Inject constructor(
 
     val state = _state
         .onStart {
+            alarmProvider.register()
             if (!_isInit) {
                 _isInit = true
                 initialsCalculator.getInitials().let { initials ->
@@ -113,6 +116,18 @@ class AgendaViewModel @Inject constructor(
         .combine(_selectedDate){ state, selectedDate->
             agendaRepository.fetchItems(selectedDate.toEpochMilli())
             state.copy(selectedLocalDate = selectedDate)
+        }
+        .combine(
+            alarmProvider.alarmAvailable()
+        ){ state, alarmAvailable ->
+            val s= updateState {
+                it.copy(
+                    isScheduleAlarmPermissionAccepted = alarmAvailable
+                )
+            }
+            state.copy(
+                isScheduleAlarmPermissionAccepted = alarmAvailable
+            )
         }
         .flatMapLatest { state->
             agendaRepository.getItems(
@@ -328,6 +343,11 @@ class AgendaViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        alarmProvider.unregister()
     }
 
 }
