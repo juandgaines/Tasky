@@ -82,6 +82,7 @@ import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.agenda.presentation.home.componets.agenda_cards.AgendaCard
 import com.juandgaines.agenda.presentation.home.componets.selector_date.DateSelector
 import com.juandgaines.agenda.presentation.utils.hasNotificationPermission
+import com.juandgaines.agenda.presentation.utils.hasScheduleAlarmPermission
 import com.juandgaines.agenda.presentation.utils.requestTaskyPermissions
 import com.juandgaines.agenda.presentation.utils.shouldShowPostNotificationPermissionRationale
 import com.juandgaines.core.domain.agenda.AgendaItemOption
@@ -190,7 +191,7 @@ fun AgendaScreen(
                 showNotificationRationale
             )
         )
-        val isGranted = alarmManager.canScheduleExactAlarms()
+        val isGranted = activity.hasScheduleAlarmPermission()
         agendaActions(SendScheduleAlarmPermission(isGranted))
 
         if  (!showNotificationRationale) {
