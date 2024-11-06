@@ -8,6 +8,7 @@ sealed interface AgendaItems{
     val title: String
     val description: String
     val date:ZonedDateTime
+    val alarmDate:ZonedDateTime
     val agendaItemOption: AgendaItemOption
 
     data class Task(
@@ -19,6 +20,7 @@ sealed interface AgendaItems{
         val isDone:Boolean
     ):AgendaItems {
         override val date = time
+        override val alarmDate = remindAt
         override val agendaItemOption = AgendaItemOption.TASK
     }
 
@@ -30,6 +32,7 @@ sealed interface AgendaItems{
         val remindAt:ZonedDateTime
     ):AgendaItems {
         override val date = time
+        override val alarmDate = remindAt
         override val agendaItemOption = AgendaItemOption.REMINDER
     }
 
@@ -37,6 +40,7 @@ sealed interface AgendaItems{
         override val id = ""
         override val title = ""
         override val description = ""
+        override val alarmDate = ZonedDateTime.now()
         override val date = ZonedDateTime.now()
         override val agendaItemOption = AgendaItemOption.EVENT
     }

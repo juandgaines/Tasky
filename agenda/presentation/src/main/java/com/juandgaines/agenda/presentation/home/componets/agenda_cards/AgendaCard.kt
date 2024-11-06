@@ -142,12 +142,8 @@ fun AgendaCard(
                     imageVector = MoreHor,
                     contentDescription = null,
                     tint = colorSecondaryText,
-                    modifier = Modifier.pointerInput(true){
-                        detectTapGestures (
-                            onTap = {
-                                isMenuExpanded = true
-                            }
-                        )
+                    modifier = Modifier.clickable {
+                        isMenuExpanded = true
                     }
                 )
 
@@ -157,24 +153,24 @@ fun AgendaCard(
                 ) {
                     DropdownMenuItem(
                         onClick = {
+                            isMenuExpanded = false
                             onMenuItemClick(AgendaCardMenuOperations.Open(
                                 agendaItem
                             ))
-                            isMenuExpanded = false
                         },
                         text = { Text(stringResource(R.string.open)) }
                     )
                     DropdownMenuItem(
                         onClick = {
-                            onMenuItemClick(AgendaCardMenuOperations.Edit(agendaItem))
                             isMenuExpanded = false
+                            onMenuItemClick(AgendaCardMenuOperations.Edit(agendaItem))
                         },
                         text = { Text(stringResource(R.string.edit)) }
                     )
                     DropdownMenuItem(
                         onClick = {
-                            onMenuItemClick(AgendaCardMenuOperations.Delete(agendaItem))
                             isMenuExpanded = false
+                            onMenuItemClick(AgendaCardMenuOperations.Delete(agendaItem))
                         },
                         text = { Text(stringResource(R.string.delete)) }
                     )
