@@ -27,6 +27,8 @@ import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
+import com.juandgaines.agenda.presentation.home.AgendaActions.SendNotificationPermission
+import com.juandgaines.agenda.presentation.home.AgendaActions.SendScheduleAlarmPermission
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowProfileMenu
@@ -300,12 +302,29 @@ class AgendaViewModel @Inject constructor(
 
                 is CreateItem -> {
                     eventChannel.send(
-                        AgendaEvents.GoToItemScreen(
+                        GoToItemScreen(
                             type = action.option,
                             isEditing = true,
                             dateEpochMilli = _selectedDate.value.toEpochMilli()
                         )
                     )
+                }
+
+                is SendNotificationPermission -> {
+                    updateState {
+                        it.copy(
+                            isNotificationAccepted = action.permission,
+                            isNotificationRationaleNeeded = action.needRationale
+                        )
+                    }
+
+                }
+                is SendScheduleAlarmPermission -> {
+                    updateState {
+                        it.copy(
+                            isScheduleAlarmPermissionAccepted = action.permission,
+                        )
+                    }
                 }
             }
         }

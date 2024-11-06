@@ -22,8 +22,6 @@ sealed interface AgendaActions{
     ) : AgendaActions
     data class SendScheduleAlarmPermission(
         val permission: Boolean,
-        val needRationale: Boolean,
-        val shouldAskAgain: Boolean?,
     ):AgendaActions
     data object Logout : AgendaActions
 }
