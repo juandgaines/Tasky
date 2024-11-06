@@ -283,16 +283,16 @@ fun AgendaScreen(
                 )
             }
 
-            if (stateAgenda.isNotificationRationaleNeeded || stateAgenda.isScheduleAlarmPermissionAccepted.not()) {
+            if (stateAgenda.isNotificationRationaleNeeded ||!stateAgenda.isScheduleAlarmPermissionAccepted) {
                 TaskyDialog(
                     title = stringResource(id = R.string.permission_required),
-                    onDismiss = { /* Normal dismissing not allowed for permissions */ },
+                    onDismiss = {  },
                     description = when {
-                        stateAgenda.isNotificationRationaleNeeded && stateAgenda.isScheduleAlarmPermissionAccepted -> {
+                        stateAgenda.isNotificationRationaleNeeded && !stateAgenda.isScheduleAlarmPermissionAccepted-> {
                             stringResource(id = R.string.alarm_and_notification_permission_rationale)
                         }
 
-                        stateAgenda.isScheduleAlarmPermissionAccepted -> {
+                        !stateAgenda.isScheduleAlarmPermissionAccepted -> {
                             stringResource(id = R.string.alarm_permission_rationale)
                         }
 

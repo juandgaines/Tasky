@@ -1,5 +1,6 @@
 package com.juandgaines.core.presentation.designsystem.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +30,10 @@ fun TaskyDialog(
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier = modifier
-                .clip(RoundedCornerShape(15.dp))
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    RoundedCornerShape(15.dp)
+                )
                 .padding(15.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally

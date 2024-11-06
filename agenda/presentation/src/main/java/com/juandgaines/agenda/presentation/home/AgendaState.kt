@@ -16,7 +16,7 @@ data class AgendaState(
     val agendaItems: List<AgendaItemUi> = emptyList(),
     val isNotificationAccepted: Boolean = false,
     val isNotificationRationaleNeeded: Boolean = false,
-    val isScheduleAlarmPermissionAccepted: Boolean = false,
+    val isScheduleAlarmPermissionAccepted: Boolean = true,
 ){
     val currentMonth:String
         get() = selectedLocalDate.month.name.uppercase()
