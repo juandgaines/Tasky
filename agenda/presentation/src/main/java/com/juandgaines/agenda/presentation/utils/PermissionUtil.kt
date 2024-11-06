@@ -6,11 +6,10 @@ import android.content.Context
 import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
+import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.app.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import androidx.fragment.app.FragmentActivity
 
 fun ComponentActivity.shouldShowExactAlarmPermissionRationale(): Boolean {
     return if (VERSION.SDK_INT >= VERSION_CODES.S) {
