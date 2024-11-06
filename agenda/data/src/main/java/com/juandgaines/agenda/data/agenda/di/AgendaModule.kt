@@ -4,11 +4,13 @@ import android.content.Context
 import com.juandgaines.agenda.data.agenda.AgendaPendingSyncScheduler
 import com.juandgaines.agenda.data.agenda.DefaultAgendaRepository
 import com.juandgaines.agenda.data.agenda.DefaultAlarmScheduler
+import com.juandgaines.agenda.data.agenda.receiver.AlarmAvailabilityReceiver
 import com.juandgaines.agenda.data.agenda.remote.AgendaApi
 import com.juandgaines.agenda.data.reminder.remote.ReminderApi
 import com.juandgaines.agenda.data.task.remote.TaskApi
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
+import com.juandgaines.agenda.domain.agenda.AlarmProvider
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
@@ -87,5 +89,13 @@ class AgendaModule {
         @ApplicationContext context: Context
     ): AlarmScheduler {
         return DefaultAlarmScheduler(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAlarmProvider(
+        @ApplicationContext context: Context
+    ): AlarmProvider {
+        return AlarmAvailabilityReceiver(context)
     }
 }

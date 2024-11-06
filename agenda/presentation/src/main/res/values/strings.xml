@@ -32,4 +32,9 @@
   <string name="item_deleted_scheduled">Item deletion scheduled for later</string>
   <string name="item_updated_scheduled">Item update scheduled for later</string>
   <string name="item_created_scheduled">Item creation scheduled for later</string>
+  <string name="permission_required">Permission required</string>
+  <string name="alarm_and_notification_permission_rationale">You need to give permissions of notifications and schedule alarm to use this app</string>
+  <string name="alarm_permission_rationale">Alarm permission required to use this app</string>
+  <string name="notification_permission_rationale">Notifications permission must be granted to use this app</string>
+  <string name="okay">Okay</string>
 </resources>

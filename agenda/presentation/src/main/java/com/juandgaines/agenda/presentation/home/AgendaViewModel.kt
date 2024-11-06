@@ -10,6 +10,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
+import com.juandgaines.agenda.domain.agenda.AlarmProvider
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
@@ -27,6 +28,8 @@ import com.juandgaines.agenda.presentation.home.AgendaActions.DismissProfileMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.Logout
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDate
 import com.juandgaines.agenda.presentation.home.AgendaActions.SelectDateWithingRange
+import com.juandgaines.agenda.presentation.home.AgendaActions.SendNotificationPermission
+import com.juandgaines.agenda.presentation.home.AgendaActions.SendScheduleAlarmPermission
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowCreateContextMenu
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowDateDialog
 import com.juandgaines.agenda.presentation.home.AgendaActions.ShowProfileMenu
@@ -75,7 +78,8 @@ class AgendaViewModel @Inject constructor(
     private val agendaRepository: AgendaRepository,
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
-    private val agendaSyncScheduler: AgendaSyncScheduler
+    private val agendaSyncScheduler: AgendaSyncScheduler,
+    private val alarmProvider: AlarmProvider
 ):ViewModel() {
 
     private val _state = MutableStateFlow(AgendaState())
@@ -92,6 +96,7 @@ class AgendaViewModel @Inject constructor(
 
     val state = _state
         .onStart {
+            alarmProvider.register()
             if (!_isInit) {
                 _isInit = true
                 initialsCalculator.getInitials().let { initials ->
@@ -111,6 +116,18 @@ class AgendaViewModel @Inject constructor(
         .combine(_selectedDate){ state, selectedDate->
             agendaRepository.fetchItems(selectedDate.toEpochMilli())
             state.copy(selectedLocalDate = selectedDate)
+        }
+        .combine(
+            alarmProvider.alarmAvailable()
+        ){ state, alarmAvailable ->
+            val s= updateState {
+                it.copy(
+                    isScheduleAlarmPermissionAccepted = alarmAvailable
+                )
+            }
+            state.copy(
+                isScheduleAlarmPermissionAccepted = alarmAvailable
+            )
         }
         .flatMapLatest { state->
             agendaRepository.getItems(
@@ -300,15 +317,37 @@ class AgendaViewModel @Inject constructor(
 
                 is CreateItem -> {
                     eventChannel.send(
-                        AgendaEvents.GoToItemScreen(
+                        GoToItemScreen(
                             type = action.option,
                             isEditing = true,
                             dateEpochMilli = _selectedDate.value.toEpochMilli()
                         )
                     )
                 }
+
+                is SendNotificationPermission -> {
+                    updateState {
+                        it.copy(
+                            isNotificationAccepted = action.permission,
+                            isNotificationRationaleNeeded = action.needRationale
+                        )
+                    }
+
+                }
+                is SendScheduleAlarmPermission -> {
+                    updateState {
+                        it.copy(
+                            isScheduleAlarmPermissionAccepted = action.permission,
+                        )
+                    }
+                }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        alarmProvider.unregister()
     }
 
 }
