@@ -306,7 +306,7 @@ fun AgendaScreen(
                             isLoading = false,
                             onClick = {
 
-                                val canScheduleAlarmPermission = alarmManager.canScheduleExactAlarms()
+                                val canScheduleAlarmPermission = activity.hasScheduleAlarmPermission()
 
                                 if (
                                     canScheduleAlarmPermission.not()
