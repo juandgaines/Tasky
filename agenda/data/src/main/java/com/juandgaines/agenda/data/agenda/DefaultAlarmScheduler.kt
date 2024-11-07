@@ -19,6 +19,7 @@ class DefaultAlarmScheduler @Inject constructor(
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra(AlarmReceiver.TITLE, agendaItem.title)
+            putExtra(AlarmReceiver.TYPE, agendaItem.agendaItemOption.ordinal)
             putExtra(AlarmReceiver.DESCRIPTION, agendaItem.description)
             putExtra(AlarmReceiver.AGENDA_ITEM_ID, agendaItem.id)
             putExtra(AlarmReceiver.TIME, agendaItem.date.toEpochMilli())

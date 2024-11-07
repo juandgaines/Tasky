@@ -38,6 +38,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_SIX
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_TEN
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_THIRTY
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
@@ -78,7 +79,7 @@ class AgendaItemViewModel @Inject constructor(
     private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
     private var _isInit: Boolean = false
     private var _agendaItemBuffer: AgendaItems? = null
-    private val _type = _navParameters.type
+    private val _type = AgendaItemOption.fromOrdinal( _navParameters.type)
 
     val state:StateFlow<AgendaItemState> = _state
         .onStart {

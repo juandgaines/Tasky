@@ -23,8 +23,10 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val agendaItemId = intent?.getStringExtra(AGENDA_ITEM_ID)
         val title = intent?.getStringExtra(TITLE)
+        val type = intent?.getIntExtra(TYPE, -1)
         val description = intent?.getStringExtra(DESCRIPTION)
-        val time = intent?.getLongExtra(TIME, 0)?.toZonedDateTime()?.toFormattedTime()
+        val timeForIntent= intent?.getLongExtra(TIME, 0)
+        val time = timeForIntent?.toZonedDateTime()?.toFormattedTime()
 
         val notificationManager =
             context?.getSystemService<NotificationManager>()!!
@@ -36,9 +38,10 @@ class AlarmReceiver : BroadcastReceiver() {
         createNotificationChannel(context, notificationManager)
 
         val activityIntent = Intent(Intent.ACTION_VIEW).apply {
-            data = "tasky://agenda_item/${agendaItemId}".toUri()
+            data = "tasky://agenda_item/${type}?id=${agendaItemId}?isEditing=${false}?dateEpochMillis=${timeForIntent}".toUri()
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
+
 
         val pendingIntent = TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(activityIntent)
@@ -47,6 +50,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val notification = baseNotification
             .setContentText(description)
             .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
             .build()
 
         notificationManager.notify(1, notification)
@@ -66,6 +70,7 @@ class AlarmReceiver : BroadcastReceiver() {
     companion object {
         const val CHANNEL_ID = "alarms"
         const val TITLE = "title"
+        const val TYPE = "type"
         const val DESCRIPTION = "message"
         const val AGENDA_ITEM_ID = "alarm_id"
         const val TIME = "time"

@@ -116,7 +116,7 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                     navController.navigate(
                         ScreenNav.AgendaItem(
                             id = id,
-                            type = type,
+                            type = type.ordinal,
                             isEditing = isEditing,
                             dateEpochMillis = epochMillis
                         )
