@@ -38,7 +38,7 @@ class AlarmReceiver : BroadcastReceiver() {
         createNotificationChannel(context, notificationManager)
 
         val activityIntent = Intent(Intent.ACTION_VIEW).apply {
-            data = "tasky://agenda_item/${type}?id=${agendaItemId}?isEditing=${false}?dateEpochMillis=${timeForIntent}".toUri()
+            data = "tasky://agenda_item/${type}?id=${agendaItemId}&isEditing=${0}&dateEpochMillis=${timeForIntent}".toUri()
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 
