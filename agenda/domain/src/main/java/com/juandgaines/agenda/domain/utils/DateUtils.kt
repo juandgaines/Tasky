@@ -62,6 +62,7 @@ fun Long.toZonedDateTime(zoneId: ZoneId = ZoneId.systemDefault()): ZonedDateTime
         .atZone(zoneId) // Apply the desired ZoneId to get ZonedDateTime
 }
 
+
 fun Long.toUtcZonedDateTime(): ZonedDateTime {
     return ZonedDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneOffset.UTC)
 }
@@ -72,6 +73,10 @@ fun ZonedDateTime.toZonedDateTimeWithZoneId(zone: ZoneId): ZonedDateTime {
 
 fun ZonedDateTime.toUtcFromZonedDateTime(): ZonedDateTime {
     return this.withZoneSameInstant(ZoneOffset.UTC)
+}
+//from zoneddatetime to epoch millis
+fun ZonedDateTime.toEpochMilli(): Long {
+    return this.toInstant().toEpochMilli()
 }
 
 fun ZonedDateTime.toFormattedSingleDateTime(): String {
