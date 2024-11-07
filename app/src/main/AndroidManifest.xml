@@ -29,7 +29,7 @@
       </intent-filter>
 
       <intent-filter>
-        <action android:name="com.tasky.ALARM_RING" />
+        <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
 
         <!-- Handle the custom URI scheme -->

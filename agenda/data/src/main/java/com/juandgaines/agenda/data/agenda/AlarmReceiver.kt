@@ -16,30 +16,30 @@ import com.juandgaines.agenda.domain.utils.toZonedDateTime
 
 class AlarmReceiver : BroadcastReceiver() {
 
-
-
     override fun onReceive(
         context: Context?,
         intent: Intent?,
     ) {
 
+        val agendaItemId = intent?.getStringExtra(AGENDA_ITEM_ID)
         val title = intent?.getStringExtra(TITLE)
         val description = intent?.getStringExtra(DESCRIPTION)
-        val agendaItemId = intent?.getStringExtra(AGENDA_ITEM_ID)
         val time = intent?.getLongExtra(TIME, 0)?.toZonedDateTime()?.toFormattedTime()
 
         val notificationManager =
             context?.getSystemService<NotificationManager>()!!
 
-        val baseNotification = NotificationCompat.Builder(context!!, CHANNEL_ID)
+        val baseNotification = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.tasky_logo)
                 .setContentTitle("Alarm: $title at $time")
 
         createNotificationChannel(context, notificationManager)
-        val activityIntent = Intent("com.tasky.ALARM_RING").apply {
-            data = "tasky://agenda_item".toUri()
+
+        val activityIntent = Intent(Intent.ACTION_VIEW).apply {
+            data = "tasky://agenda_item/${agendaItemId}".toUri()
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
+
         val pendingIntent = TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(activityIntent)
             getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)

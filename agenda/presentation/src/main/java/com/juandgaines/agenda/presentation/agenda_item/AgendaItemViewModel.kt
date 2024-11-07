@@ -78,6 +78,7 @@ class AgendaItemViewModel @Inject constructor(
     private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
     private var _isInit: Boolean = false
     private var _agendaItemBuffer: AgendaItems? = null
+    private val _type = _navParameters.type
 
     val state:StateFlow<AgendaItemState> = _state
         .onStart {
@@ -101,10 +102,10 @@ class AgendaItemViewModel @Inject constructor(
 
     private suspend fun initState() {
         _isEditing.value = _navParameters.isEditing
-        val type = _navParameters.type
+
         val idItem = _navParameters.id
         if (idItem != null) {
-            when (type) {
+            when (_type) {
                 REMINDER -> reminderRepository.getReminderById(idItem)
                 TASK -> taskRepository.getTaskById(idItem)
                 EVENT -> taskRepository.getTaskById(idItem)
@@ -115,7 +116,7 @@ class AgendaItemViewModel @Inject constructor(
                         isNew = false,
                         title = item.title,
                         description = item.description,
-                        details = when (type) {
+                        details = when (_type) {
                             REMINDER -> ReminderDetails
                             TASK -> TaskDetails(
                                 isCompleted = (item as Task).isDone
@@ -141,7 +142,7 @@ class AgendaItemViewModel @Inject constructor(
                 it.copy(
                     isNew = true,
                     startDateTime =initialDate ?: ZonedDateTime.now(),
-                    details = when (type) {
+                    details = when (_type) {
                         REMINDER -> ReminderDetails
                         TASK -> TaskDetails()
                         EVENT -> EventDetails()
@@ -186,7 +187,7 @@ class AgendaItemViewModel @Inject constructor(
                 Delete -> {
                     val agendaItemId = _navParameters.id
                     if (agendaItemId != null) {
-                        when (_navParameters.type) {
+                        when (_type) {
                             REMINDER -> reminderRepository.deleteReminder(
                                 Reminder(
                                     id = agendaItemId,
@@ -222,8 +223,7 @@ class AgendaItemViewModel @Inject constructor(
 
 
                     if (agendaItemId != null) {
-                        val type =  _navParameters.type
-                        val data = when (type) {
+                        val data = when (_type) {
                             REMINDER -> {
                                 Reminder(
                                     id = agendaItemId,
@@ -271,8 +271,7 @@ class AgendaItemViewModel @Inject constructor(
                                 eventChannel.send(AgendaItemEvent.UpdateScheduled)
                             }
                     } else {
-                        val type = _navParameters.type
-                        val data = when (type) {
+                        val data = when (_type) {
                             REMINDER -> {
                                 Reminder(
                                     id = UUID.randomUUID().toString(),
