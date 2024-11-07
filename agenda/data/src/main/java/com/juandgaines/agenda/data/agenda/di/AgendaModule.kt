@@ -2,6 +2,7 @@ package com.juandgaines.agenda.data.agenda.di
 
 import android.content.Context
 import com.juandgaines.agenda.data.agenda.AgendaPendingSyncScheduler
+import com.juandgaines.agenda.data.agenda.AlarmReceiver
 import com.juandgaines.agenda.data.agenda.DefaultAgendaRepository
 import com.juandgaines.agenda.data.agenda.DefaultAlarmScheduler
 import com.juandgaines.agenda.data.agenda.receiver.AlarmAvailabilityReceiver
@@ -98,4 +99,5 @@ class AgendaModule {
     ): AlarmProvider {
         return AlarmAvailabilityReceiver(context)
     }
+
 }

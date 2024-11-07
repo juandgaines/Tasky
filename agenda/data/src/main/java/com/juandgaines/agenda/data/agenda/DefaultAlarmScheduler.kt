@@ -32,7 +32,7 @@ class DefaultAlarmScheduler @Inject constructor(
         alarmManager.cancel(
             PendingIntent.getBroadcast(
                 context,
-                agendaItem.id.toInt(),
+                agendaItem.hashCode(),
                 Intent(context, AlarmReceiver::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )

@@ -27,6 +27,14 @@
 
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
+
+      <intent-filter>
+        <action android:name="com.tasky.ALARM_RING" />
+        <category android:name="android.intent.category.DEFAULT" />
+
+        <!-- Handle the custom URI scheme -->
+        <data android:scheme="tasky" android:host="agenda_item" />
+      </intent-filter>
     </activity>
 
     <provider
