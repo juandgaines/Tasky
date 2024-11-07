@@ -77,6 +77,7 @@ class AgendaItemViewModel @Inject constructor(
     private var _isEditing:MutableStateFlow<Boolean> = MutableStateFlow(false)
     private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
     private var _isInit: Boolean = false
+    private var _agendaItemBuffer: AgendaItems? = null
 
     val state:StateFlow<AgendaItemState> = _state
         .onStart {
@@ -108,6 +109,7 @@ class AgendaItemViewModel @Inject constructor(
                 TASK -> taskRepository.getTaskById(idItem)
                 EVENT -> taskRepository.getTaskById(idItem)
             }.onSuccess { item ->
+                _agendaItemBuffer = item
                 updateState {
                     it.copy(
                         isNew = false,
@@ -260,7 +262,9 @@ class AgendaItemViewModel @Inject constructor(
                         }
                         response
                             .onSuccess {
-                                alarmScheduler.cancelAlarm(data)
+                                _agendaItemBuffer?.run {
+                                    alarmScheduler.cancelAlarm(this)
+                                }
                                 alarmScheduler.scheduleAlarm(data)
                                 eventChannel.send(AgendaItemEvent.Updated)
                             }.onError {
