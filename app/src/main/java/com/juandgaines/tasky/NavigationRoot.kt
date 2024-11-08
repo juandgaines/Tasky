@@ -16,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navDeepLink
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemScreenRoot
 import com.juandgaines.agenda.presentation.edit_field.EditFieldScreenRoot
@@ -115,7 +116,7 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                     navController.navigate(
                         ScreenNav.AgendaItem(
                             id = id,
-                            type = type,
+                            type = type.ordinal,
                             isEditing = isEditing,
                             dateEpochMillis = epochMillis
                         )
@@ -131,7 +132,13 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
             )
         }
 
-        composable<ScreenNav.AgendaItem> { entry ->
+        composable<ScreenNav.AgendaItem>(
+            deepLinks =listOf(
+                navDeepLink<ScreenNav.AgendaItem>(
+                    basePath = "tasky://agenda_item",
+                )
+            )
+        ) { entry ->
             val textTitle = entry
                 .savedStateHandle
                 .get<String>(AgendaItems.EDIT_FIELD_TITLE_KEY)

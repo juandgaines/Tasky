@@ -121,10 +121,17 @@ class AgendaViewModel @Inject constructor(
             alarmProvider.alarmAvailable()
         ){ state, alarmAvailable ->
             val s= updateState {
-                it.copy(
-                    isScheduleAlarmPermissionAccepted = alarmAvailable
-                )
+
+                if(it.isScheduleAlarmPermissionAccepted){
+                    it
+                }
+                else {
+                    it.copy(
+                        isScheduleAlarmPermissionAccepted = alarmAvailable
+                    )
+                }
             }
+
             state.copy(
                 isScheduleAlarmPermissionAccepted = alarmAvailable
             )
@@ -157,7 +164,6 @@ class AgendaViewModel @Inject constructor(
         viewModelScope.launch {
             when (action) {
                 is SelectDate -> {
-
                     val utcZonedDateTime = action.date.toUtcLocalDateTime()
                     val newDate = utcZonedDateTime.toLocalDateWithZoneId(
                         ZoneId.systemDefault()

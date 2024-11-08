@@ -38,6 +38,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_SIX
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_TEN
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_THIRTY
+import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
@@ -77,6 +78,8 @@ class AgendaItemViewModel @Inject constructor(
     private var _isEditing:MutableStateFlow<Boolean> = MutableStateFlow(false)
     private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
     private var _isInit: Boolean = false
+    private var _agendaItemBuffer: AgendaItems? = null
+    private val _type = AgendaItemOption.fromOrdinal( _navParameters.type)
 
     val state:StateFlow<AgendaItemState> = _state
         .onStart {
@@ -100,20 +103,21 @@ class AgendaItemViewModel @Inject constructor(
 
     private suspend fun initState() {
         _isEditing.value = _navParameters.isEditing
-        val type = _navParameters.type
+
         val idItem = _navParameters.id
         if (idItem != null) {
-            when (type) {
+            when (_type) {
                 REMINDER -> reminderRepository.getReminderById(idItem)
                 TASK -> taskRepository.getTaskById(idItem)
                 EVENT -> taskRepository.getTaskById(idItem)
             }.onSuccess { item ->
+                _agendaItemBuffer = item
                 updateState {
                     it.copy(
                         isNew = false,
                         title = item.title,
                         description = item.description,
-                        details = when (type) {
+                        details = when (_type) {
                             REMINDER -> ReminderDetails
                             TASK -> TaskDetails(
                                 isCompleted = (item as Task).isDone
@@ -139,7 +143,7 @@ class AgendaItemViewModel @Inject constructor(
                 it.copy(
                     isNew = true,
                     startDateTime =initialDate ?: ZonedDateTime.now(),
-                    details = when (type) {
+                    details = when (_type) {
                         REMINDER -> ReminderDetails
                         TASK -> TaskDetails()
                         EVENT -> EventDetails()
@@ -184,7 +188,7 @@ class AgendaItemViewModel @Inject constructor(
                 Delete -> {
                     val agendaItemId = _navParameters.id
                     if (agendaItemId != null) {
-                        when (_navParameters.type) {
+                        when (_type) {
                             REMINDER -> reminderRepository.deleteReminder(
                                 Reminder(
                                     id = agendaItemId,
@@ -220,8 +224,7 @@ class AgendaItemViewModel @Inject constructor(
 
 
                     if (agendaItemId != null) {
-                        val type =  _navParameters.type
-                        val data = when (type) {
+                        val data = when (_type) {
                             REMINDER -> {
                                 Reminder(
                                     id = agendaItemId,
@@ -260,15 +263,16 @@ class AgendaItemViewModel @Inject constructor(
                         }
                         response
                             .onSuccess {
-                                alarmScheduler.cancelAlarm(data)
+                                _agendaItemBuffer?.run {
+                                    alarmScheduler.cancelAlarm(this)
+                                }
                                 alarmScheduler.scheduleAlarm(data)
                                 eventChannel.send(AgendaItemEvent.Updated)
                             }.onError {
                                 eventChannel.send(AgendaItemEvent.UpdateScheduled)
                             }
                     } else {
-                        val type = _navParameters.type
-                        val data = when (type) {
+                        val data = when (_type) {
                             REMINDER -> {
                                 Reminder(
                                     id = UUID.randomUUID().toString(),
