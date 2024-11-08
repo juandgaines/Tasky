@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.tasky.android.library)
     alias(libs.plugins.tasky.android.room)
     alias(libs.plugins.tasky.jvm.retrofit)
+    id("kotlin-parcelize")
 }
 
 android {

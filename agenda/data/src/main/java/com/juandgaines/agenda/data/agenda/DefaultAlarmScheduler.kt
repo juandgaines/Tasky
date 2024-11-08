@@ -18,11 +18,13 @@ class DefaultAlarmScheduler @Inject constructor(
     override fun scheduleAlarm(agendaItem: AgendaItems) {
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra(AlarmReceiver.TITLE, agendaItem.title)
-            putExtra(AlarmReceiver.TYPE, agendaItem.agendaItemOption.ordinal)
-            putExtra(AlarmReceiver.DESCRIPTION, agendaItem.description)
-            putExtra(AlarmReceiver.AGENDA_ITEM_ID, agendaItem.id)
-            putExtra(AlarmReceiver.TIME, agendaItem.date.toEpochMilli())
+            putExtra(AlarmReceiver.NOTIFICATION_DATA, NotificationDataParcelable(
+                id = agendaItem.id,
+                title = agendaItem.title,
+                type = agendaItem.agendaItemOption.ordinal,
+                description = agendaItem.description,
+                date = agendaItem.date.toEpochMilli()
+            ))
         }
 
         alarmManager.setExactAndAllowWhileIdle(
