@@ -207,6 +207,7 @@ class AgendaPendingSyncScheduler (
             is Reminder ->{
                 agendaSyncDao.upsertDeleteReminderSync(
                     DeleteReminderSyncEntity(
+                        reminder = agendaItem.toReminderEntity(),
                         reminderId = agendaItem.id,
                         userId = userId
                     )
@@ -217,7 +218,8 @@ class AgendaPendingSyncScheduler (
                 agendaSyncDao.upsertDeleteTaskSync(
                     DeleteTaskSyncEntity(
                         taskId = agendaItem.id,
-                        userId = userId
+                        userId = userId,
+                        task = agendaItem.toTaskEntity()
                     )
                 )
                 agendaItem.agendaItemOption
