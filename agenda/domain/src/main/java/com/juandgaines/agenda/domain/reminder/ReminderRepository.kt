@@ -16,4 +16,8 @@ interface ReminderRepository {
         startDate: Long,
         endDay: Long
     ): Flow<List<Reminder>>
+
+    suspend fun getRemindersAfterDate(
+        date: Long
+    ): List<Reminder>
 }

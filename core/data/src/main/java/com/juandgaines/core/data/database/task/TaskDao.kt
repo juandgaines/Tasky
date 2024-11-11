@@ -28,4 +28,7 @@ interface TaskDao {
         startDate: Long,
         endDay: Long
     ): Flow<List<TaskEntity>>
+
+    @Query("SELECT * FROM task WHERE time >= :date")
+    suspend fun getTasksAfterDate(date: Long): List<TaskEntity>
 }

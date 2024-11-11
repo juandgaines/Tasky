@@ -147,4 +147,11 @@ class DefaultTaskRepository @Inject constructor(
                 }
             }
     }
+
+    override suspend fun getTasksAfterDate(date: Long): List<Task> {
+        return taskDao.getTasksAfterDate(date)
+            .map {
+                it.toTask()
+            }
+    }
 }
