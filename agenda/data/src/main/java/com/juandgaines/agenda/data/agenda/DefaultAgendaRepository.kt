@@ -14,6 +14,7 @@ import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.auth.SessionManager
+import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.Network
 import com.juandgaines.core.domain.util.EmptyDataResult
 import com.juandgaines.core.domain.util.Result
@@ -69,6 +70,12 @@ class DefaultAgendaRepository @Inject constructor(
             }
         }
     }.asEmptyDataResult()
+
+    override suspend fun fetchFutureItems(time: Long): List<AgendaItems> {
+        val listOfReminders = reminderRepository.getRemindersAfterDate(time)
+        val listOfTasks = taskRepository.getTasksAfterDate(time)
+        return listOfReminders + listOfTasks
+    }
 
     override suspend fun syncPendingAgendaItem() {
         return withContext(Dispatchers.IO){

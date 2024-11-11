@@ -17,7 +17,7 @@ interface AgendaRepository{
 
     suspend fun fetchFutureItems(
         time:Long
-    ): EmptyDataResult<DataError>
+    ): List<AgendaItems>
 
     suspend fun syncPendingAgendaItem()
 }
