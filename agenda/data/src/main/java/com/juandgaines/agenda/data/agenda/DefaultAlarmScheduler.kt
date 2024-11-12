@@ -28,9 +28,6 @@ class DefaultAlarmScheduler @Inject constructor(
             ))
         }
 
-        Log.d("DefaultAlarmScheduler", "scheduleAlarm hashcode: ${agendaItem.hashCode()}")
-        Log.d("DefaultAlarmScheduler", "scheduleAlarm hashcode: ${agendaItem.hashCode()}")
-
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             agendaItem.alarmDate.toInstant().toEpochMilli(),
@@ -44,7 +41,7 @@ class DefaultAlarmScheduler @Inject constructor(
     }
 
     override fun cancelAlarm(agendaItem: AgendaItems) {
-        Log.d("DefaultAlarmScheduler", "cancelAlarm hashcode: ${agendaItem.hashCode()}")
+
         alarmManager.cancel(
             PendingIntent.getBroadcast(
                 context,
