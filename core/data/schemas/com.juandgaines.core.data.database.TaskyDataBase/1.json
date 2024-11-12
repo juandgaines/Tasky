@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "435cc1634fe6479b5785abc459ce00e7",
+    "identityHash": "e3119348481a4e31b7ab476d8e63d4d0",
     "entities": [
       {
         "tableName": "task",
@@ -100,7 +100,7 @@
       },
       {
         "tableName": "delete_task_sync",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`taskId` TEXT NOT NULL, `userId` TEXT NOT NULL, PRIMARY KEY(`taskId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`taskId` TEXT NOT NULL, `userId` TEXT NOT NULL, `id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `is_done` INTEGER NOT NULL, PRIMARY KEY(`taskId`))",
         "fields": [
           {
             "fieldPath": "taskId",
@@ -112,6 +112,42 @@
             "fieldPath": "userId",
             "columnName": "userId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "task.id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "task.title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "task.description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "task.time",
+            "columnName": "time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "task.remindAt",
+            "columnName": "remind_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "task.isDone",
+            "columnName": "is_done",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -126,7 +162,7 @@
       },
       {
         "tableName": "delete_reminder_sync",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`reminderId` TEXT NOT NULL, `userId` TEXT NOT NULL, PRIMARY KEY(`reminderId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`reminderId` TEXT NOT NULL, `userId` TEXT NOT NULL, `id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, PRIMARY KEY(`reminderId`))",
         "fields": [
           {
             "fieldPath": "reminderId",
@@ -138,6 +174,36 @@
             "fieldPath": "userId",
             "columnName": "userId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reminder.id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reminder.title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reminder.description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "reminder.time",
+            "columnName": "time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reminder.remindAt",
+            "columnName": "remind_at",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -390,7 +456,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '435cc1634fe6479b5785abc459ce00e7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e3119348481a4e31b7ab476d8e63d4d0')"
     ]
   }
 }

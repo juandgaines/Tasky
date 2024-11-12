@@ -140,4 +140,11 @@ class DefaultReminderRepository @Inject constructor(
                     }
             }
     }
+
+    override suspend fun getRemindersAfterDate(date: Long): List<Reminder> {
+        return reminderDao.getRemindersAfterDate(date)
+            .map {
+                it.toReminder()
+            }
+    }
 }

@@ -28,4 +28,7 @@ interface ReminderDao {
         startDate: Long,
         endDay: Long
     ): Flow<List<ReminderEntity>>
+
+    @Query("SELECT * FROM reminder WHERE time >= :date")
+    suspend fun getRemindersAfterDate(date: Long): List<ReminderEntity>
 }

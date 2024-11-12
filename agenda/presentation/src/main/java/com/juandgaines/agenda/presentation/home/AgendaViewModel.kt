@@ -11,6 +11,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaRepository
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.agenda.AlarmProvider
+import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
@@ -42,14 +43,15 @@ import com.juandgaines.agenda.presentation.home.AgendaEvents.LogOut
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Item
 import com.juandgaines.agenda.presentation.home.AgendaItemUi.Needle
 import com.juandgaines.agenda.presentation.home.AgendaState.Companion.calculateRangeDays
+import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
+import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
+import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.domain.auth.AuthCoreService
+import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
-import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
-import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
-import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.presentation.ui.UiText.StringResource
 import com.juandgaines.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,7 +61,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -67,7 +68,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -79,7 +79,8 @@ class AgendaViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
     private val agendaSyncScheduler: AgendaSyncScheduler,
-    private val alarmProvider: AlarmProvider
+    private val alarmProvider: AlarmProvider,
+    private val alarmScheduler: AlarmScheduler,
 ):ViewModel() {
 
     private val _state = MutableStateFlow(AgendaState())
@@ -241,18 +242,19 @@ class AgendaViewModel @Inject constructor(
                 is AgendaOperation -> {
                     when(action.agendaOperation){
                         is Delete -> {
+                            alarmScheduler.cancelAlarm(action.agendaOperation.agendaItem)
+
                             when (val agendaItem = action.agendaOperation.agendaItem){
                                 is Task -> {
                                    taskRepository.deleteTask(agendaItem)
                                        .onSuccess {
-                                             eventChannel.send(
-                                                 AgendaEvents.Success(
-                                                     StringResource(R.string.task_deleted)
-                                                 )
-                                             )
+                                           eventChannel.send(
+                                               AgendaEvents.Success(
+                                                   StringResource(R.string.task_deleted)
+                                               )
+                                           )
                                        }.onError {
-
-                                            eventChannel.send(AgendaEvents.Error(it.asUiText()))
+                                           eventChannel.send(AgendaEvents.Error(it.asUiText()))
                                        }
                                 }
                                 is Reminder -> {
@@ -268,9 +270,12 @@ class AgendaViewModel @Inject constructor(
                                         }
                                 }
                                 is Event -> {
-
+                                    //TODO: Implement delete event
+                                    Result.Success(Unit)
                                 }
                             }
+
+
                         }
                         is Edit -> {
                             val item = action.agendaOperation.agendaItem

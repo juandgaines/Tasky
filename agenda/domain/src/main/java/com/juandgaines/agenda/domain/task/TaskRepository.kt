@@ -16,4 +16,8 @@ interface TaskRepository {
         startDate: Long,
         endDay: Long
     ): Flow<List<Task>>
+
+    suspend fun getTasksAfterDate(
+        date: Long
+    ): List<Task>
 }

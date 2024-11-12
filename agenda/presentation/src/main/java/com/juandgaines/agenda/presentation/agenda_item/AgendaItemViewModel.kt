@@ -42,6 +42,7 @@ import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.util.EmptyDataResult
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
@@ -188,7 +189,10 @@ class AgendaItemViewModel @Inject constructor(
                 Delete -> {
                     val agendaItemId = _navParameters.id
                     if (agendaItemId != null) {
-                        when (_type) {
+                        _agendaItemBuffer?.run {
+                            alarmScheduler.cancelAlarm(this)
+                        }
+                         when (_type) {
                             REMINDER -> reminderRepository.deleteReminder(
                                 Reminder(
                                     id = agendaItemId,
@@ -209,14 +213,15 @@ class AgendaItemViewModel @Inject constructor(
                                 )
                             )
                             EVENT -> {
-                                Event
+                                Result.Success(Unit)
                             }
                         }
+
                     }
 
                 }
-                Edit -> {
-                    _isEditing.value = true
+            Edit -> {
+                _isEditing.value = true
                 }
                 Save -> {
                     val agendaItemId = _navParameters.id
