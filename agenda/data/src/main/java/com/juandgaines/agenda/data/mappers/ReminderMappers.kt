@@ -23,11 +23,13 @@ fun ReminderResponse.toReminder() = Reminder(
     time = time
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
-        ),
+        ).withNano(0)
+        .withSecond(0),
     remindAt = remindAt
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
-        )
+        ).withNano(0)
+        .withSecond(0)
 )
 
 fun ReminderEntity.toReminder() = Reminder(
@@ -37,11 +39,13 @@ fun ReminderEntity.toReminder() = Reminder(
     time = time
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
-        ),
+        ).withNano(0)
+        .withSecond(0),
     remindAt = remindAt
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
-        )
+        ).withNano(0)
+        .withSecond(0)
 )
 
 fun Reminder.toReminderEntity() = ReminderEntity(

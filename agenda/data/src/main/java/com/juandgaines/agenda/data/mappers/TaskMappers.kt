@@ -23,11 +23,13 @@ fun TaskResponse.toTask() = Task(
     time = time
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
-        ),
+        ).withNano(0)
+        .withSecond(0),
     remindAt = remindAt
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
-        ),
+        ).withNano(0)
+        .withSecond(0),
     isDone = isDone
 )
 
@@ -38,11 +40,13 @@ fun TaskEntity.toTask() = Task(
     time = time
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
-        ),
+        ).withNano(0)
+        .withSecond(0),
     remindAt = remindAt
         .toZonedDateTime(
             zoneId = ZoneId.systemDefault()
-        ),
+        ).withNano(0)
+        .withSecond(0),
     isDone = isDone
 )
 

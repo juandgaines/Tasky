@@ -134,12 +134,15 @@ class AgendaItemViewModel @Inject constructor(
             updateState {
                 val isToday = _navParameters.dateEpochMillis?.toZonedDateTime()?.isToday()
                 val initialDate = if (isToday == true) {
-                    ZonedDateTime.now()
+                    ZonedDateTime.now().withNano(0).withSecond(0)
                 } else {
                     _navParameters.dateEpochMillis
                         ?.toZonedDateTime()
                         ?.withHour(0)
                         ?.withMinute(0)
+                        ?.withSecond(0)
+                        ?.withNano(0)
+
                 }
                 it.copy(
                     isNew = true,
@@ -166,7 +169,7 @@ class AgendaItemViewModel @Inject constructor(
                             _state.value.startDateTime.hour,
                             _state.value.startDateTime.minute
                         )
-                    )
+                    ).withNano(0).withSecond(0)
                 updateState {
                     it.copy(
                         startDateTime = zonedDate,
@@ -222,140 +225,140 @@ class AgendaItemViewModel @Inject constructor(
                 }
             Edit -> {
                 _isEditing.value = true
-                }
-                Save -> {
-                    val agendaItemId = _navParameters.id
-                    val desiredAlarmDate = calculateTimeAlarm()
+            }
+            Save -> {
+                val agendaItemId = _navParameters.id
+                val desiredAlarmDate = calculateTimeAlarm()
 
 
-                    if (agendaItemId != null) {
-                        val data = when (_type) {
-                            REMINDER -> {
-                                Reminder(
-                                    id = agendaItemId,
-                                    title = _state.value.title,
-                                    description = _state.value.description,
-                                    time = _state.value.startDateTime,
-                                    remindAt = desiredAlarmDate
-                                )
-                            }
-                            TASK -> {
-                                Task(
-                                    id = agendaItemId,
-                                    title = _state.value.title,
-                                    description = _state.value.description,
-                                    time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as TaskDetails).isCompleted,
-                                    remindAt = desiredAlarmDate
-                                )
-                            }
-                            EVENT -> {
-                                Event
-                            }
-                        }
-
-                        val response = when (data) {
-                            is Reminder -> reminderRepository.updateReminder(
-                                data
+                if (agendaItemId != null) {
+                    val data = when (_type) {
+                        REMINDER -> {
+                            Reminder(
+                                id = agendaItemId,
+                                title = _state.value.title,
+                                description = _state.value.description,
+                                time = _state.value.startDateTime,
+                                remindAt = desiredAlarmDate
                             )
-                            is Task -> taskRepository.updateTask(
-                                data
-                            )
-                            Event -> {
-                                //TODO: Implement update event
-                                Result.Success(Unit)
-                            }
                         }
-                        response
-                            .onSuccess {
-                                _agendaItemBuffer?.run {
-                                    alarmScheduler.cancelAlarm(this)
-                                }
-                                alarmScheduler.scheduleAlarm(data)
-                                eventChannel.send(AgendaItemEvent.Updated)
-                            }.onError {
-                                eventChannel.send(AgendaItemEvent.UpdateScheduled)
-                            }
-                    } else {
-                        val data = when (_type) {
-                            REMINDER -> {
-                                Reminder(
-                                    id = UUID.randomUUID().toString(),
-                                    title = _state.value.title,
-                                    description = _state.value.description,
-                                    time = _state.value.startDateTime,
-                                    remindAt = desiredAlarmDate
-                                )
-                            }
-                            TASK -> {
-                                Task(
-                                    id = UUID.randomUUID().toString(),
-                                    title = _state.value.title,
-                                    description = _state.value.description,
-                                    time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as TaskDetails).isCompleted,
-                                    remindAt = desiredAlarmDate
-                                )
-                            }
-                            EVENT -> {
-                                Event
-                            }
+                        TASK -> {
+                            Task(
+                                id = agendaItemId,
+                                title = _state.value.title,
+                                description = _state.value.description,
+                                time = _state.value.startDateTime,
+                                isDone = (_state.value.details as TaskDetails).isCompleted,
+                                remindAt = desiredAlarmDate
+                            )
                         }
-                            .also {
-                                Log.d("AgendaItemViewModel", "alarm date  ${it.alarmDate}")
-                            }
-                        val response = when (data) {
-                            is Reminder -> reminderRepository.insertReminder(
-                                data
-                            )
-                            is Task -> taskRepository.insertTask(
-                               data
-                            )
+                        EVENT -> {
+                            Event
+                        }
+                    }
 
-                            Event -> {
-                                //TODO: Implement update event
-                                Result.Success(Unit)
-                            }
+                    val response = when (data) {
+                        is Reminder -> reminderRepository.updateReminder(
+                            data
+                        )
+                        is Task -> taskRepository.updateTask(
+                            data
+                        )
+                        Event -> {
+                            //TODO: Implement update event
+                            Result.Success(Unit)
                         }
-                        response
-                            .onSuccess {
-                                alarmScheduler.scheduleAlarm(data)
-                                eventChannel.send(AgendaItemEvent.Created)
-                            }.onError {
-                                eventChannel.send(AgendaItemEvent.CreationScheduled)
-                            }
                     }
-                }
-                Close -> Unit
-                DismissDateDialog -> {
-                    updateState {
-                        it.copy(
-                            isSelectDateDialog = false
+                    _agendaItemBuffer?.run {
+                        alarmScheduler.cancelAlarm(this)
+                    }
+                    alarmScheduler.scheduleAlarm(data)
+                    response
+                        .onSuccess {
+                            eventChannel.send(AgendaItemEvent.Updated)
+                        }.onError {
+                            eventChannel.send(AgendaItemEvent.UpdateScheduled)
+                        }
+                } else {
+                    val data = when (_type) {
+                        REMINDER -> {
+                            Reminder(
+                                id = UUID.randomUUID().toString(),
+                                title = _state.value.title,
+                                description = _state.value.description,
+                                time = _state.value.startDateTime,
+                                remindAt = desiredAlarmDate
+                            )
+                        }
+                        TASK -> {
+                            Task(
+                                id = UUID.randomUUID().toString(),
+                                title = _state.value.title,
+                                description = _state.value.description,
+                                time = _state.value.startDateTime,
+                                isDone = (_state.value.details as TaskDetails).isCompleted,
+                                remindAt = desiredAlarmDate
+                            )
+                        }
+                        EVENT -> {
+                            Event
+                        }
+                    }
+                        .also {
+                            Log.d("AgendaItemViewModel", "alarm date  ${it.alarmDate}")
+                        }
+                    val response = when (data) {
+                        is Reminder -> reminderRepository.insertReminder(
+                            data
                         )
-                    }
-                }
-                DismissTimeDialog -> {
+                        is Task -> taskRepository.insertTask(
+                            data
+                        )
 
-                    updateState {
-                        it.copy(
-                            isSelectTimeDialogVisible = false
-                        )
+                        Event -> {
+                            //TODO: Implement update event
+                            Result.Success(Unit)
+                        }
                     }
+                    response
+                        .onSuccess {
+                            alarmScheduler.scheduleAlarm(data)
+                            eventChannel.send(AgendaItemEvent.Created)
+                        }.onError {
+                            eventChannel.send(AgendaItemEvent.CreationScheduled)
+                        }
                 }
-                ShowDateDialog -> {
-                    updateState {
-                        it.copy(
-                            isSelectDateDialog = true
-                        )
-                    }
+            }
+            Close -> Unit
+            DismissDateDialog -> {
+                updateState {
+                    it.copy(
+                        isSelectDateDialog = false
+                    )
                 }
-                ShowTimeDialog -> {
-                    updateState {
-                        it.copy(
-                            isSelectTimeDialogVisible = true
-                        )
-                    }
+            }
+            DismissTimeDialog -> {
+
+                updateState {
+                    it.copy(
+                        isSelectTimeDialogVisible = false
+                    )
                 }
+            }
+            ShowDateDialog -> {
+                updateState {
+                    it.copy(
+                        isSelectDateDialog = true
+                    )
+                }
+            }
+            ShowTimeDialog -> {
+                updateState {
+                    it.copy(
+                        isSelectTimeDialogVisible = true
+                    )
+                }
+            }
 
             is SelectAlarm -> {
                 updateState {
@@ -381,7 +384,7 @@ class AgendaItemViewModel @Inject constructor(
                 }
             }
         }
-    }
+        }
 
     }
 
@@ -399,6 +402,6 @@ class AgendaItemViewModel @Inject constructor(
             HOUR_SIX -> startDateTime.minusHours(6)
             DAY_ONE -> startDateTime.minusDays(1)
         }
-        return newDateTime.withSecond(0)
+        return newDateTime.withSecond(0).withNano(0)
     }
 }

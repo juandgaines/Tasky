@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.utils.toEpochMilli
@@ -27,6 +28,9 @@ class DefaultAlarmScheduler @Inject constructor(
             ))
         }
 
+        Log.d("DefaultAlarmScheduler", "scheduleAlarm hashcode: ${agendaItem.hashCode()}")
+        Log.d("DefaultAlarmScheduler", "scheduleAlarm hashcode: ${agendaItem.hashCode()}")
+
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             agendaItem.alarmDate.toInstant().toEpochMilli(),
@@ -40,6 +44,7 @@ class DefaultAlarmScheduler @Inject constructor(
     }
 
     override fun cancelAlarm(agendaItem: AgendaItems) {
+        Log.d("DefaultAlarmScheduler", "cancelAlarm hashcode: ${agendaItem.hashCode()}")
         alarmManager.cancel(
             PendingIntent.getBroadcast(
                 context,
