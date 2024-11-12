@@ -242,11 +242,12 @@ class AgendaViewModel @Inject constructor(
                 is AgendaOperation -> {
                     when(action.agendaOperation){
                         is Delete -> {
+                            alarmScheduler.cancelAlarm(action.agendaOperation.agendaItem)
+
                             when (val agendaItem = action.agendaOperation.agendaItem){
                                 is Task -> {
                                    taskRepository.deleteTask(agendaItem)
                                        .onSuccess {
-                                           alarmScheduler.cancelAlarm(agendaItem)
                                            eventChannel.send(
                                                AgendaEvents.Success(
                                                    StringResource(R.string.task_deleted)
@@ -259,7 +260,6 @@ class AgendaViewModel @Inject constructor(
                                 is Reminder -> {
                                     reminderRepository.deleteReminder(agendaItem)
                                         .onSuccess {
-                                            alarmScheduler.cancelAlarm(agendaItem)
                                             eventChannel.send(
                                                 AgendaEvents.Success(
                                                     StringResource(R.string.reminder_deleted)
@@ -274,6 +274,7 @@ class AgendaViewModel @Inject constructor(
                                     Result.Success(Unit)
                                 }
                             }
+
 
                         }
                         is Edit -> {

@@ -189,7 +189,10 @@ class AgendaItemViewModel @Inject constructor(
                 Delete -> {
                     val agendaItemId = _navParameters.id
                     if (agendaItemId != null) {
-                        val result = when (_type) {
+                        _agendaItemBuffer?.run {
+                            alarmScheduler.cancelAlarm(this)
+                        }
+                         when (_type) {
                             REMINDER -> reminderRepository.deleteReminder(
                                 Reminder(
                                     id = agendaItemId,
@@ -213,15 +216,7 @@ class AgendaItemViewModel @Inject constructor(
                                 Result.Success(Unit)
                             }
                         }
-                        result
-                            .onSuccess {
-                                _agendaItemBuffer?.run {
-                                    alarmScheduler.cancelAlarm(this)
-                                }
-                                eventChannel.send(AgendaItemEvent.Deleted)
-                            }.onError {
-                                eventChannel.send(AgendaItemEvent.DeletionScheduled)
-                            }
+
                     }
 
                 }

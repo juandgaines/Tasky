@@ -23,7 +23,6 @@ class DeleteAgendaItemWorker @AssistedInject constructor(
     private val agendaApi: AgendaApi,
     private val sessionManager: SessionManager,
     private val agendaSyncDao: AgendaSyncDao,
-    private val alarmScheduler: AlarmScheduler
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -45,11 +44,11 @@ class DeleteAgendaItemWorker @AssistedInject constructor(
             )
         }.onSuccess {
             taskDeleteList.forEach {
-                alarmScheduler.cancelAlarm(it.task.toTask())
+
                 agendaSyncDao.deleteDeleteTaskSync(it.taskId)
             }
             reminderDeleteList.forEach {
-                alarmScheduler.cancelAlarm(it.reminder.toReminder())
+
                 agendaSyncDao.deleteDeleteReminderSync(it.reminderId)
             }
         }
