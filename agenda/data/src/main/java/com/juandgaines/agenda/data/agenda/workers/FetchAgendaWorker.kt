@@ -3,10 +3,8 @@ package com.juandgaines.agenda.data.agenda.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker.Result.Success
 import androidx.work.WorkerParameters
 import com.juandgaines.agenda.data.agenda.remote.AgendaApi
-import com.juandgaines.agenda.data.agenda.remote.SyncAgendaRequest
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toTask
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
@@ -15,13 +13,9 @@ import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.toEpochMilli
-import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.network.safeCall
-import com.juandgaines.core.domain.auth.SessionManager
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.Result.Error
-import com.juandgaines.core.domain.util.map
-import com.juandgaines.core.domain.util.mapError
 import com.juandgaines.core.domain.util.onSuccess
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -84,8 +78,8 @@ class FetchAgendaWorker @AssistedInject constructor(
         reminders: List<Reminder>,
     ) {
         val localReminderList = reminderRepository.getRemindersAfterDate(epochMillis)
-        val taskNotPresent = reminders.subtract(localReminderList.toSet()).toList()
-        taskNotPresent.forEach { task ->
+        val reminderNotPresent = reminders.subtract(localReminderList.toSet()).toList()
+        reminderNotPresent.forEach { task ->
             alarmScheduler.scheduleAlarm(task)
         }
     }
