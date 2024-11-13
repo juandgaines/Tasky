@@ -9,6 +9,9 @@ import com.juandgaines.agenda.data.agenda.remote.AgendaApi
 import com.juandgaines.agenda.data.agenda.remote.SyncAgendaRequest
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toTask
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
+import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.toEpochMilli
@@ -30,22 +33,27 @@ class FetchAgendaWorker @AssistedInject constructor(
     @Assisted val params: WorkerParameters,
     private val agendaApi: AgendaApi,
     private val taskRepository: TaskRepository,
-    private val reminderRepository: ReminderRepository
+    private val reminderRepository: ReminderRepository,
+    private val alarmScheduler: AlarmScheduler
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         if (runAttemptCount > 5) {
             return Result.failure()
         }
+        val epochMillis = LocalDate.now().toEpochMilli()
 
         val response = safeCall {
-            val epochMillis = LocalDate.now().toEpochMilli()
             agendaApi.getAgenda(
                 epochMillis
             )
         }.onSuccess {
             val tasks = it.tasks.map { task -> task.toTask() }
             val reminders = it.reminders.map { reminder -> reminder.toReminder() }
+
+            syncTaskFromOtherDevices(epochMillis, tasks)
+            syncReminderFromOtherDevices(epochMillis, reminders)
+
             taskRepository.upsertTasks(tasks)
             reminderRepository.upsertReminders(reminders)
         }
@@ -57,6 +65,28 @@ class FetchAgendaWorker @AssistedInject constructor(
             is com.juandgaines.core.domain.util.Result.Success -> {
                 Result.success()
             }
+        }
+    }
+
+    private suspend fun syncTaskFromOtherDevices(
+        epochMillis: Long,
+        tasks: List<Task>,
+    ) {
+        val localTaskList = taskRepository.getTasksAfterDate(epochMillis)
+        val taskNotPresent = tasks.subtract(localTaskList.toSet()).toList()
+        taskNotPresent.forEach { task ->
+            alarmScheduler.scheduleAlarm(task)
+        }
+    }
+
+    private suspend fun syncReminderFromOtherDevices(
+        epochMillis: Long,
+        reminders: List<Reminder>,
+    ) {
+        val localReminderList = reminderRepository.getRemindersAfterDate(epochMillis)
+        val taskNotPresent = reminders.subtract(localReminderList.toSet()).toList()
+        taskNotPresent.forEach { task ->
+            alarmScheduler.scheduleAlarm(task)
         }
     }
 }
