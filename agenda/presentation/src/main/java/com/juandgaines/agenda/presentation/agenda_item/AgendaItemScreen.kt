@@ -34,8 +34,6 @@ import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.EventDetails
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.ReminderDetails
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.TaskDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
