@@ -3,8 +3,8 @@ package com.juandgaines.agenda.presentation.agenda_item
 sealed interface AgendaItemAction{
     data class EditField(val key:String, val value :String): AgendaItemAction
     data class UpdateField(val key: String, val value: String): AgendaItemAction
-    data object ShowTimeDialog: AgendaItemAction
-    data object ShowDateDialog: AgendaItemAction
+    data class ShowTimeDialog(val isEndDate:Boolean =false): AgendaItemAction
+    data class ShowDateDialog(val isEndDate: Boolean = false): AgendaItemAction
     data object DismissTimeDialog: AgendaItemAction
     data object DismissDateDialog: AgendaItemAction
     data class SelectDateStart(val dateMillis:Long): AgendaItemAction

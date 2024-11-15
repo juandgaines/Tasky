@@ -378,17 +378,31 @@ class AgendaItemViewModel @Inject constructor(
                     )
                 }
             }
-            ShowDateDialog -> {
+            is ShowDateDialog -> {
                 updateState {
                     it.copy(
-                        isSelectDateDialog = true
+                        isSelectDateDialog = true,
+                        details = if (it.details is EventDetails) {
+                            it.details.copy(
+                                isEditingFinishDate = action.isEndDate
+                            )
+                        } else {
+                            it.details
+                        }
                     )
                 }
             }
-            ShowTimeDialog -> {
+            is ShowTimeDialog -> {
                 updateState {
                     it.copy(
-                        isSelectTimeDialogVisible = true
+                        isSelectTimeDialogVisible = true,
+                        details = if (it.details is EventDetails) {
+                            it.details.copy(
+                                isEditingFinishDate = action.isEndDate
+                            )
+                        } else {
+                            it.details
+                        }
                     )
                 }
             }

@@ -6,6 +6,7 @@ sealed interface AgendaItemDetails {
 
     data class EventDetails(
         val finishDate:ZonedDateTime = ZonedDateTime.now(),
+        val isEditingFinishDate:Boolean = false,
     ): AgendaItemDetails
 
     data class TaskDetails(val isCompleted:Boolean = false): AgendaItemDetails
