@@ -42,7 +42,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
-import com.juandgaines.agenda.presentation.agenda_item.components.StartDateSection
+import com.juandgaines.agenda.presentation.agenda_item.components.DateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
 import com.juandgaines.agenda.presentation.components.AgendaTimePicker
@@ -299,7 +299,7 @@ fun AgendaItemScreen(
                     color = TaskyLight
                 )
 
-                StartDateSection(
+                DateSection(
                     date = state.startDateTime,
                     isEditing = state.isEditing,
                     onEditStartDate = {
@@ -307,8 +307,27 @@ fun AgendaItemScreen(
                     },
                     onEditStartTime = {
                         onAction(AgendaItemAction.ShowTimeDialog)
-                    }
+                    },
+                    title =stringResource(id = R.string.from)
                 )
+                if (state.details is AgendaItemDetails.EventDetails) {
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        color = TaskyLight
+                    )
+                    DateSection(
+                        date = state.details.finishDate,
+                        isEditing = state.isEditing,
+                        onEditStartDate = {
+                            onAction(AgendaItemAction.ShowDateDialog)
+                        },
+                        onEditStartTime = {
+                            onAction(AgendaItemAction.ShowTimeDialog)
+                        },
+                        title = stringResource(id = R.string.to)
+                    )
+                }
 
                 AlarmSection(
                     alarm = state.alarm,
