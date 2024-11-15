@@ -5,13 +5,14 @@ package com.juandgaines.agenda.presentation.agenda_item
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
@@ -41,8 +43,8 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateSch
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
+import com.juandgaines.agenda.presentation.agenda_item.components.DateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
-import com.juandgaines.agenda.presentation.agenda_item.components.StartDateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
 import com.juandgaines.agenda.presentation.components.AgendaTimePicker
@@ -52,7 +54,6 @@ import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyLight
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
-import com.juandgaines.core.presentation.designsystem.components.TaskyToolbar
 import com.juandgaines.core.presentation.ui.ObserveAsEvents
 import java.time.ZonedDateTime
 
@@ -174,38 +175,31 @@ fun AgendaItemScreen(
     }
         TaskyScaffold (
             topAppBar = {
-                TaskyToolbar(
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .padding(
-                            horizontal = 16.dp
-                        ),
-                    backNavigation = {
-                        Icon(
-                            imageVector = CloseIcon,
-                            contentDescription = "Close",
-                            modifier = Modifier.clickable {
-                                onAction(AgendaItemAction.Close)
-                            }
-                        )
-                    },
-                    content = {
-                        Row (
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .size(56.dp),
-                        ){
-                            Text(
-                                text = state.title,
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                        .height(56.dp)
+                ){
+                    Icon(
+                        imageVector = CloseIcon,
+                        contentDescription = "Close",
+                        modifier = Modifier.clickable {
+                            onAction(AgendaItemAction.Close)
                         }
-
-                    },
-                    actions = {
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = state.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Box(
+                        contentAlignment = Alignment.Center,
+                    ){
                         if (state.isEditing) {
                             Text(
                                 text = stringResource(R.string.save),
@@ -226,14 +220,24 @@ fun AgendaItemScreen(
                                 }
                             )
                         }
-                    },
-                )
+                    }
+                }
             },
             loading = {
                 if(state.isSelectDateDialog){
                     AgendaDatePicker(
                         onDateSelected = { date->
-                            onAction(SelectDateStart(date))
+                            when(state.details) {
+                                is EventDetails ->{
+                                    if (state.details.isEditingFinishDate) {
+                                        onAction(AgendaItemAction.SelectDateFinish(date))
+                                    }
+                                    else {
+                                        onAction(SelectDateStart(date))
+                                    }
+                                }
+                                else -> onAction(SelectDateStart(date))
+                            }
                         },
                         onDismissDialog = {
                             onAction(DismissDateDialog)
@@ -250,7 +254,17 @@ fun AgendaItemScreen(
                             Alignment.Center
                         ),
                         onTimeSelected = { h, m ->
-                            onAction(AgendaItemAction.SelectTimeStart(h, m))
+                            when(state.details) {
+                                is EventDetails ->{
+                                    if (state.details.isEditingFinishDate) {
+                                        onAction(AgendaItemAction.SelectTimeFinish(h, m))
+                                    }
+                                    else {
+                                        onAction(AgendaItemAction.SelectTimeStart(h, m))
+                                    }
+                                }
+                                else -> onAction(AgendaItemAction.SelectTimeStart(h, m))
+                            }
                         },
                         onDismissDialog = {
                             onAction(AgendaItemAction.DismissTimeDialog)
@@ -299,16 +313,35 @@ fun AgendaItemScreen(
                     color = TaskyLight
                 )
 
-                StartDateSection(
+                DateSection(
                     date = state.startDateTime,
                     isEditing = state.isEditing,
                     onEditStartDate = {
-                        onAction(AgendaItemAction.ShowDateDialog)
+                        onAction(AgendaItemAction.ShowDateDialog())
                     },
                     onEditStartTime = {
-                        onAction(AgendaItemAction.ShowTimeDialog)
-                    }
+                        onAction(AgendaItemAction.ShowTimeDialog())
+                    },
+                    title =stringResource(id = R.string.from)
                 )
+                if (state.details is AgendaItemDetails.EventDetails) {
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        color = TaskyLight
+                    )
+                    DateSection(
+                        date = state.details.finishDate,
+                        isEditing = state.isEditing,
+                        onEditStartDate = {
+                            onAction(AgendaItemAction.ShowDateDialog(true))
+                        },
+                        onEditStartTime = {
+                            onAction(AgendaItemAction.ShowTimeDialog(true))
+                        },
+                        title = stringResource(id = R.string.to)
+                    )
+                }
 
                 AlarmSection(
                     alarm = state.alarm,

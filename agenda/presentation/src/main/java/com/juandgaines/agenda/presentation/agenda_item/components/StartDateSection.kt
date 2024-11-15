@@ -22,9 +22,10 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import java.time.ZonedDateTime
 
 @Composable
-fun StartDateSection(
+fun DateSection(
     modifier: Modifier = Modifier,
     date: ZonedDateTime,
+    title : String,
     isEditing: Boolean,
     onEditStartDate: () -> Unit,
     onEditStartTime: () -> Unit
@@ -38,7 +39,7 @@ fun StartDateSection(
         ) {
 
         Text(
-            text = stringResource(id = R.string.from),
+            text = title,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSecondary,
         )
@@ -101,11 +102,12 @@ fun StartDateSection(
 @Composable
 fun StartDateSectionPreview() {
     TaskyTheme {
-        StartDateSection(
+        DateSection(
             date = ZonedDateTime.now(),
             isEditing = false,
             onEditStartDate = {},
-            onEditStartTime = {}
+            onEditStartTime = {},
+            title = stringResource(id = R.string.from)
         )
     }
 }
