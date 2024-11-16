@@ -9,6 +9,7 @@ import com.juandgaines.core.data.database.agenda.DeleteReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteTaskSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateTaskSyncEntity
+import com.juandgaines.core.data.database.event.EventEntity
 import com.juandgaines.core.data.database.reminder.ReminderDao
 import com.juandgaines.core.data.database.reminder.ReminderEntity
 import com.juandgaines.core.data.database.task.TaskDao
@@ -18,6 +19,7 @@ import com.juandgaines.core.data.database.task.TaskEntity
     entities = [
         TaskEntity::class,
         ReminderEntity::class,
+        EventEntity::class,
         DeleteTaskSyncEntity::class,
         DeleteReminderSyncEntity::class,
         UpdateTaskSyncEntity::class,

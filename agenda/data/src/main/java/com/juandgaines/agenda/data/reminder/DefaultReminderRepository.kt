@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DefaultReminderRepository @Inject constructor(
@@ -37,11 +38,13 @@ class DefaultReminderRepository @Inject constructor(
             }.onError {
                 when (it) {
                     DataError.Network.NO_INTERNET -> {
-                        agendaItemScheduler.scheduleSync(
-                            AgendaSyncOperations.CreateAgendaItem(
-                                reminder
+                        applicationScope.launch {
+                            agendaItemScheduler.scheduleSync(
+                                AgendaSyncOperations.CreateAgendaItem(
+                                    reminder
+                                )
                             )
-                        )
+                        }
                     }
                     else -> Unit
                 }
