@@ -9,6 +9,7 @@ import com.juandgaines.core.data.database.agenda.DeleteReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteTaskSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateTaskSyncEntity
+import com.juandgaines.core.data.database.event.EventDao
 import com.juandgaines.core.data.database.event.EventEntity
 import com.juandgaines.core.data.database.reminder.ReminderDao
 import com.juandgaines.core.data.database.reminder.ReminderEntity
@@ -31,4 +32,5 @@ abstract class TaskyDataBase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun reminderDao(): ReminderDao
     abstract fun agendaSyncDao(): AgendaSyncDao
+    abstract fun eventDao(): EventDao
 }

@@ -347,7 +347,6 @@ fun AgendaScreen(
                                             },
                                             title = item.title,
                                             description = item.description ?: "",
-                                            date = item.time.toFormattedSingleDateTime(),
                                             onMenuItemClick = { operation ->
                                                 agendaActions(AgendaOperation(operation))
                                             }
@@ -365,7 +364,6 @@ fun AgendaScreen(
                                             },
                                             title = item.title,
                                             description = item.description ?: "",
-                                            date = item.time.toFormattedSingleDateTime(),
                                             onMenuItemClick = { operation ->
                                                 agendaActions(AgendaOperation(operation))
                                             }
@@ -383,7 +381,6 @@ fun AgendaScreen(
                                             },
                                             title = item.title,
                                             description = item.description ?: "",
-                                            date = item.date.toFormattedSingleDateTime(),
                                             onMenuItemClick = { operation ->
                                                 agendaActions(AgendaOperation(operation))
                                             }

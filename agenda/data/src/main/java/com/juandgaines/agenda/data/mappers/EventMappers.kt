@@ -22,7 +22,7 @@ fun Event.toEventRequest() = CreateEventRequest(
     title = title,
     description = description,
     from = time.toInstant().toEpochMilli(),
-    to = time.toInstant().toEpochMilli(),
+    to = endTime.toInstant().toEpochMilli(),
     remindAt = remindAt.toInstant().toEpochMilli()
 )
 

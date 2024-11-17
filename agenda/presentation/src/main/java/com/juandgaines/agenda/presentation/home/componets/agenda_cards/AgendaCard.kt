@@ -34,13 +34,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.domain.agenda.AgendaItems
+import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
+import com.juandgaines.agenda.domain.utils.toFormattedSingleDateTime
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.DAY_ONE
 import com.juandgaines.agenda.presentation.home.componets.Check
 import com.juandgaines.agenda.presentation.home.AgendaCardMenuOperations
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.core.presentation.designsystem.MoreHor
+import com.juandgaines.core.presentation.designsystem.TaskyLightGreen
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import java.time.ZonedDateTime
 
@@ -53,11 +56,11 @@ fun AgendaCard(
     onClickItem: (() -> Unit),
     onMenuItemClick: (AgendaCardMenuOperations) -> Unit,
     description: String,
-    date: String,
     agendaItem: AgendaItems
 ) {
     val colorBackground= when (agendaItem){
         is Task ->MaterialTheme.colorScheme.primary
+        is Event -> TaskyLightGreen
         else -> MaterialTheme.colorScheme.primaryContainer
     }
 
@@ -132,6 +135,16 @@ fun AgendaCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                text = "${agendaItem.date.toFormattedSingleDateTime()} " +
+                    if (agendaItem.dateEnd !=null) "- "+agendaItem.dateEnd?.toFormattedSingleDateTime() else "",
+                style = MaterialTheme.typography.labelSmall,
+                color = colorSecondaryText,
+                modifier = Modifier.align(Alignment.End)
+            )
+
         }
         Column(
             horizontalAlignment = Alignment.End,
@@ -177,13 +190,8 @@ fun AgendaCard(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = date,
-                style = MaterialTheme.typography.labelSmall,
-                color = colorSecondaryText
-            )
         }
+
     }
 
 }
@@ -196,7 +204,6 @@ fun TaskCardPreview() {
             title = "Title",
             isDone = true,
             description = "Description",
-            date = "Mar 5, 10:00",
             agendaItem = Task("1","Title", "Description"
                 ,ZonedDateTime.now(),
                 ZonedDateTime.now(),
@@ -216,9 +223,25 @@ fun ReminderCardPreview() {
         AgendaCard(
             title = "Title",
             description = "Description",
-            date = "Mar 5, 10:00",
             agendaItem = Reminder("1","Title", "Description",
                 ZonedDateTime.now(), ZonedDateTime.now()),
+            onCheckClick = {},
+            onClickItem = {},
+            onMenuItemClick = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun EventCardPreview() {
+    TaskyTheme {
+        AgendaCard(
+            title = "Title",
+            description = "Description",
+            agendaItem = Event("1","Title", "Description",
+                ZonedDateTime.now(), ZonedDateTime.now(), ZonedDateTime.now(),
+                "Host", true),
             onCheckClick = {},
             onClickItem = {},
             onMenuItemClick = {}

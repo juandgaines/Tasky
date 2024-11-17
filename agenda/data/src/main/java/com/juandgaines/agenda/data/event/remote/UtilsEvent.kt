@@ -8,8 +8,11 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 fun createEventRequestBody(eventRequest: CreateEventRequest): RequestBody {
-    val json = Json.encodeToString(CreateEventRequest.serializer(), eventRequest)
-    return json.toRequestBody("application/json".toMediaType())
+    val json = Json {
+        encodeDefaults = true // Ensure default values are included
+    }
+    val serializedRequest = json.encodeToString(CreateEventRequest.serializer(), eventRequest)
+    return serializedRequest.toRequestBody("application/json".toMediaType())
 }
 
 fun createPhotoParts(photoFiles: List<File>): List<MultipartBody.Part> {

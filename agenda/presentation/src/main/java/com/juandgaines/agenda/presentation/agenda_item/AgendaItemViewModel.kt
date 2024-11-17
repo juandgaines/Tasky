@@ -12,6 +12,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
+import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.isToday
@@ -74,6 +75,7 @@ class AgendaItemViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
+    private val eventRepository: EventRepository,
     private val alarmScheduler: AlarmScheduler
 ):ViewModel() {
 
@@ -115,7 +117,7 @@ class AgendaItemViewModel @Inject constructor(
             when (_type) {
                 REMINDER -> reminderRepository.getReminderById(idItem)
                 TASK -> taskRepository.getTaskById(idItem)
-                EVENT -> taskRepository.getTaskById(idItem)
+                EVENT -> eventRepository.getEventById(idItem)
             }.onSuccess { item ->
                 _agendaItemBuffer = item
                 updateState {
@@ -128,7 +130,11 @@ class AgendaItemViewModel @Inject constructor(
                             TASK -> TaskDetails(
                                 isCompleted = (item as Task).isDone
                             )
-                            EVENT -> EventDetails()
+                            EVENT -> EventDetails(
+                                finishDate = (item as Event).endTime,
+                                host = item.host,
+                                isUserCreator = item.isUserEventCreator
+                            )
                         },
                         startDateTime = item.date
                     )
@@ -286,7 +292,16 @@ class AgendaItemViewModel @Inject constructor(
                             )
                         }
                         EVENT -> {
-                            Event
+                            Event(
+                                id = agendaItemId,
+                                title = _state.value.title,
+                                description = _state.value.description,
+                                time = _state.value.startDateTime,
+                                endTime = (_state.value.details as EventDetails).finishDate,
+                                remindAt = desiredAlarmDate,
+                                host = (_state.value.details as EventDetails).host,
+                                isUserEventCreator = (_state.value.details as EventDetails).isUserCreator
+                            )
                         }
                     }
 
@@ -297,7 +312,7 @@ class AgendaItemViewModel @Inject constructor(
                         is Task -> taskRepository.updateTask(
                             data
                         )
-                        Event -> {
+                        is Event -> {
                             //TODO: Implement update event
                             Success(Unit)
                         }
@@ -334,12 +349,18 @@ class AgendaItemViewModel @Inject constructor(
                             )
                         }
                         EVENT -> {
-                            Event
+                            Event(
+                                id = UUID.randomUUID().toString(),
+                                title = _state.value.title,
+                                description = _state.value.description,
+                                time = _state.value.startDateTime,
+                                endTime = (_state.value.details as EventDetails).finishDate,
+                                remindAt = desiredAlarmDate,
+                                host = (_state.value.details as EventDetails).host,
+                                isUserEventCreator = (_state.value.details as EventDetails).isUserCreator
+                            )
                         }
                     }
-                        .also {
-                            Log.d("AgendaItemViewModel", "alarm date  ${it.alarmDate}")
-                        }
                     val response = when (data) {
                         is Reminder -> reminderRepository.insertReminder(
                             data
@@ -348,10 +369,9 @@ class AgendaItemViewModel @Inject constructor(
                             data
                         )
 
-                        Event -> {
-                            //TODO: Implement update event
-                            Success(Unit)
-                        }
+                        is Event -> eventRepository.insertEvent(
+                            data
+                        )
                     }
                     response
                         .onSuccess {

@@ -12,7 +12,6 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.juandgaines.agenda.data.R
-import com.juandgaines.agenda.domain.agenda.AgendaItems.Event.description
 import com.juandgaines.agenda.domain.utils.toFormattedTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
 
@@ -50,7 +49,9 @@ class AlarmReceiver : BroadcastReceiver() {
             getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
         }
         val notification = baseNotification
-            .setContentText(description)
+            .setContentText(
+                "Alarm: ${notificationData?.title} at ${notificationData?.date?.toZonedDateTime()?.toFormattedTime()}"
+            )
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()
