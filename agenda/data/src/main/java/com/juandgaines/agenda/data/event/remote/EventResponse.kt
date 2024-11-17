@@ -13,7 +13,7 @@ data class EventResponse(
     val host: String,
     val isUserEventCreator: Boolean,
     val attendees: List<AttendeeDto>,
-    val photos: List<PhotoDto>
+    val photos: List<PhotoDto>? = null
 )
 
 @Serializable
@@ -23,7 +23,7 @@ data class AttendeeDto(
     val userId: String,
     val eventId: String,
     val isGoing: Boolean,
-    val remindAt: Long
+    val remindAt: Long,
 )
 
 @Serializable

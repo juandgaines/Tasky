@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.juandgaines.core.data.database.TaskyDataBase
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
+import com.juandgaines.core.data.database.event.EventDao
 import com.juandgaines.core.data.database.reminder.ReminderDao
 import com.juandgaines.core.data.database.task.TaskDao
 import dagger.Module
@@ -51,6 +52,12 @@ class DaoModule {
     fun provideAgendaSyncDao(
         taskyDataBase: TaskyDataBase
     ) : AgendaSyncDao = taskyDataBase.agendaSyncDao()
+
+    @Provides
+    @Singleton
+    fun provideEventDao(
+        taskyDataBase: TaskyDataBase
+    ) : EventDao = taskyDataBase.eventDao()
 }
 
 

@@ -14,6 +14,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.agenda.AlarmProvider
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
+import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
@@ -49,6 +50,7 @@ class AgendaModule {
     fun providesAgendaRepository(
         reminderRepository: ReminderRepository,
         taskRepository: TaskRepository,
+        eventRepository: EventRepository,
         agendaApi: AgendaApi,
         sessionManager: SessionManager,
         agendaSyncDao: AgendaSyncDao,
@@ -59,6 +61,7 @@ class AgendaModule {
         return DefaultAgendaRepository(
             reminderRepository,
             taskRepository,
+            eventRepository,
             sessionManager,
             agendaApi,
             agendaSyncDao,

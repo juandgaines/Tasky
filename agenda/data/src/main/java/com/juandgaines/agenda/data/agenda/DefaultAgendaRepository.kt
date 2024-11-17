@@ -1,6 +1,7 @@
 package com.juandgaines.agenda.data.agenda
 
 import com.juandgaines.agenda.data.agenda.remote.AgendaApi
+import com.juandgaines.agenda.data.mappers.toEvent
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toReminderRequest
 import com.juandgaines.agenda.data.mappers.toTask
@@ -9,12 +10,12 @@ import com.juandgaines.agenda.data.reminder.remote.ReminderApi
 import com.juandgaines.agenda.data.task.remote.TaskApi
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaRepository
+import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.auth.SessionManager
-import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.Network
 import com.juandgaines.core.domain.util.EmptyDataResult
 import com.juandgaines.core.domain.util.Result
@@ -32,6 +33,7 @@ import javax.inject.Inject
 class DefaultAgendaRepository @Inject constructor(
     private val reminderRepository: ReminderRepository,
     private val taskRepository: TaskRepository,
+    private val eventRepository: EventRepository,
     private val sessionManager: SessionManager,
     private val agendaApi: AgendaApi,
     private val agendaSyncDao: AgendaSyncDao,
@@ -51,9 +53,13 @@ class DefaultAgendaRepository @Inject constructor(
         taskRepository.getTasks(
             startDate,
             endDay
+        ),
+        eventRepository.getEvents(
+            startDate,
+            endDay
         )
-    ){ reminders, tasks ->
-        (reminders + tasks)
+    ){ reminders, tasks, events ->
+        (reminders + tasks + events)
     }
 
     override suspend fun fetchItems(time: Long): EmptyDataResult<Network> = safeCall {
@@ -61,6 +67,7 @@ class DefaultAgendaRepository @Inject constructor(
     }.onSuccess { response->
         val taskItems= response.tasks.map { it.toTask() }
         val reminderItems= response.reminders.map { it.toReminder() }
+        val eventsItems = response.events.map { it.toEvent() }
         applicationScope.launch {
             launch {
                 reminderRepository.upsertReminders(reminderItems)
@@ -68,13 +75,17 @@ class DefaultAgendaRepository @Inject constructor(
             launch {
                 taskRepository.upsertTasks(taskItems)
             }
+            launch {
+                eventRepository.upsertEvents(eventsItems)
+            }
         }
     }.asEmptyDataResult()
 
     override suspend fun fetchFutureItems(time: Long): List<AgendaItems> {
         val listOfReminders = reminderRepository.getRemindersAfterDate(time)
         val listOfTasks = taskRepository.getTasksAfterDate(time)
-        return listOfReminders + listOfTasks
+        val listOfEvents = eventRepository.getEventsAfterDate(time)
+        return listOfReminders + listOfTasks + listOfEvents
     }
 
     override suspend fun syncPendingAgendaItem() {

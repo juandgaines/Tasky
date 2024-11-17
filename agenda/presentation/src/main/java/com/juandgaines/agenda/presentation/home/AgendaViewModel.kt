@@ -13,6 +13,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.agenda.AlarmProvider
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
+import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.endOfDay
@@ -78,6 +79,7 @@ class AgendaViewModel @Inject constructor(
     private val agendaRepository: AgendaRepository,
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
+    private val eventRepository: EventRepository,
     private val agendaSyncScheduler: AgendaSyncScheduler,
     private val alarmProvider: AlarmProvider,
     private val alarmScheduler: AlarmScheduler,
