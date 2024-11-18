@@ -3,10 +3,13 @@ package com.juandgaines.agenda.data.event
 import android.database.sqlite.SQLiteException
 import com.juandgaines.agenda.data.event.remote.EventApi
 import com.juandgaines.agenda.data.event.remote.createEventRequestBody
+import com.juandgaines.agenda.data.event.remote.updateEventRequestBody
 import com.juandgaines.agenda.data.mappers.toEvent
 import com.juandgaines.agenda.data.mappers.toEventEntity
 import com.juandgaines.agenda.data.mappers.toEventRequest
+import com.juandgaines.agenda.data.mappers.toUpdateEventRequest
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
+import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.core.data.database.event.EventDao
@@ -40,7 +43,11 @@ class DefaultEventRepository @Inject constructor(
             }.onError {
                 when (it) {
                     DataError.Network.NO_INTERNET -> {
-                        //Todo: schedule sync event
+                        agendaItemScheduler.scheduleSync(
+                            AgendaSyncOperations.CreateAgendaItem(
+                                event
+                            )
+                        )
                     }
                     else -> Unit
                 }
@@ -53,7 +60,31 @@ class DefaultEventRepository @Inject constructor(
     }
 
     override suspend fun updateEvent(event: Event): Result<Unit, DataError> {
-        TODO("Not yet implemented")
+        return try {
+            val entity = event.toEventEntity()
+            eventDao.upsertEvent(entity)
+
+            val response = safeCall {
+                val request = event.toUpdateEventRequest()
+                val eventBody = updateEventRequestBody(request)
+                eventApi.updateEvent(eventBody)
+            }.onError {
+                when (it) {
+                    DataError.Network.NO_INTERNET -> {
+                        agendaItemScheduler.scheduleSync(
+                            AgendaSyncOperations.UpdateAgendaItem(
+                                event
+                            )
+                        )
+                    }
+                    else -> Unit
+                }
+            }.asEmptyDataResult()
+            response
+        }
+        catch (e: SQLiteException) {
+            Result.Error(LocalError.DISK_FULL)
+        }
     }
 
     override suspend fun upsertEvents(list: List<Event>): Result<Unit, DataError> {
@@ -83,7 +114,22 @@ class DefaultEventRepository @Inject constructor(
     }
 
     override suspend fun deleteEvent(event: Event): Result<Unit, DataError> {
-        TODO("Not yet implemented")
+        val reminderId = event.id
+        eventDao.deleteEventById(reminderId)
+        val response = safeCall {
+            eventApi.deleteEventById(reminderId)
+        }.onError {
+            when (it) {
+                DataError.Network.NO_INTERNET ->
+                    agendaItemScheduler.scheduleSync(
+                        AgendaSyncOperations.DeleteAgendaItem(
+                            event
+                        )
+                    )
+                else -> Unit
+            }
+        }.asEmptyDataResult()
+        return response
     }
 
     override fun getEvents(

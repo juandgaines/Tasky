@@ -3,10 +3,13 @@ package com.juandgaines.core.data.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
+import com.juandgaines.core.data.database.agenda.CreateEventSyncEntity
 import com.juandgaines.core.data.database.agenda.CreateReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.CreateTaskSyncEntity
+import com.juandgaines.core.data.database.agenda.DeleteEventSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteTaskSyncEntity
+import com.juandgaines.core.data.database.agenda.UpdateEventSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateTaskSyncEntity
 import com.juandgaines.core.data.database.event.EventDao
@@ -23,10 +26,13 @@ import com.juandgaines.core.data.database.task.TaskEntity
         EventEntity::class,
         DeleteTaskSyncEntity::class,
         DeleteReminderSyncEntity::class,
+        DeleteEventSyncEntity::class,
         UpdateTaskSyncEntity::class,
         UpdateReminderSyncEntity::class,
+        UpdateEventSyncEntity::class,
         CreateTaskSyncEntity::class,
-        CreateReminderSyncEntity::class
+        CreateReminderSyncEntity::class,
+        CreateEventSyncEntity::class
     ], version = 1)
 abstract class TaskyDataBase : RoomDatabase() {
     abstract fun taskDao(): TaskDao

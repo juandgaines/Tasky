@@ -4,12 +4,15 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.juandgaines.agenda.data.mappers.toEvent
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toTask
+import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.domain.agenda.AgendaItemOption
+import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import dagger.assisted.Assisted
@@ -21,7 +24,8 @@ class CreateAgendaItemWorker @AssistedInject constructor(
     @Assisted val params: WorkerParameters,
     private val agendaSyncDao: AgendaSyncDao,
     private val taskRepository: TaskRepository,
-    private val reminderRepository: ReminderRepository
+    private val reminderRepository: ReminderRepository,
+    private val eventRepository: EventRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -76,7 +80,25 @@ class CreateAgendaItemWorker @AssistedInject constructor(
                     }
                 } ?: Result.failure()
             }
-            else -> Result.success()
+            EVENT -> {
+                val createEventSync = agendaSyncDao.getCreateEventSync(agendaId)
+                createEventSync?.let {
+                    val updateEventSync = agendaSyncDao.getUpdateEventSync(createEventSync.eventId)
+
+                    val createdEvent= updateEventSync?.event ?: createEventSync.event
+
+                    val response = eventRepository.insertEvent(createdEvent.toEvent())
+                    return if (response is com.juandgaines.core.domain.util.Result.Error) {
+                        response.error.toWorkerResult()
+                    } else {
+                        agendaSyncDao.deleteCreateEventSync(createEventSync.eventId)
+                        updateEventSync?.let {
+                            agendaSyncDao.deleteUpdateEventSync(it.eventId)
+                        }
+                        Result.success()
+                    }
+                } ?: Result.failure()
+            }
         }
 
     }

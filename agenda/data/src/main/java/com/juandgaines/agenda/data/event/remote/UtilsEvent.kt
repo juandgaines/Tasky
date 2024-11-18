@@ -9,9 +9,17 @@ import java.io.File
 
 fun createEventRequestBody(eventRequest: CreateEventRequest): RequestBody {
     val json = Json {
-        encodeDefaults = true // Ensure default values are included
+        encodeDefaults = true
     }
     val serializedRequest = json.encodeToString(CreateEventRequest.serializer(), eventRequest)
+    return serializedRequest.toRequestBody("application/json".toMediaType())
+}
+
+fun updateEventRequestBody(eventRequest: UpdateEventRequest): RequestBody {
+    val json = Json {
+        encodeDefaults = true
+    }
+    val serializedRequest = json.encodeToString(UpdateEventRequest.serializer(), eventRequest)
     return serializedRequest.toRequestBody("application/json".toMediaType())
 }
 

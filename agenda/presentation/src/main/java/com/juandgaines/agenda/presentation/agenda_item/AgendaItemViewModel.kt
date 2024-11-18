@@ -300,7 +300,8 @@ class AgendaItemViewModel @Inject constructor(
                                 endTime = (_state.value.details as EventDetails).finishDate,
                                 remindAt = desiredAlarmDate,
                                 host = (_state.value.details as EventDetails).host,
-                                isUserEventCreator = (_state.value.details as EventDetails).isUserCreator
+                                isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                isGoing = false, // Todo: Adjust when implemented invitations
                             )
                         }
                     }
@@ -312,10 +313,9 @@ class AgendaItemViewModel @Inject constructor(
                         is Task -> taskRepository.updateTask(
                             data
                         )
-                        is Event -> {
-                            //TODO: Implement update event
-                            Success(Unit)
-                        }
+                        is Event -> eventRepository.updateEvent(
+                            data
+                        )
                     }
                     response
                         .onSuccess {
@@ -357,7 +357,8 @@ class AgendaItemViewModel @Inject constructor(
                                 endTime = (_state.value.details as EventDetails).finishDate,
                                 remindAt = desiredAlarmDate,
                                 host = (_state.value.details as EventDetails).host,
-                                isUserEventCreator = (_state.value.details as EventDetails).isUserCreator
+                                isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                isGoing = false  // Todo: Adjust when implemented invitations
                             )
                         }
                     }

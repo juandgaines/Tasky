@@ -2,6 +2,7 @@ package com.juandgaines.agenda.data.mappers
 
 import com.juandgaines.agenda.data.event.remote.CreateEventRequest
 import com.juandgaines.agenda.data.event.remote.EventResponse
+import com.juandgaines.agenda.data.event.remote.UpdateEventRequest
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
 import com.juandgaines.core.data.database.event.EventEntity
@@ -14,7 +15,8 @@ fun EventResponse.toEvent() = Event(
     endTime = to.toZonedDateTime(),
     remindAt = remindAt.toZonedDateTime(),
     host = host,
-    isUserEventCreator = isUserEventCreator
+    isUserEventCreator = isUserEventCreator,
+    isGoing = false // TODO: change with implementation of attendees
 )
 
 fun Event.toEventRequest() = CreateEventRequest(
@@ -24,6 +26,18 @@ fun Event.toEventRequest() = CreateEventRequest(
     from = time.toInstant().toEpochMilli(),
     to = endTime.toInstant().toEpochMilli(),
     remindAt = remindAt.toInstant().toEpochMilli()
+)
+
+fun Event.toUpdateEventRequest() = UpdateEventRequest(
+    id = id,
+    title = title,
+    description = description,
+    from = time.toInstant().toEpochMilli(),
+    to = endTime.toInstant().toEpochMilli(),
+    remindAt = remindAt.toInstant().toEpochMilli(),
+    isGoing = isGoing,
+    attendeeIds = emptyList(),
+    deletedPhotoKeys = emptyList()
 )
 
 fun Event.toEventEntity() = EventEntity(
@@ -45,5 +59,6 @@ fun EventEntity.toEvent() = Event(
     endTime = timeEnd.toZonedDateTime(),
     remindAt = remindAt.toZonedDateTime(),
     host = host,
-    isUserEventCreator = isUserEventCreator
+    isUserEventCreator = isUserEventCreator,
+    isGoing = false // TODO: change with implementation of attendees
 )
