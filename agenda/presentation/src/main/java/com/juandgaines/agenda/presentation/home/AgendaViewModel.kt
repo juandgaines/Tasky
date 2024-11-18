@@ -272,8 +272,15 @@ class AgendaViewModel @Inject constructor(
                                         }
                                 }
                                 is Event -> {
-                                    //TODO: Implement delete event
-                                    Result.Success(Unit)
+                                    eventRepository.deleteEvent(agendaItem).onSuccess {
+                                        eventChannel.send(
+                                            AgendaEvents.Success(
+                                                StringResource(R.string.event_deleted)
+                                            )
+                                        )
+                                    }.onError {
+                                        eventChannel.send(AgendaEvents.Error(it.asUiText()))
+                                    }
                                 }
                             }
 
@@ -362,5 +369,4 @@ class AgendaViewModel @Inject constructor(
         super.onCleared()
         alarmProvider.unregister()
     }
-
 }

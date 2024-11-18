@@ -29,11 +29,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
+import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
@@ -229,7 +230,7 @@ fun AgendaItemScreen(
                         onDateSelected = { date->
                             when(state.details) {
                                 is EventDetails ->{
-                                    if (state.details.isEditingFinishDate) {
+                                    if (state.isEditingEndDate) {
                                         onAction(AgendaItemAction.SelectDateFinish(date))
                                     }
                                     else {
@@ -256,7 +257,7 @@ fun AgendaItemScreen(
                         onTimeSelected = { h, m ->
                             when(state.details) {
                                 is EventDetails ->{
-                                    if (state.details.isEditingFinishDate) {
+                                    if (state.isEditingEndDate) {
                                         onAction(AgendaItemAction.SelectTimeFinish(h, m))
                                     }
                                     else {

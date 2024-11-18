@@ -1,4 +1,4 @@
-package com.juandgaines.agenda.presentation.agenda_item
+package com.juandgaines.agenda.domain.agenda
 
 import java.time.ZonedDateTime
 
@@ -6,7 +6,6 @@ sealed interface AgendaItemDetails {
 
     data class EventDetails(
         val finishDate:ZonedDateTime = ZonedDateTime.now(),
-        val isEditingFinishDate:Boolean = false,
         val host : String = "",
         val isUserCreator:Boolean = false
     ): AgendaItemDetails

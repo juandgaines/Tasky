@@ -13,6 +13,7 @@ import com.juandgaines.agenda.data.agenda.workers.CreateAgendaItemWorker
 import com.juandgaines.agenda.data.agenda.workers.DeleteAgendaItemWorker
 import com.juandgaines.agenda.data.agenda.workers.FetchAgendaWorker
 import com.juandgaines.agenda.data.agenda.workers.UpdateAgendaItemWorker
+import com.juandgaines.agenda.data.mappers.toEventEntity
 import com.juandgaines.agenda.data.mappers.toReminderEntity
 import com.juandgaines.agenda.data.mappers.toTaskEntity
 import com.juandgaines.agenda.domain.agenda.AgendaItems
@@ -26,13 +27,15 @@ import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations.FetchAgendas
 import com.juandgaines.agenda.domain.agenda.AgendaSyncOperations.UpdateAgendaItem
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
+import com.juandgaines.core.data.database.agenda.CreateEventSyncEntity
 import com.juandgaines.core.data.database.agenda.CreateReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.CreateTaskSyncEntity
+import com.juandgaines.core.data.database.agenda.DeleteEventSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.DeleteTaskSyncEntity
+import com.juandgaines.core.data.database.agenda.UpdateEventSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateReminderSyncEntity
 import com.juandgaines.core.data.database.agenda.UpdateTaskSyncEntity
-import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.auth.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -118,7 +121,17 @@ class AgendaPendingSyncScheduler (
                 )
                 agendaItem.agendaItemOption
             }
-            is Event -> agendaItem.agendaItemOption
+            is Event ->{
+                val event = agendaItem as Event
+                agendaSyncDao.upsertUpdateEventSync(
+                    UpdateEventSyncEntity(
+                        event = event.toEventEntity(),
+                        userId = userId,
+                        eventId = event.id
+                    )
+                )
+                agendaItem.agendaItemOption
+            }
         }
 
         val workRequest = OneTimeWorkRequestBuilder<UpdateAgendaItemWorker>()
@@ -171,7 +184,17 @@ class AgendaPendingSyncScheduler (
                 )
                 agendaItem.agendaItemOption
             }
-            is Event -> agendaItem.agendaItemOption
+            is Event -> {
+                val event = agendaItem as Event
+                agendaSyncDao.upsertCreateEventSync(
+                    CreateEventSyncEntity(
+                        event = event.toEventEntity(),
+                        userId = userId,
+                        eventId = event.id
+                    )
+                )
+                agendaItem.agendaItemOption
+            }
         }
 
         val workRequest = OneTimeWorkRequestBuilder<CreateAgendaItemWorker>()
@@ -224,7 +247,16 @@ class AgendaPendingSyncScheduler (
                 )
                 agendaItem.agendaItemOption
             }
-            is Event -> agendaItem.agendaItemOption
+            is Event -> {
+                agendaSyncDao.upsertDeleteEventSync(
+                    DeleteEventSyncEntity(
+                        eventId = agendaItem.id,
+                        userId = userId,
+                        event = agendaItem.toEventEntity()
+                    )
+                )
+                agendaItem.agendaItemOption
+            }
         }
 
         val workRequest = OneTimeWorkRequestBuilder<DeleteAgendaItemWorker>()

@@ -1,18 +1,18 @@
 package com.juandgaines.agenda.data.agenda.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.juandgaines.agenda.data.mappers.toEvent
 import com.juandgaines.agenda.data.mappers.toReminder
 import com.juandgaines.agenda.data.mappers.toTask
+import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.util.Result.Error
-import com.juandgaines.core.domain.util.onSuccess
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -22,7 +22,8 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
     @Assisted val params: WorkerParameters,
     private val agendaSyncDao: AgendaSyncDao,
     private val taskRepository: TaskRepository,
-    private val reminderRepository: ReminderRepository
+    private val reminderRepository: ReminderRepository,
+    private val eventRepository: EventRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -55,7 +56,6 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
                     }
                 }
                 else{
-                    Log.d("UpdateAgendaItemWorker", "Task already exists")
                     updateAgendaItemTaskPendingSync(agendaId)
                 }
 
@@ -81,7 +81,26 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
                     updateAgendaItemReminderSync(agendaId)
                 }
             }
-            else -> Result.failure()
+            AgendaItemOption.EVENT -> {
+                val eventResponse = eventRepository.getEventById(agendaId)
+                if (eventResponse is Error) {
+                    val eventCreated = agendaSyncDao.getCreateEventSync(agendaId) ?: return Result.failure()
+                    val updateEvent = agendaSyncDao.getUpdateEventSync(agendaId) ?: return Result.failure()
+                    val event = updateEvent.event
+                    val response = eventRepository.insertEvent(event.toEvent())
+
+                    return if (response is Error) {
+                        response.error.toWorkerResult()
+                    } else {
+                        agendaSyncDao.deleteCreateEventSync(eventCreated.eventId)
+                        agendaSyncDao.deleteUpdateEventSync(updateEvent.eventId)
+                        Result.success()
+                    }
+                }
+                else{
+                    updateAgendaItemEventPendingSync(agendaId)
+                }
+            }
         }
     }
 
@@ -110,6 +129,19 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
                 response.error.toWorkerResult()
             } else {
                 agendaSyncDao.deleteUpdateTaskSync(updatedPendingAgendaItem.taskId)
+                Result.success()
+            }
+        } ?: Result.failure()
+    }
+
+    private suspend fun updateAgendaItemEventPendingSync(agendaId: String): Result {
+        val updatedPendingAgendaItem = agendaSyncDao.getUpdateEventSync(agendaId)
+        return updatedPendingAgendaItem?.let {
+            val response = eventRepository.updateEvent(updatedPendingAgendaItem.event.toEvent())
+            return if (response is Error) {
+                response.error.toWorkerResult()
+            } else {
+                agendaSyncDao.deleteUpdateEventSync(updatedPendingAgendaItem.eventId)
                 Result.success()
             }
         } ?: Result.failure()

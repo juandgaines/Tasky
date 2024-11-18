@@ -11,6 +11,7 @@ sealed interface AgendaItems{
     val dateEnd:ZonedDateTime?
     val alarmDate:ZonedDateTime
     val agendaItemOption: AgendaItemOption
+    val agendaItemDetails:AgendaItemDetails
 
     data class Task(
         override val id:String,
@@ -24,6 +25,7 @@ sealed interface AgendaItems{
         override val dateEnd = null
         override val alarmDate = remindAt
         override val agendaItemOption = AgendaItemOption.TASK
+        override val agendaItemDetails = AgendaItemDetails.TaskDetails(isDone)
     }
 
     data class Reminder(
@@ -37,6 +39,7 @@ sealed interface AgendaItems{
         override val dateEnd = null
         override val alarmDate = remindAt
         override val agendaItemOption = AgendaItemOption.REMINDER
+        override val agendaItemDetails = AgendaItemDetails.ReminderDetails
     }
 
     data class Event(
@@ -48,11 +51,17 @@ sealed interface AgendaItems{
         val remindAt:ZonedDateTime,
         val host:String,
         val isUserEventCreator:Boolean,
+        val isGoing:Boolean
     ):AgendaItems{
         override val date = time
         override val dateEnd = endTime
         override val alarmDate = remindAt
         override val agendaItemOption = AgendaItemOption.EVENT
+        override val agendaItemDetails = AgendaItemDetails.EventDetails(
+            finishDate =  endTime,
+            host = host,
+            isUserCreator =  isUserEventCreator
+        )
     }
 
     companion object{

@@ -39,8 +39,10 @@ class DefaultTaskRepository @Inject constructor(
                 taskApi.createTask(task.toTaskRequest())
             }.onError { error->
                when (error){
-                   NO_INTERNET -> {
-                          agendaSyncScheduler.scheduleSync(
+                   DataError.Network.SERVER_ERROR,
+                   DataError.Network.REQUEST_TIMEOUT,
+                   DataError.Network.NO_INTERNET ->{
+                       agendaSyncScheduler.scheduleSync(
                             AgendaSyncOperations.CreateAgendaItem(
                                  task
                             )
@@ -64,7 +66,9 @@ class DefaultTaskRepository @Inject constructor(
                 taskApi.updateTask(task.toTaskRequest())
             }.onError {
                 when (it) {
-                    NO_INTERNET -> {
+                    DataError.Network.SERVER_ERROR,
+                    DataError.Network.REQUEST_TIMEOUT,
+                    DataError.Network.NO_INTERNET ->{
                         agendaSyncScheduler.scheduleSync(
                             AgendaSyncOperations.UpdateAgendaItem(
                                 task

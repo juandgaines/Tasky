@@ -55,7 +55,7 @@ interface AgendaSyncDao{
     @Query("DELETE FROM delete_reminder_sync WHERE reminderId = :reminderId")
     suspend fun deleteDeleteReminderSync(reminderId: String)
 
-    //Task sync update
+    //Reminder sync update
     @Upsert
     suspend fun upsertUpdateReminderSync(updateTaskSync: UpdateReminderSyncEntity)
 
@@ -68,7 +68,7 @@ interface AgendaSyncDao{
     @Query("SELECT * FROM update_reminder_sync WHERE reminderId = :taskId")
     suspend fun getUpdateReminderSync(taskId: String): UpdateReminderSyncEntity?
 
-    //Task sync create
+    //Reminder sync create
     @Upsert
     suspend fun upsertCreateReminderSync(updateTaskSync: CreateReminderSyncEntity)
 
@@ -81,4 +81,41 @@ interface AgendaSyncDao{
     @Query("SELECT * FROM create_reminder_sync WHERE reminderId = :taskId")
     suspend fun getCreateReminderSync(taskId: String): CreateReminderSyncEntity?
 
+
+    //Event sync create
+    @Upsert
+    suspend fun upsertCreateEventSync(createEventSyncEntity: CreateEventSyncEntity)
+
+    @Query("SELECT * FROM create_event_sync WHERE userId = :userId")
+    suspend fun getAllCreateEventSync(userId: String): List<CreateEventSyncEntity>
+
+    @Query("DELETE FROM create_event_sync WHERE eventId = :taskId")
+    suspend fun deleteCreateEventSync(taskId: String)
+
+    @Query("SELECT * FROM create_event_sync WHERE eventId = :taskId")
+    suspend fun getCreateEventSync(taskId: String): CreateEventSyncEntity?
+
+    //Event sync update
+    @Upsert
+    suspend fun upsertUpdateEventSync(updateEventSync: UpdateEventSyncEntity)
+
+    @Query("SELECT * FROM update_event_sync WHERE userId = :userId")
+    suspend fun getAllUpdateEventSync(userId: String): List<UpdateEventSyncEntity>
+
+    @Query("DELETE FROM update_event_sync WHERE eventId = :taskId")
+    suspend fun deleteUpdateEventSync(taskId: String)
+
+    @Query("SELECT * FROM update_event_sync WHERE eventId = :taskId")
+    suspend fun getUpdateEventSync(taskId: String): UpdateEventSyncEntity?
+
+
+    //Event sync delete
+    @Query("SELECT * FROM delete_event_sync WHERE userId = :userId")
+    suspend fun getAllDeleteEventSync(userId: String): List<DeleteEventSyncEntity>
+
+    @Upsert
+    suspend fun upsertDeleteEventSync(deleteEventSyncEntity: DeleteEventSyncEntity)
+
+    @Query("DELETE FROM delete_event_sync WHERE eventId = :reminderId")
+    suspend fun deleteDeleteEventSync(reminderId: String)
 }

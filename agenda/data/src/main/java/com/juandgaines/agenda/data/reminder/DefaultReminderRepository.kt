@@ -37,6 +37,8 @@ class DefaultReminderRepository @Inject constructor(
                 reminderApi.createReminder(reminder.toReminderRequest())
             }.onError {
                 when (it) {
+                    DataError.Network.SERVER_ERROR,
+                    DataError.Network.REQUEST_TIMEOUT,
                     DataError.Network.NO_INTERNET -> {
                         applicationScope.launch {
                             agendaItemScheduler.scheduleSync(
@@ -65,6 +67,8 @@ class DefaultReminderRepository @Inject constructor(
                 reminderApi.updateReminder(reminder.toReminderRequest())
             }.onError {
                 when (it) {
+                    DataError.Network.SERVER_ERROR,
+                    DataError.Network.REQUEST_TIMEOUT,
                     DataError.Network.NO_INTERNET -> {
                         agendaItemScheduler.scheduleSync(
                             AgendaSyncOperations.UpdateAgendaItem(
@@ -115,6 +119,8 @@ class DefaultReminderRepository @Inject constructor(
             reminderApi.deleteReminderById(reminderId)
         }.onError {
             when (it) {
+                DataError.Network.SERVER_ERROR,
+                DataError.Network.REQUEST_TIMEOUT,
                 DataError.Network.NO_INTERNET ->
                     agendaItemScheduler.scheduleSync(
                         AgendaSyncOperations.DeleteAgendaItem(

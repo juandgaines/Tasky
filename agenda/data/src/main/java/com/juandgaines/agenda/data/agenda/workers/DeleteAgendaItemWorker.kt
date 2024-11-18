@@ -6,9 +6,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.juandgaines.agenda.data.agenda.remote.AgendaApi
 import com.juandgaines.agenda.data.agenda.remote.SyncAgendaRequest
-import com.juandgaines.agenda.data.mappers.toReminder
-import com.juandgaines.agenda.data.mappers.toTask
-import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.auth.SessionManager
@@ -33,23 +30,25 @@ class DeleteAgendaItemWorker @AssistedInject constructor(
 
         val reminderDeleteList = agendaSyncDao.getAllDeleteReminderSync(userId)
         val taskDeleteList = agendaSyncDao.getAllDeleteTaskSync(userId)
+        val eventDeleteList = agendaSyncDao.getAllDeleteEventSync(userId)
 
         val response = safeCall {
             agendaApi.syncAgenda(
                 SyncAgendaRequest(
-                    deletedEventIds = emptyList(),
+                    deletedEventIds = eventDeleteList.map { it.eventId },
                     deletedTaskIds = taskDeleteList.map { it.taskId },
                     deletedReminderIds = reminderDeleteList.map { it.reminderId }
                 )
             )
         }.onSuccess {
             taskDeleteList.forEach {
-
                 agendaSyncDao.deleteDeleteTaskSync(it.taskId)
             }
             reminderDeleteList.forEach {
-
                 agendaSyncDao.deleteDeleteReminderSync(it.reminderId)
+            }
+            eventDeleteList.forEach {
+                agendaSyncDao.deleteDeleteEventSync(it.eventId)
             }
         }
 
