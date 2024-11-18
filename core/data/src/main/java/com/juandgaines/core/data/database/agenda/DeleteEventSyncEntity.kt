@@ -9,6 +9,6 @@ import com.juandgaines.core.data.database.event.EventEntity
 data class DeleteEventSyncEntity (
     @Embedded val event: EventEntity,
     @PrimaryKey(autoGenerate = false)
-    val eventId: String,
+    val eventId: String = event.id,
     val userId: String
 )

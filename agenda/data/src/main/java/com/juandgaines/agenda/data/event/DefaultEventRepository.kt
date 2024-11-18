@@ -42,7 +42,9 @@ class DefaultEventRepository @Inject constructor(
                 eventApi.createEvent(eventBody)
             }.onError {
                 when (it) {
-                    DataError.Network.NO_INTERNET -> {
+                    DataError.Network.SERVER_ERROR,
+                    DataError.Network.REQUEST_TIMEOUT,
+                    DataError.Network.NO_INTERNET ->{
                         agendaItemScheduler.scheduleSync(
                             AgendaSyncOperations.CreateAgendaItem(
                                 event
@@ -70,7 +72,9 @@ class DefaultEventRepository @Inject constructor(
                 eventApi.updateEvent(eventBody)
             }.onError {
                 when (it) {
-                    DataError.Network.NO_INTERNET -> {
+                    DataError.Network.SERVER_ERROR,
+                    DataError.Network.REQUEST_TIMEOUT,
+                    DataError.Network.NO_INTERNET ->{
                         agendaItemScheduler.scheduleSync(
                             AgendaSyncOperations.UpdateAgendaItem(
                                 event
@@ -120,6 +124,8 @@ class DefaultEventRepository @Inject constructor(
             eventApi.deleteEventById(reminderId)
         }.onError {
             when (it) {
+                DataError.Network.SERVER_ERROR,
+                DataError.Network.REQUEST_TIMEOUT,
                 DataError.Network.NO_INTERNET ->
                     agendaItemScheduler.scheduleSync(
                         AgendaSyncOperations.DeleteAgendaItem(
