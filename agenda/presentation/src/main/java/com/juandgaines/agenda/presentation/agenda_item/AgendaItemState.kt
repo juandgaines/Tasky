@@ -1,5 +1,6 @@
 package com.juandgaines.agenda.presentation.agenda_item
 
+import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
 import java.time.ZonedDateTime
 
 data class AgendaItemState(
@@ -11,5 +12,6 @@ data class AgendaItemState(
     val startDateTime: ZonedDateTime = ZonedDateTime.now(),
     val alarm: AlarmOptions = AlarmOptions.MINUTES_TEN,
     val details: AgendaItemDetails?  = null,
+    val isEditingEndDate: Boolean = false,
     val title: String = "",
 )

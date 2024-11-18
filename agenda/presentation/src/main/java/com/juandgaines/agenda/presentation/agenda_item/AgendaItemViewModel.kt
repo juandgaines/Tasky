@@ -2,11 +2,13 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.EventDetails
+import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.ReminderDetails
+import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.TaskDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
@@ -33,9 +35,6 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTi
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateField
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.EventDetails
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.ReminderDetails
-import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetails.TaskDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
@@ -125,17 +124,7 @@ class AgendaItemViewModel @Inject constructor(
                         isNew = false,
                         title = item.title,
                         description = item.description,
-                        details = when (_type) {
-                            REMINDER -> ReminderDetails
-                            TASK -> TaskDetails(
-                                isCompleted = (item as Task).isDone
-                            )
-                            EVENT -> EventDetails(
-                                finishDate = (item as Event).endTime,
-                                host = item.host,
-                                isUserCreator = item.isUserEventCreator
-                            )
-                        },
+                        details = item.agendaItemDetails,
                         startDateTime = item.date
                     )
                 }
@@ -403,13 +392,7 @@ class AgendaItemViewModel @Inject constructor(
                 updateState {
                     it.copy(
                         isSelectDateDialog = true,
-                        details = if (it.details is EventDetails) {
-                            it.details.copy(
-                                isEditingFinishDate = action.isEndDate
-                            )
-                        } else {
-                            it.details
-                        }
+                        isEditingEndDate = action.isEndDate
                     )
                 }
             }
@@ -417,13 +400,7 @@ class AgendaItemViewModel @Inject constructor(
                 updateState {
                     it.copy(
                         isSelectTimeDialogVisible = true,
-                        details = if (it.details is EventDetails) {
-                            it.details.copy(
-                                isEditingFinishDate = action.isEndDate
-                            )
-                        } else {
-                            it.details
-                        }
+                        isEditingEndDate = action.isEndDate
                     )
                 }
             }

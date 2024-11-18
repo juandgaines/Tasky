@@ -33,8 +33,14 @@ class AlarmReceiver : BroadcastReceiver() {
         ) as NotificationManager
 
         val baseNotification = NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.tasky_logo)
-                .setContentTitle("Alarm: ${notificationData?.title} at ${notificationData?.date?.toZonedDateTime()?.toFormattedTime()}")
+            .setSmallIcon(R.drawable.tasky_logo)
+            .setContentTitle(
+                context.getString(
+                    R.string.notification_message,
+                    notificationData?.title,
+                    notificationData?.date?.toZonedDateTime()?.toFormattedTime()
+                )
+            )
 
         createNotificationChannel(context, notificationManager)
 
