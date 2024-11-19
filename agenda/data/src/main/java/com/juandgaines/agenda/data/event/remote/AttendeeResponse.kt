@@ -5,11 +5,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AttendeeResponse(
     val doesUserExist: Boolean,
-    val attendee: AttendeeRDto
+    val attendee: AttendeeMinimalDto
 )
 
 @Serializable
-data class AttendeeRDto(
+data class AttendeeMinimalDto(
     val email: String,
     val fullName: String,
     val userId: String,

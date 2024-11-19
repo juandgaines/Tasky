@@ -244,11 +244,20 @@ class AgendaItemViewModel @Inject constructor(
                                 remindAt = _state.value.startDateTime
                             )
                         )
-                        EVENT -> {
-                            Success(Unit)
-                        }
+                        EVENT -> eventRepository.deleteEvent(
+                                Event(
+                                    id = agendaItemId,
+                                    title = _state.value.title,
+                                    description = _state.value.description,
+                                    time = _state.value.startDateTime,
+                                    endTime = (_state.value.details as EventDetails).finishDate,
+                                    remindAt = _state.value.startDateTime,
+                                    host = (_state.value.details as EventDetails).host,
+                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    isGoing = false // Todo: Adjust when implemented invitations
+                                )
+                            )
                     }
-
                 }
             }
             Edit -> {
