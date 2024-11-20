@@ -16,5 +16,6 @@ data class EventEntity(
     val remindAt: Long,
     val host : String,
     @ColumnInfo(name = "is_user_event_creator")
-    val isUserEventCreator: Boolean
+    val isUserEventCreator: Boolean,
+    val attendees: List<AttendeeEntity>
 )

@@ -28,6 +28,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAttendeeFilter
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateFinish
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeFinish
@@ -438,6 +439,13 @@ class AgendaItemViewModel @Inject constructor(
                 }
             }
 
+            is SelectAttendeeFilter -> {
+                updateState {
+                    it.copy(
+                        attendeeFilter = action.filter
+                    )
+                }
+            }
         }
         }
 

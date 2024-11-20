@@ -14,4 +14,5 @@ data class AgendaItemState(
     val details: AgendaItemDetails?  = null,
     val isEditingEndDate: Boolean = false,
     val title: String = "",
+    val attendeeFilter: AttendeeFilter = AttendeeFilter.ALL,
 )

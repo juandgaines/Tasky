@@ -1,10 +1,13 @@
 package com.juandgaines.agenda.data.mappers
 
+import com.juandgaines.agenda.data.event.remote.AttendeeDto
 import com.juandgaines.agenda.data.event.remote.CreateEventRequest
 import com.juandgaines.agenda.data.event.remote.EventResponse
 import com.juandgaines.agenda.data.event.remote.UpdateEventRequest
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
+import com.juandgaines.agenda.domain.agenda.Attendee
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
+import com.juandgaines.core.data.database.event.AttendeeEntity
 import com.juandgaines.core.data.database.event.EventEntity
 
 fun EventResponse.toEvent() = Event(
@@ -16,7 +19,17 @@ fun EventResponse.toEvent() = Event(
     remindAt = remindAt.toZonedDateTime(),
     host = host,
     isUserEventCreator = isUserEventCreator,
-    isGoing = false // TODO: change with implementation of attendees
+    attendee = attendees.map { it.toAttendee(host) }
+)
+
+fun AttendeeDto.toAttendee(id:String) = Attendee(
+    email = email,
+    fullName = fullName,
+    userId = userId,
+    eventId = eventId,
+    isGoing = isGoing,
+    remindAt = remindAt.toZonedDateTime(),
+    isUserCreator = id == userId
 )
 
 fun Event.toEventRequest() = CreateEventRequest(
@@ -35,9 +48,9 @@ fun Event.toUpdateEventRequest() = UpdateEventRequest(
     from = time.toInstant().toEpochMilli(),
     to = endTime.toInstant().toEpochMilli(),
     remindAt = remindAt.toInstant().toEpochMilli(),
-    isGoing = isGoing,
     attendeeIds = emptyList(),
-    deletedPhotoKeys = emptyList()
+    deletedPhotoKeys = emptyList(),
+    isGoing = false // TODO: change with implementation of attendees
 )
 
 fun Event.toEventEntity() = EventEntity(
@@ -48,7 +61,8 @@ fun Event.toEventEntity() = EventEntity(
     timeEnd = endTime.toInstant().toEpochMilli(),
     remindAt = remindAt.toInstant().toEpochMilli(),
     host = host,
-    isUserEventCreator = isUserEventCreator
+    isUserEventCreator = isUserEventCreator,
+    attendees = attendee.map { it.toAttendeeEntity() }
 )
 
 fun EventEntity.toEvent() = Event(
@@ -60,5 +74,25 @@ fun EventEntity.toEvent() = Event(
     remindAt = remindAt.toZonedDateTime(),
     host = host,
     isUserEventCreator = isUserEventCreator,
-    isGoing = false // TODO: change with implementation of attendees
+    attendee = emptyList()
+)
+
+fun AttendeeEntity.toAttendee() = Attendee(
+    email = email,
+    fullName = fullName,
+    userId = userId,
+    eventId = eventId,
+    isGoing = isGoing,
+    remindAt = remindAt.toZonedDateTime(),
+    isUserCreator = isUserCreator
+)
+
+fun Attendee.toAttendeeEntity() = AttendeeEntity(
+    email = email,
+    fullName = fullName,
+    userId = userId,
+    eventId = eventId,
+    isGoing = isGoing,
+    remindAt = remindAt.toInstant().toEpochMilli(),
+    isUserCreator = isUserCreator
 )

@@ -12,6 +12,7 @@ sealed interface AgendaItemAction{
     data class SelectDateFinish(val dateMillis:Long): AgendaItemAction
     data class SelectTimeFinish(val hour:Int, val minutes:Int): AgendaItemAction
     data class SelectAlarm(val alarm: AlarmOptions): AgendaItemAction
+    data class SelectAttendeeFilter(val filter: AttendeeFilter) : AgendaItemAction
     data object Edit: AgendaItemAction
     data object Save: AgendaItemAction
     data object Close: AgendaItemAction

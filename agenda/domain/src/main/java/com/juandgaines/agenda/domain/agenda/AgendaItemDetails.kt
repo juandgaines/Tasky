@@ -7,7 +7,8 @@ sealed interface AgendaItemDetails {
     data class EventDetails(
         val finishDate:ZonedDateTime = ZonedDateTime.now(),
         val host : String = "",
-        val isUserCreator:Boolean = false
+        val isUserCreator:Boolean = false,
+        val attendees:List<Attendee>
     ): AgendaItemDetails
 
     data class TaskDetails(val isCompleted:Boolean = false): AgendaItemDetails
