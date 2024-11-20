@@ -101,7 +101,9 @@ fun AttendeeSectionFilter(
                     )
                 }
                 items(attendeesGoing) { attendee ->
-
+                    AttendeeItem(
+                        attendee = attendee
+                    )
                 }
             }
 

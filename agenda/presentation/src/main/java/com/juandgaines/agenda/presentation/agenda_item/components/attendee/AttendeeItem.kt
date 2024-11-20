@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.juandgaines.agenda.domain.agenda.Attendee
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.core.presentation.designsystem.TaskyBlack
 import com.juandgaines.core.presentation.designsystem.TaskyDarkGray
@@ -26,8 +27,8 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 @Composable
 fun AttendeeItem(
     modifier: Modifier = Modifier,
-    isCreator : Boolean = false,
-    isEdition : Boolean = true
+    isEdition: Boolean = true,
+    attendee: Attendee
 ) {
 
     Row (
@@ -43,18 +44,18 @@ fun AttendeeItem(
         ProfileIcon(
             modifier = Modifier
                 .padding(8.dp),
-            initials = "JD", // TODO: Replace with real initials
+            initials = attendee.initials.uppercase(), // TODO: Replace with real initials
             colorBackground = TaskyGray,
             colorLetters = TaskyLight
         )
         Text(
-            text = "Juan David",
+            text = attendee.fullName,
             color = TaskyDarkGray,
             style = MaterialTheme.typography.labelMedium,
         )
         Spacer(modifier = Modifier.weight(1f))
         when {
-            isCreator -> {
+            attendee.isUserCreator -> {
                 Text(
                     text = "Creator",
                     color = TaskyLightBlue,
@@ -79,6 +80,15 @@ fun AttendeeItem(
 @Preview
 fun PreviewAttendeeItem() {
     TaskyTheme {
-        AttendeeItem()
+        AttendeeItem(attendee = Attendee(
+            email = "j123@gmail.com",
+            fullName = "Juan David",
+            userId = "j123",
+            eventId = "e123",
+            isGoing = true,
+            remindAt = java.time.ZonedDateTime.now(),
+            isUserCreator = true,
+            initials = "JD"
+        ))
     }
 }

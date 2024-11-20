@@ -29,7 +29,8 @@ fun AttendeeDto.toAttendee(id:String) = Attendee(
     eventId = eventId,
     isGoing = isGoing,
     remindAt = remindAt.toZonedDateTime(),
-    isUserCreator = id == userId
+    isUserCreator = id == userId,
+    initials = ""
 )
 
 fun Event.toEventRequest() = CreateEventRequest(
@@ -74,7 +75,7 @@ fun EventEntity.toEvent() = Event(
     remindAt = remindAt.toZonedDateTime(),
     host = host,
     isUserEventCreator = isUserEventCreator,
-    attendee = emptyList()
+    attendee = attendees.map { it.toAttendee() }
 )
 
 fun AttendeeEntity.toAttendee() = Attendee(
@@ -84,7 +85,8 @@ fun AttendeeEntity.toAttendee() = Attendee(
     eventId = eventId,
     isGoing = isGoing,
     remindAt = remindAt.toZonedDateTime(),
-    isUserCreator = isUserCreator
+    isUserCreator = isUserCreator,
+    initials = ""
 )
 
 fun Attendee.toAttendeeEntity() = AttendeeEntity(
