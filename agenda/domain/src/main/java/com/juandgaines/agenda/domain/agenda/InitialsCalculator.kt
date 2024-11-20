@@ -5,10 +5,23 @@ import com.juandgaines.core.domain.auth.SessionManager
 class InitialsCalculator(
     private val sessionManager: SessionManager
 ) {
-    suspend fun getInitials(): String {
-        val authData = sessionManager.get() ?: return ""
+    suspend fun getInitials(name: String = ""): String {
+        if (name.isNotEmpty()) {
+            return extractInitials(name)
+        }
+        else {
+            val authData = sessionManager.get() ?: return ""
+            return extractInitials(authData.fullName)
+        }
+    }
 
-        return extractInitials(authData.fullName)
+    fun getInitialsSync(name: String = ""): String {
+        return if (name.isNotEmpty()) {
+            extractInitials(name)
+        }
+        else {
+            ""
+        }
     }
 
     private fun extractInitials(fullName: String): String {

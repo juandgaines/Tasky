@@ -22,18 +22,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.juandgaines.agenda.domain.agenda.Attendee
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AttendeeFilter
+import com.juandgaines.agenda.presentation.agenda_item.AttendeeFilter.ALL
+import com.juandgaines.agenda.presentation.agenda_item.AttendeeFilter.GOING
 import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.ui.UiText.StringResource
 
 @Composable
-fun AttendeeSection(
+fun AttendeeSectionFilter(
     modifier: Modifier = Modifier,
-    selectedFilter: AttendeeFilter = AttendeeFilter.ALL,
-    onSelectFilter : (AttendeeFilter) -> Unit,
-    attendee: List<AttendeeUI>,
+    selectedFilter: AttendeeFilter = ALL,
+    onSelectFilter: (AttendeeFilter) -> Unit,
+    attendeesGoing: List<Attendee>,
+    attendeesNotGoing: List<Attendee>,
 ) {
     Column (
         modifier = modifier
@@ -83,22 +87,44 @@ fun AttendeeSection(
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
-            when(selectedFilter){
-                AttendeeFilter.ALL -> {
 
+            if (
+                (selectedFilter == ALL || selectedFilter == GOING) &&
+                attendeesGoing.isNotEmpty()
+            ){
+                item {
+                    Text(
+                        text = stringResource(R.string.going),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
                 }
-                AttendeeFilter.GOING -> {
-
-                }
-                AttendeeFilter.NOT_GOING -> {
+                items(attendeesGoing) { attendee ->
 
                 }
             }
-            items(attendee){
-                Column {
+
+            if (
+                (selectedFilter == ALL || selectedFilter == GOING) &&
+                attendeesNotGoing.isNotEmpty()
+            ){
+
+                item {
+                    Text(
+                        text = stringResource(R.string.not_going),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+                }
+                items(attendeesNotGoing) { attendee ->
+
                 }
             }
+
         }
+
     }
 }
 
@@ -106,12 +132,13 @@ fun AttendeeSection(
 @Preview(
     showBackground = true
 )
-fun PreviewAttendeeSection() {
+fun PreviewAttendeeSectionFilter() {
     TaskyTheme {
-        AttendeeSection(
+        AttendeeSectionFilter(
             selectedFilter = AttendeeFilter.ALL,
             onSelectFilter = {},
-            attendee = listOf()
+            attendeesNotGoing = listOf(),
+            attendeesGoing = listOf()
         )
     }
 }
