@@ -32,7 +32,7 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.ui.UiText.StringResource
 
 @Composable
-fun AttendeeSectionFilter(
+fun AttendeeSection(
     modifier: Modifier = Modifier,
     selectedFilter: AttendeeFilter = ALL,
     isEditing: Boolean,
@@ -141,7 +141,7 @@ fun AttendeeSectionFilter(
 )
 fun PreviewAttendeeSectionFilter() {
     TaskyTheme {
-        AttendeeSectionFilter(
+        AttendeeSection(
             selectedFilter = AttendeeFilter.ALL,
             onSelectFilter = {},
             attendeesNotGoing = listOf(),

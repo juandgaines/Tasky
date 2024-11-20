@@ -47,7 +47,7 @@ import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
-import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeSectionFilter
+import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeSection
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
 import com.juandgaines.agenda.presentation.components.AgendaTimePicker
 import com.juandgaines.core.presentation.designsystem.CloseIcon
@@ -354,7 +354,7 @@ fun AgendaItemScreen(
                 )
                 if (state.details is EventDetails) {
 
-                    AttendeeSectionFilter(
+                    AttendeeSection(
                         selectedFilter = state.attendeeFilter,
                         attendeesGoing = state.details.isGoing,
                         attendeesNotGoing = state.details.isNotGoing,
