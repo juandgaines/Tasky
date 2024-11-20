@@ -358,6 +358,7 @@ fun AgendaItemScreen(
                         selectedFilter = state.attendeeFilter,
                         attendeesGoing = state.details.isGoing,
                         attendeesNotGoing = state.details.isNotGoing,
+                        isEditing = state.isEditing,
                         onSelectFilter = { filter ->
                             onAction(AgendaItemAction.SelectAttendeeFilter(filter))
                         },

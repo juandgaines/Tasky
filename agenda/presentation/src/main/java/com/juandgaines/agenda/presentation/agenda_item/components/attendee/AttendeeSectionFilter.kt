@@ -35,6 +35,7 @@ import com.juandgaines.core.presentation.ui.UiText.StringResource
 fun AttendeeSectionFilter(
     modifier: Modifier = Modifier,
     selectedFilter: AttendeeFilter = ALL,
+    isEditing: Boolean,
     onSelectFilter: (AttendeeFilter) -> Unit,
     attendeesGoing: List<Attendee>,
     attendeesNotGoing: List<Attendee>,
@@ -102,7 +103,8 @@ fun AttendeeSectionFilter(
                 }
                 items(attendeesGoing) { attendee ->
                     AttendeeItem(
-                        attendee = attendee
+                        attendee = attendee,
+                        isEdition = isEditing
                     )
                 }
             }
@@ -121,7 +123,10 @@ fun AttendeeSectionFilter(
                     )
                 }
                 items(attendeesNotGoing) { attendee ->
-
+                    AttendeeItem(
+                        attendee = attendee,
+                        isEdition = isEditing
+                    )
                 }
             }
 
@@ -140,7 +145,8 @@ fun PreviewAttendeeSectionFilter() {
             selectedFilter = AttendeeFilter.ALL,
             onSelectFilter = {},
             attendeesNotGoing = listOf(),
-            attendeesGoing = listOf()
+            attendeesGoing = listOf(),
+            isEditing = false
         )
     }
 }
