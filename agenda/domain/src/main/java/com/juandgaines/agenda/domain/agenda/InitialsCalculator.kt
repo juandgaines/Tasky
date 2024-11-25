@@ -5,7 +5,7 @@ import com.juandgaines.core.domain.auth.SessionManager
 class InitialsCalculator(
     private val sessionManager: SessionManager
 ) {
-    suspend fun getInitials(name: String = ""): String {
+    suspend fun getLoggedUserInitials(name: String = ""): String {
         if (name.isNotEmpty()) {
             return extractInitials(name)
         }

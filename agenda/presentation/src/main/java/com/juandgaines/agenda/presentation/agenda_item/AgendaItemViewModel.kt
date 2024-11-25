@@ -88,7 +88,6 @@ class AgendaItemViewModel @Inject constructor(
     private var _isEditing:MutableStateFlow<Boolean> = MutableStateFlow(false)
     private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
     private var _isInit: Boolean = false
-    private var _agendaItemBuffer: AgendaItems? = null
     private val _type = AgendaItemOption.fromOrdinal( _navParameters.type)
 
     val state:StateFlow<AgendaItemState> = _state
@@ -121,26 +120,21 @@ class AgendaItemViewModel @Inject constructor(
                 TASK -> taskRepository.getTaskById(idItem)
                 EVENT -> eventRepository.getEventById(idItem)
             }.onSuccess { item ->
-                _agendaItemBuffer = item
 
-                updateState {
+                updateState { event->
 
-                    it.copy(
+                    event.copy(
                         isNew = false,
                         title = item.title,
                         description = item.description,
-                        details = when (item.agendaItemDetails) {
-                            is AgendaItemDetails.EventDetails -> {
-                                val eventDetails = item.agendaItemDetails as EventDetails
-                                eventDetails.copy(
-                                    attendees = eventDetails.attendees.map {
-                                        it.copy(
-                                            initials = initialsCalculator.getInitialsSync(it.fullName)
-                                        )
-                                    }
-                                )
-                            }
-                            else ->item.agendaItemDetails
+                        details = updateDetailsIfEvent { details ->
+                            details.copy(
+                                attendees = details.attendees.map {
+                                    it.copy(
+                                        initials = initialsCalculator.getInitialsSync(it.fullName)
+                                    )
+                                }
+                            )
                         },
                         startDateTime = item.date
                     )
@@ -238,9 +232,7 @@ class AgendaItemViewModel @Inject constructor(
                 Delete -> {
                     val agendaItemId = _navParameters.id
                     if (agendaItemId != null) {
-                        _agendaItemBuffer?.run {
-                            alarmScheduler.cancelAlarm(this)
-                        }
+                        alarmScheduler.cancelAlarm(agendaItemId)
                         when (_type) {
                             REMINDER -> reminderRepository.deleteReminder(
                                 Reminder(
@@ -332,9 +324,8 @@ class AgendaItemViewModel @Inject constructor(
                         }
                         response
                             .onSuccess {
-                                _agendaItemBuffer?.run {
-                                    alarmScheduler.cancelAlarm(this)
-                                }
+                                alarmScheduler.cancelAlarm(agendaItemId)
+
                                 alarmScheduler.scheduleAlarm(data)
                                 eventChannel.send(Updated)
                             }.onError {
@@ -466,6 +457,13 @@ class AgendaItemViewModel @Inject constructor(
 
     private fun updateState(update: (AgendaItemState) -> AgendaItemState) {
         _state.update { update(it) }
+    }
+
+    private fun updateDetailsIfEvent(update: (AgendaItemDetails.EventDetails) -> AgendaItemDetails.EventDetails): AgendaItemDetails {
+        return when (val details = state.value.details) {
+            is AgendaItemDetails.EventDetails -> update(details)
+            else -> details
+        }
     }
 
     private fun calculateTimeAlarm():ZonedDateTime {

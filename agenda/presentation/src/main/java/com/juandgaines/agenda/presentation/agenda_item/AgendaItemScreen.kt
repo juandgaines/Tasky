@@ -173,7 +173,6 @@ fun AgendaItemScreen(
         is AgendaItemDetails.ReminderDetails -> stringResource(id = R.string.reminder)
         is AgendaItemDetails.EventDetails -> stringResource(id = R.string.event)
         is AgendaItemDetails.TaskDetails -> stringResource(id = R.string.task)
-        else -> ""
     }
         TaskyScaffold (
             topAppBar = {
