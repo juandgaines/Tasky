@@ -11,7 +11,7 @@ data class AgendaItemState(
     val description: String = "",
     val startDateTime: ZonedDateTime = ZonedDateTime.now(),
     val alarm: AlarmOptions = AlarmOptions.MINUTES_TEN,
-    val details: AgendaItemDetails = AgendaItemDetails.ReminderDetails,
+    val details: AgendaItemDetailsUi = AgendaItemDetailsUi.ReminderDetails,
     val isEditingEndDate: Boolean = false,
     val title: String = "",
     val attendeeFilter: AttendeeFilter = AttendeeFilter.ALL,

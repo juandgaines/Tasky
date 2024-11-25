@@ -6,9 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.EventDetails
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.ReminderDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.TaskDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
@@ -121,21 +119,14 @@ class AgendaItemViewModel @Inject constructor(
                 EVENT -> eventRepository.getEventById(idItem)
             }.onSuccess { item ->
 
+
                 updateState { event->
 
                     event.copy(
                         isNew = false,
                         title = item.title,
                         description = item.description,
-                        details = updateDetailsIfEvent { details ->
-                            details.copy(
-                                attendees = details.attendees.map {
-                                    it.copy(
-                                        initials = initialsCalculator.getInitialsSync(it.fullName)
-                                    )
-                                }
-                            )
-                        },
+                        details = item.agendaItemDetails.toAgendaItemDetailsUi(),
                         startDateTime = item.date
                     )
                 }
@@ -156,9 +147,9 @@ class AgendaItemViewModel @Inject constructor(
                     isNew = true,
                     startDateTime =initialDate ?: ZonedDateTime.now(),
                     details = when (_type) {
-                        REMINDER -> ReminderDetails
-                        TASK -> TaskDetails()
-                        EVENT -> EventDetails()
+                        REMINDER -> AgendaItemDetailsUi.ReminderDetails
+                        TASK -> AgendaItemDetailsUi.TaskDetails()
+                        EVENT -> AgendaItemDetailsUi.EventDetails()
                     }
                 )
             }
@@ -198,26 +189,27 @@ class AgendaItemViewModel @Inject constructor(
 
                 }
                 is SelectDateFinish -> {
-                    val details = _state.value.details as EventDetails
-                    val zonedDate = action.dateMillis
-                        .toUtcLocalDateTime()
-                        .toZonedDateTime(
-                            LocalTime.of(
-                                details.finishDate.hour,
-                                details.finishDate.minute
-                            )
-                        )
+
                     updateState {
                         it.copy(
-                            details = details.copy(
-                                finishDate = zonedDate
-                            ),
+                            details = updateDetailsIfEvent { details->
+                                details.copy(
+                                    finishDate = action.dateMillis
+                                        .toUtcLocalDateTime()
+                                        .toZonedDateTime(
+                                            LocalTime.of(
+                                                details.finishDate.hour,
+                                                details.finishDate.minute
+                                            )
+                                        ),
+                                )
+                            } ,
                             isSelectDateDialog = false
                         )
                     }
                 }
                 is SelectTimeFinish -> {
-                    val details = _state.value.details as EventDetails
+                    val details = _state.value.details as AgendaItemDetailsUi.EventDetails
                     updateState {
                         it.copy(
                             details = details.copy(
@@ -348,7 +340,7 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as TaskDetails).isCompleted,
+                                    isDone = (_state.value.details as AgendaItemDetailsUi.TaskDetails).isCompleted,
                                     remindAt = desiredAlarmDate
                                 )
                             }
@@ -358,10 +350,10 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    endTime = (_state.value.details as EventDetails).finishDate,
+                                    endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
                                     remindAt = desiredAlarmDate,
-                                    host = (_state.value.details as EventDetails).host,
-                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
+                                    isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
                                 )
                             }
                         }
@@ -459,9 +451,9 @@ class AgendaItemViewModel @Inject constructor(
         _state.update { update(it) }
     }
 
-    private fun updateDetailsIfEvent(update: (AgendaItemDetails.EventDetails) -> AgendaItemDetails.EventDetails): AgendaItemDetails {
+    private fun updateDetailsIfEvent(update: (AgendaItemDetailsUi.EventDetails) -> AgendaItemDetailsUi.EventDetails): AgendaItemDetailsUi {
         return when (val details = state.value.details) {
-            is AgendaItemDetails.EventDetails -> update(details)
+            is AgendaItemDetailsUi.EventDetails -> update(details)
             else -> details
         }
     }

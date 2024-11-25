@@ -170,9 +170,9 @@ fun AgendaItemScreen(
     onAction: (AgendaItemAction) -> Unit
 ) {
     val agendaItemName = when (state.details) {
-        is AgendaItemDetails.ReminderDetails -> stringResource(id = R.string.reminder)
-        is AgendaItemDetails.EventDetails -> stringResource(id = R.string.event)
-        is AgendaItemDetails.TaskDetails -> stringResource(id = R.string.task)
+        is AgendaItemDetailsUi.ReminderDetails -> stringResource(id = R.string.reminder)
+        is AgendaItemDetailsUi.EventDetails -> stringResource(id = R.string.event)
+        is AgendaItemDetailsUi.TaskDetails -> stringResource(id = R.string.task)
     }
         TaskyScaffold (
             topAppBar = {
@@ -229,7 +229,7 @@ fun AgendaItemScreen(
                     AgendaDatePicker(
                         onDateSelected = { date->
                             when(state.details) {
-                                is EventDetails ->{
+                                is AgendaItemDetailsUi.EventDetails ->{
                                     if (state.isEditingEndDate) {
                                         onAction(AgendaItemAction.SelectDateFinish(date))
                                     }
@@ -256,7 +256,7 @@ fun AgendaItemScreen(
                         ),
                         onTimeSelected = { h, m ->
                             when(state.details) {
-                                is EventDetails ->{
+                                is AgendaItemDetailsUi.EventDetails ->{
                                     if (state.isEditingEndDate) {
                                         onAction(AgendaItemAction.SelectTimeFinish(h, m))
                                     }
@@ -325,7 +325,7 @@ fun AgendaItemScreen(
                     },
                     title =stringResource(id = R.string.from)
                 )
-                if (state.details is AgendaItemDetails.EventDetails) {
+                if (state.details is AgendaItemDetailsUi.EventDetails) {
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -351,7 +351,7 @@ fun AgendaItemScreen(
                         onAction(AgendaItemAction.SelectAlarm(alarm))
                     }
                 )
-                if (state.details is EventDetails) {
+                if (state.details is AgendaItemDetailsUi.EventDetails) {
 
                     AttendeeSection(
                         selectedFilter = state.attendeeFilter,
@@ -395,7 +395,7 @@ fun AgendaItemScreenPreview() {
                 title = "Title",
                 description = "",
                 startDateTime = ZonedDateTime.now(),
-                details = AgendaItemDetails.EventDetails(
+                details = AgendaItemDetailsUi.EventDetails(
                     finishDate = ZonedDateTime.now(),
                     host = "Host",
                     isUserCreator = true,

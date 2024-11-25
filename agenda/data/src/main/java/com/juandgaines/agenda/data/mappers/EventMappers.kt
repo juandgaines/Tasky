@@ -30,7 +30,6 @@ fun AttendeeDto.toAttendee(id:String) = Attendee(
     isGoing = isGoing,
     remindAt = remindAt.toZonedDateTime(),
     isUserCreator = id == userId,
-    initials = ""
 )
 
 fun Event.toEventRequest() = CreateEventRequest(
@@ -86,7 +85,6 @@ fun AttendeeEntity.toAttendee() = Attendee(
     isGoing = isGoing,
     remindAt = remindAt.toZonedDateTime(),
     isUserCreator = isUserCreator,
-    initials = ""
 )
 
 fun Attendee.toAttendeeEntity() = AttendeeEntity(

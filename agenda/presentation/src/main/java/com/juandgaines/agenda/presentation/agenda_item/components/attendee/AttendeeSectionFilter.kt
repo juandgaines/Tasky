@@ -37,8 +37,8 @@ fun AttendeeSection(
     selectedFilter: AttendeeFilter = ALL,
     isEditing: Boolean,
     onSelectFilter: (AttendeeFilter) -> Unit,
-    attendeesGoing: List<Attendee>,
-    attendeesNotGoing: List<Attendee>,
+    attendeesGoing: List<AttendeeUi>,
+    attendeesNotGoing: List<AttendeeUi>,
 ) {
     Column (
         modifier = modifier
@@ -104,7 +104,7 @@ fun AttendeeSection(
                 items(attendeesGoing) { attendee ->
                     AttendeeItem(
                         attendee = attendee,
-                        isEdition = isEditing
+                        isEditing = isEditing
                     )
                 }
             }
@@ -125,7 +125,7 @@ fun AttendeeSection(
                 items(attendeesNotGoing) { attendee ->
                     AttendeeItem(
                         attendee = attendee,
-                        isEdition = isEditing
+                        isEditing = isEditing
                     )
                 }
             }

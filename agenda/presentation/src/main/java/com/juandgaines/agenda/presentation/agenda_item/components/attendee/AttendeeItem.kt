@@ -23,12 +23,13 @@ import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyLight
 import com.juandgaines.core.presentation.designsystem.TaskyLightBlue
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
+import java.time.ZonedDateTime
 
 @Composable
 fun AttendeeItem(
     modifier: Modifier = Modifier,
-    isEdition: Boolean = true,
-    attendee: Attendee
+    isEditing: Boolean = true,
+    attendee: AttendeeUi
 ) {
 
     Row (
@@ -63,7 +64,7 @@ fun AttendeeItem(
                 )
             }
             else -> {
-                if (isEdition) {
+                if (isEditing) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Edit",
@@ -80,15 +81,16 @@ fun AttendeeItem(
 @Preview
 fun PreviewAttendeeItem() {
     TaskyTheme {
-        AttendeeItem(attendee = Attendee(
+        AttendeeItem(attendee = AttendeeUi(
             email = "j123@gmail.com",
             fullName = "Juan David",
             userId = "j123",
             eventId = "e123",
             isGoing = true,
-            remindAt = java.time.ZonedDateTime.now(),
             isUserCreator = true,
-            initials = "JD"
-        ))
+            initials = "JD",
+            isCreator = true
+        )
+        )
     }
 }

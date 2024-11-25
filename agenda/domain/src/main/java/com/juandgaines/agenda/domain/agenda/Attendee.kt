@@ -10,5 +10,4 @@ data class Attendee(
     val isGoing: Boolean,
     val remindAt: ZonedDateTime,
     val isUserCreator: Boolean,
-    val initials: String
 )

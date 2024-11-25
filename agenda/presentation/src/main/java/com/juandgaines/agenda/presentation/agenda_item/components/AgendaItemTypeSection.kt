@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetailsUi
 import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyGreen
 import com.juandgaines.core.presentation.designsystem.TaskyLightGreen
@@ -24,7 +25,7 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 @Composable
 fun AgendaItemTypeSection(
     modifier: Modifier = Modifier,
-    agendaItemDetails: AgendaItemDetails?,
+    agendaItemDetails: AgendaItemDetailsUi,
     agendaItemName:String
 ){
     Row (
@@ -40,10 +41,10 @@ fun AgendaItemTypeSection(
                 )
                 .then(
                     when (agendaItemDetails){
-                        is AgendaItemDetails.TaskDetails -> Modifier.background(
+                        is AgendaItemDetailsUi.TaskDetails -> Modifier.background(
                             color = TaskyGreen
                         )
-                        is AgendaItemDetails.EventDetails -> Modifier.background(
+                        is AgendaItemDetailsUi.EventDetails -> Modifier.background(
                             color = TaskyLightGreen
                         )
                         else ->Modifier.background(
@@ -67,7 +68,7 @@ fun AgendaItemTypeSection(
 fun AgendaItemTypeSectionPreview() {
     TaskyTheme {
         AgendaItemTypeSection(
-            agendaItemDetails = AgendaItemDetails.ReminderDetails ,
+            agendaItemDetails = AgendaItemDetailsUi.ReminderDetails ,
             agendaItemName =""
         )
     }
