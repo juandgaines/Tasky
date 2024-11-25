@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,19 +24,21 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 @Composable
 fun ProfileIcon(
     modifier: Modifier = Modifier,
-    initials: String
+    initials: String,
+    colorLetters: Color = TaskyLightBlue,
+    colorBackground: Color = TaskyLight
 ) {
     Box (
         modifier = modifier
             .background(
-                color = TaskyLight,
+                color = colorBackground,
                 shape = CircleShape
             ).width(IntrinsicSize.Min),
         contentAlignment = Alignment.Center,
     ){
         Text(
             text = initials.uppercase(),
-            color = TaskyLightBlue,
+            color = colorLetters,
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(4.dp)

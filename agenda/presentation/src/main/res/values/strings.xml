@@ -39,4 +39,8 @@
   <string name="okay">Okay</string>
   <string name="to">To</string>
   <string name="event_deleted">Event deleted</string>
+  <string name="visitors">Visitors</string>
+  <string name="all">All</string>
+  <string name="going">Going</string>
+  <string name="not_going">Not going</string>
 </resources>

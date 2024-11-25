@@ -51,7 +51,7 @@ sealed interface AgendaItems{
         val remindAt:ZonedDateTime,
         val host:String,
         val isUserEventCreator:Boolean,
-        val isGoing:Boolean
+        val attendee: List<Attendee> = emptyList()
     ):AgendaItems{
         override val date = time
         override val dateEnd = endTime
@@ -60,7 +60,8 @@ sealed interface AgendaItems{
         override val agendaItemDetails = AgendaItemDetails.EventDetails(
             finishDate =  endTime,
             host = host,
-            isUserCreator =  isUserEventCreator
+            isUserCreator =  isUserEventCreator,
+            attendees = attendee
         )
     }
 

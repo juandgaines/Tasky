@@ -241,7 +241,7 @@ fun EventCardPreview() {
             description = "Description",
             agendaItem = Event("1","Title", "Description",
                 ZonedDateTime.now(), ZonedDateTime.now(), ZonedDateTime.now(),
-                "Host", true, isGoing = false),
+                "Host", true),
             onCheckClick = {},
             onClickItem = {},
             onMenuItemClick = {}

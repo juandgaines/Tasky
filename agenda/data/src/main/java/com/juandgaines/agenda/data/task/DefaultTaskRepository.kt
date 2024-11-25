@@ -15,6 +15,7 @@ import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.LocalError
 import com.juandgaines.core.domain.util.DataError.Network.NO_INTERNET
+import com.juandgaines.core.domain.util.DataError.Network.REQUEST_TIMEOUT
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.asEmptyDataResult
 import com.juandgaines.core.domain.util.onError
@@ -119,6 +120,8 @@ class DefaultTaskRepository @Inject constructor(
             taskApi.deleteTask(task.id)
         }.onError {
             when (it) {
+                DataError.Network.SERVER_ERROR,
+                REQUEST_TIMEOUT,
                 NO_INTERNET -> {
                     applicationScope.launch {
                         agendaSyncScheduler.scheduleSync(

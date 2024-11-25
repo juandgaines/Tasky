@@ -1,21 +1,9 @@
-package com.juandgaines.agenda.domain.agenda
+package com.juandgaines.agenda.presentation.agenda_item.components.attendee
 
-import com.juandgaines.core.domain.auth.SessionManager
+import com.juandgaines.agenda.domain.agenda.InitialsCalculator.Companion.ONE_WORD
 
-class InitialsCalculator(
-    private val sessionManager: SessionManager
-) {
-    suspend fun getLoggedUserInitials(name: String = ""): String {
-        if (name.isNotEmpty()) {
-            return extractInitials(name)
-        }
-        else {
-            val authData = sessionManager.get() ?: return ""
-            return extractInitials(authData.fullName)
-        }
-    }
-
-    fun getInitialsSync(name: String = ""): String {
+object UserInitialsFormatter {
+    fun format(name: String = ""): String {
         return if (name.isNotEmpty()) {
             extractInitials(name)
         }
@@ -35,9 +23,5 @@ class InitialsCalculator(
                 "$firstInitial$lastInitial"
             }
         }
-    }
-
-    companion object {
-        const val ONE_WORD = 1
     }
 }

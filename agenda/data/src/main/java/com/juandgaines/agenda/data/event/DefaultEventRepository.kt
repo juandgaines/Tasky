@@ -19,6 +19,7 @@ import com.juandgaines.core.domain.util.DataError.LocalError
 import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.asEmptyDataResult
 import com.juandgaines.core.domain.util.onError
+import com.juandgaines.core.domain.util.onSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -53,6 +54,9 @@ class DefaultEventRepository @Inject constructor(
                     }
                     else -> Unit
                 }
+            }.onSuccess {
+                val newEvent = it.toEvent()
+                eventDao.upsertEvent(newEvent.toEventEntity())
             }.asEmptyDataResult()
             response
         }

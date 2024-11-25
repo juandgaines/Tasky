@@ -32,18 +32,18 @@ class DefaultAlarmScheduler @Inject constructor(
             agendaItem.alarmDate.toInstant().toEpochMilli(),
             PendingIntent.getBroadcast(
                 context,
-                agendaItem.hashCode(),
+                agendaItem.id.hashCode(),
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )
     }
 
-    override fun cancelAlarm(agendaItem: AgendaItems) {
+    override fun cancelAlarm(agendaItemId: String) {
         alarmManager.cancel(
             PendingIntent.getBroadcast(
                 context,
-                agendaItem.hashCode(),
+                agendaItemId.hashCode(),
                 Intent(context, AlarmReceiver::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )

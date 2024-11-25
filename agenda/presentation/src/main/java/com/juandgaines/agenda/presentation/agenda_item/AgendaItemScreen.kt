@@ -47,6 +47,7 @@ import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
+import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeSection
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
 import com.juandgaines.agenda.presentation.components.AgendaTimePicker
 import com.juandgaines.core.presentation.designsystem.CloseIcon
@@ -169,10 +170,9 @@ fun AgendaItemScreen(
     onAction: (AgendaItemAction) -> Unit
 ) {
     val agendaItemName = when (state.details) {
-        is AgendaItemDetails.ReminderDetails -> stringResource(id = R.string.reminder)
-        is AgendaItemDetails.EventDetails -> stringResource(id = R.string.event)
-        is AgendaItemDetails.TaskDetails -> stringResource(id = R.string.task)
-        else -> ""
+        is AgendaItemDetailsUi.ReminderDetails -> stringResource(id = R.string.reminder)
+        is AgendaItemDetailsUi.EventDetails -> stringResource(id = R.string.event)
+        is AgendaItemDetailsUi.TaskDetails -> stringResource(id = R.string.task)
     }
         TaskyScaffold (
             topAppBar = {
@@ -229,7 +229,7 @@ fun AgendaItemScreen(
                     AgendaDatePicker(
                         onDateSelected = { date->
                             when(state.details) {
-                                is EventDetails ->{
+                                is AgendaItemDetailsUi.EventDetails ->{
                                     if (state.isEditingEndDate) {
                                         onAction(AgendaItemAction.SelectDateFinish(date))
                                     }
@@ -256,7 +256,7 @@ fun AgendaItemScreen(
                         ),
                         onTimeSelected = { h, m ->
                             when(state.details) {
-                                is EventDetails ->{
+                                is AgendaItemDetailsUi.EventDetails ->{
                                     if (state.isEditingEndDate) {
                                         onAction(AgendaItemAction.SelectTimeFinish(h, m))
                                     }
@@ -325,7 +325,7 @@ fun AgendaItemScreen(
                     },
                     title =stringResource(id = R.string.from)
                 )
-                if (state.details is AgendaItemDetails.EventDetails) {
+                if (state.details is AgendaItemDetailsUi.EventDetails) {
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -351,6 +351,18 @@ fun AgendaItemScreen(
                         onAction(AgendaItemAction.SelectAlarm(alarm))
                     }
                 )
+                if (state.details is AgendaItemDetailsUi.EventDetails) {
+
+                    AttendeeSection(
+                        selectedFilter = state.attendeeFilter,
+                        attendeesGoing = state.details.isGoing,
+                        attendeesNotGoing = state.details.isNotGoing,
+                        isEditing = state.isEditing,
+                        onSelectFilter = { filter ->
+                            onAction(AgendaItemAction.SelectAttendeeFilter(filter))
+                        },
+                    )
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -383,7 +395,12 @@ fun AgendaItemScreenPreview() {
                 title = "Title",
                 description = "",
                 startDateTime = ZonedDateTime.now(),
-                details = AgendaItemDetails.ReminderDetails,
+                details = AgendaItemDetailsUi.EventDetails(
+                    finishDate = ZonedDateTime.now(),
+                    host = "Host",
+                    isUserCreator = true,
+                    attendees = emptyList()
+                ),
                 alarm = AlarmOptions.MINUTES_TEN
             ),
             onAction = {}

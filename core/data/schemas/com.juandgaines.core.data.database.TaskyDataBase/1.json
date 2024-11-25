@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "795067a159414400b418a955ed2e3494",
+    "identityHash": "7395e2e836fd53ce56c2d5905b638054",
     "entities": [
       {
         "tableName": "task",
@@ -100,7 +100,7 @@
       },
       {
         "tableName": "event",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `timeEnd` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `host` TEXT NOT NULL, `is_user_event_creator` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `timeEnd` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `host` TEXT NOT NULL, `is_user_event_creator` INTEGER NOT NULL, `attendees` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -148,6 +148,12 @@
             "fieldPath": "isUserEventCreator",
             "columnName": "is_user_event_creator",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "attendees",
+            "columnName": "attendees",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -280,7 +286,7 @@
       },
       {
         "tableName": "delete_event_sync",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `userId` TEXT NOT NULL, `id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `timeEnd` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `host` TEXT NOT NULL, `is_user_event_creator` INTEGER NOT NULL, PRIMARY KEY(`eventId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `userId` TEXT NOT NULL, `id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `timeEnd` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `host` TEXT NOT NULL, `is_user_event_creator` INTEGER NOT NULL, `attendees` TEXT NOT NULL, PRIMARY KEY(`eventId`))",
         "fields": [
           {
             "fieldPath": "eventId",
@@ -340,6 +346,12 @@
             "fieldPath": "event.isUserEventCreator",
             "columnName": "is_user_event_creator",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "event.attendees",
+            "columnName": "attendees",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -472,7 +484,7 @@
       },
       {
         "tableName": "update_event_sync",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `userId` TEXT NOT NULL, `id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `timeEnd` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `host` TEXT NOT NULL, `is_user_event_creator` INTEGER NOT NULL, PRIMARY KEY(`eventId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `userId` TEXT NOT NULL, `id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `timeEnd` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `host` TEXT NOT NULL, `is_user_event_creator` INTEGER NOT NULL, `attendees` TEXT NOT NULL, PRIMARY KEY(`eventId`))",
         "fields": [
           {
             "fieldPath": "eventId",
@@ -532,6 +544,12 @@
             "fieldPath": "event.isUserEventCreator",
             "columnName": "is_user_event_creator",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "event.attendees",
+            "columnName": "attendees",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -664,7 +682,7 @@
       },
       {
         "tableName": "create_event_sync",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `userId` TEXT NOT NULL, `id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `timeEnd` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `host` TEXT NOT NULL, `is_user_event_creator` INTEGER NOT NULL, PRIMARY KEY(`eventId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventId` TEXT NOT NULL, `userId` TEXT NOT NULL, `id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `time` INTEGER NOT NULL, `timeEnd` INTEGER NOT NULL, `remind_at` INTEGER NOT NULL, `host` TEXT NOT NULL, `is_user_event_creator` INTEGER NOT NULL, `attendees` TEXT NOT NULL, PRIMARY KEY(`eventId`))",
         "fields": [
           {
             "fieldPath": "eventId",
@@ -725,6 +743,12 @@
             "columnName": "is_user_event_creator",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "event.attendees",
+            "columnName": "attendees",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -740,7 +764,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '795067a159414400b418a955ed2e3494')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7395e2e836fd53ce56c2d5905b638054')"
     ]
   }
 }

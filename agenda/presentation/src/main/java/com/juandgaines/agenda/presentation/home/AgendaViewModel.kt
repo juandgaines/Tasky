@@ -48,7 +48,6 @@ import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.domain.auth.AuthCoreService
-import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.Result.Error
 import com.juandgaines.core.domain.util.Result.Success
 import com.juandgaines.core.domain.util.onError
@@ -102,7 +101,7 @@ class AgendaViewModel @Inject constructor(
             alarmProvider.register()
             if (!_isInit) {
                 _isInit = true
-                initialsCalculator.getInitials().let { initials ->
+                initialsCalculator.getLoggedUserInitials().let { initials ->
                     updateState {
                         it.copy(userInitials = initials)
                     }
@@ -244,7 +243,7 @@ class AgendaViewModel @Inject constructor(
                 is AgendaOperation -> {
                     when(action.agendaOperation){
                         is Delete -> {
-                            alarmScheduler.cancelAlarm(action.agendaOperation.agendaItem)
+                            alarmScheduler.cancelAlarm(action.agendaOperation.agendaItem.id)
 
                             when (val agendaItem = action.agendaOperation.agendaItem){
                                 is Task -> {
