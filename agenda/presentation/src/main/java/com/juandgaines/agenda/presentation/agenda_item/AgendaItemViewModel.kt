@@ -252,7 +252,7 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as TaskDetails).isCompleted,
+                                    isDone = (_state.value.details as AgendaItemDetailsUi.TaskDetails).isCompleted,
                                     remindAt = _state.value.startDateTime
                                 )
                             )
@@ -262,10 +262,10 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    endTime = (_state.value.details as EventDetails).finishDate,
+                                    endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
                                     remindAt = _state.value.startDateTime,
-                                    host = (_state.value.details as EventDetails).host,
-                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
+                                    isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
                                 )
                             )
                         }
@@ -296,7 +296,7 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as TaskDetails).isCompleted,
+                                    isDone = (_state.value.details as AgendaItemDetailsUi.TaskDetails).isCompleted,
                                     remindAt = desiredAlarmDate
                                 )
                             }
