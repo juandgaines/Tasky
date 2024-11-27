@@ -20,7 +20,7 @@ class DefaultAttendeeRepository @Inject constructor(
         val response = safeCall {
             attendeeApi.getAttendee(email)
         }.map {
-            if (it.doesUserExist) {
+            if (!it.doesUserExist) {
                 null
             } else {
                 it.attendee?.toMinimalAttendee()

@@ -1,6 +1,5 @@
 package com.juandgaines.agenda.presentation.agenda_item.components.attendee
 
-import android.provider.ContactsContract.CommonDataKinds.Email
 import com.juandgaines.agenda.domain.agenda.Attendee
 
 data class AttendeeUi(
