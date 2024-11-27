@@ -52,9 +52,9 @@ fun Event.toUpdateEventRequest() = UpdateEventRequest(
     from = time.toInstant().toEpochMilli(),
     to = endTime.toInstant().toEpochMilli(),
     remindAt = remindAt.toInstant().toEpochMilli(),
-    attendeeIds = attendee.filter { it.isUserCreator }.map { it.userId },
+    attendeeIds = attendee.map { it.userId },
     deletedPhotoKeys = emptyList(),
-    isGoing = false // TODO: change with implementation of attendees
+    isGoing = attendee.find { it.isUserCreator }?.isGoing?:false
 )
 
 fun Event.toEventEntity() = EventEntity(
