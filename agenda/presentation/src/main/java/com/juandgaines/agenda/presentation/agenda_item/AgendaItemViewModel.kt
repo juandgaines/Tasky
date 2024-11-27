@@ -465,8 +465,6 @@ class AgendaItemViewModel @Inject constructor(
                             }
                         )
                     }
-                    delay(3000)
-                    //TODO: Implement this
                     if (emailPatterValidator.matches(action.email)){
                         attendeeRepository.getAttendeeByEmail(action.email)
                             .onSuccess { attendee->

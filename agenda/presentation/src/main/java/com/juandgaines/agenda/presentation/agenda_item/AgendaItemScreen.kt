@@ -135,7 +135,7 @@ fun AgendaItemScreenRoot(
             is UserAdded -> {
                 Toast.makeText(
                     context,
-                    context.getString(R.string.visitor_added, agendaItemEvents.email),
+                    context.getString(R.string.visitor_added, agendaItemEvents.email.asString(context)),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -401,6 +401,9 @@ fun AgendaItemScreen(
                         },
                         isOwner = state.details.isUserCreator,
                         isCreating = state.isNew,
+                        onRemoveAttendee = { attendeeId ->
+                            onAction(AgendaItemAction.RemoveAttendee(attendeeId))
+                        },
                         onAddAttendee = {
                             onAction(AgendaItemAction.ShowAttendeeDialog)
                         },

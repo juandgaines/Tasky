@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,7 +50,8 @@ fun AttendeeSection(
     onSelectFilter: (AttendeeFilter) -> Unit,
     attendeesGoing: List<AttendeeUi>,
     attendeesNotGoing: List<AttendeeUi>,
-    onAddAttendee: () -> Unit
+    onRemoveAttendee:(String) -> Unit,
+    onAddAttendee: () -> Unit,
 ) {
     Column (
         modifier = modifier
@@ -127,7 +129,9 @@ fun AttendeeSection(
             }
         }
         LazyColumn(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(8.dp)
         ) {
 
             if (
@@ -145,7 +149,8 @@ fun AttendeeSection(
                 items(attendeesGoing) { attendee ->
                     AttendeeItem(
                         attendee = attendee,
-                        isEditing = isEditing
+                        isEditing = isEditing,
+                        onRemove = onRemoveAttendee
                     )
                 }
             }
@@ -166,7 +171,8 @@ fun AttendeeSection(
                 items(attendeesNotGoing) { attendee ->
                     AttendeeItem(
                         attendee = attendee,
-                        isEditing = isEditing
+                        isEditing = isEditing,
+                        onRemove = onRemoveAttendee
                     )
                 }
             }
@@ -190,7 +196,8 @@ fun PreviewAttendeeSectionFilter() {
             isEditing = false,
             isOwner = true,
             isCreating = false,
-            onAddAttendee = {}
+            onAddAttendee = {},
+            onRemoveAttendee = {}
         )
     }
 }

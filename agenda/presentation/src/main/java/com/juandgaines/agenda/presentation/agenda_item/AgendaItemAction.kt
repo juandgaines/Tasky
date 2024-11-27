@@ -16,6 +16,7 @@ sealed interface AgendaItemAction{
     data object ShowAttendeeDialog : AgendaItemAction
     data object DismissAttendeeDialog : AgendaItemAction
     data class AddEmailAsAttendee(val email: String) : AgendaItemAction
+    data class RemoveAttendee(val attendeeId: String) : AgendaItemAction
     data object Edit: AgendaItemAction
     data object Save: AgendaItemAction
     data object Close: AgendaItemAction
