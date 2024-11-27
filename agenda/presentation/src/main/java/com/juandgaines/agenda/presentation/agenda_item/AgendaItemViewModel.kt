@@ -13,15 +13,16 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
-import com.juandgaines.agenda.domain.agenda.InitialsCalculator
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.isToday
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddEmailAsAttendee
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissAttendeeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
@@ -33,6 +34,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDa
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeFinish
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeStart
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowAttendeeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateField
@@ -49,12 +51,14 @@ import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.auth.PatternValidator
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -76,7 +80,7 @@ class AgendaItemViewModel @Inject constructor(
     private val reminderRepository: ReminderRepository,
     private val eventRepository: EventRepository,
     private val alarmScheduler: AlarmScheduler,
-    private val initialsCalculator: InitialsCalculator,
+    private val emailPatterValidator: PatternValidator
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -439,6 +443,49 @@ class AgendaItemViewModel @Inject constructor(
                     updateState {
                         it.copy(
                             attendeeFilter = action.filter
+                        )
+                    }
+                }
+
+                is AddEmailAsAttendee ->{
+
+                    updateState { state->
+                        state.copy(
+                            isAddingVisitor = true
+                        )
+                    }
+                    delay(3000)
+                    //TODO: Implement this
+                    if (emailPatterValidator.matches(action.email)){
+                        updateState { state->
+                            state.copy(
+                                isEmailError = false,
+                                isAddingVisitor = false
+                            )
+                        }
+                    }
+                    else{
+                        updateState {
+                            it.copy(
+                               isEmailError = true,
+                                isAddingVisitor = false
+                            )
+                        }
+                    }
+
+                }
+                ShowAttendeeDialog -> {
+                    updateState {
+                        it.copy(
+                            isAddAttendeeDialogVisible = true
+                        )
+                    }
+                }
+
+                DismissAttendeeDialog -> {
+                    updateState {
+                        it.copy(
+                            isAddAttendeeDialogVisible = false
                         )
                     }
                 }

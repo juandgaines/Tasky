@@ -1,6 +1,6 @@
 package com.juandgaines.agenda.presentation.agenda_item
 
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
+import androidx.compose.foundation.text.input.TextFieldState
 import java.time.ZonedDateTime
 
 data class AgendaItemState(
@@ -10,7 +10,11 @@ data class AgendaItemState(
     val isSelectDateDialog: Boolean = false,
     val description: String = "",
     val startDateTime: ZonedDateTime = ZonedDateTime.now(),
+    val isAddAttendeeDialogVisible: Boolean = false,
     val alarm: AlarmOptions = AlarmOptions.MINUTES_TEN,
+    val attendeeEmailBuffer: TextFieldState = TextFieldState(),
+    val isAddingVisitor: Boolean = false,
+    val isEmailError: Boolean = false,
     val details: AgendaItemDetailsUi = AgendaItemDetailsUi.ReminderDetails,
     val isEditingEndDate: Boolean = false,
     val title: String = "",

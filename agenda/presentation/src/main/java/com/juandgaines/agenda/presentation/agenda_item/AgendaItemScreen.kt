@@ -29,8 +29,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
@@ -55,6 +53,8 @@ import com.juandgaines.core.presentation.designsystem.EditIcon
 import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyLight
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
+import com.juandgaines.core.presentation.designsystem.components.TaskyActionButton
+import com.juandgaines.core.presentation.designsystem.components.TaskyEditTextDialog
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.ui.ObserveAsEvents
 import java.time.ZonedDateTime
@@ -275,6 +275,29 @@ fun AgendaItemScreen(
                     )
 
                 }
+
+                if (state.isAddAttendeeDialogVisible) {
+                    TaskyEditTextDialog(
+                        title = stringResource(id = R.string.add_visitor),
+                        onDismiss = {
+                            onAction(AgendaItemAction.DismissAttendeeDialog)
+                        },
+                        textState = state.attendeeEmailBuffer,
+                        isError = state.isEmailError,
+                        primaryButton = {
+                            TaskyActionButton(
+                                text = stringResource(id = R.string.add),
+                                isLoading = state.isAddingVisitor,
+                                enabled = state.attendeeEmailBuffer.text.isNotEmpty() && !state.isAddingVisitor,
+                                onClick = {
+                                    onAction(AgendaItemAction.AddEmailAsAttendee(
+                                        state.attendeeEmailBuffer.text.toString()
+                                    ))
+                                },
+                            )
+                        }
+                    )
+                }
             }
         ){
             Column (
@@ -360,6 +383,11 @@ fun AgendaItemScreen(
                         isEditing = state.isEditing,
                         onSelectFilter = { filter ->
                             onAction(AgendaItemAction.SelectAttendeeFilter(filter))
+                        },
+                        isOwner = state.details.isUserCreator,
+                        isCreating = state.isNew,
+                        onAddAttendee = {
+                            onAction(AgendaItemAction.ShowAttendeeDialog)
                         },
                     )
                 }

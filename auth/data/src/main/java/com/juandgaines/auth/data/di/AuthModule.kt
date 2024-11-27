@@ -1,11 +1,11 @@
 package com.juandgaines.auth.data.di
 
 import com.juandgaines.auth.data.DefaultAuthRepository
-import com.juandgaines.auth.data.EmailPatternValidator
+import com.juandgaines.core.data.auth.EmailPatternValidator
 import com.juandgaines.auth.data.network.AuthApi
 import com.juandgaines.auth.data.network.RemoteAuthDataSourceImpl
 import com.juandgaines.auth.domain.AuthRepository
-import com.juandgaines.auth.domain.PatternValidator
+import com.juandgaines.core.domain.auth.PatternValidator
 import com.juandgaines.auth.domain.RemoteAuthDataSource
 import com.juandgaines.auth.domain.UserDataValidator
 import com.juandgaines.core.domain.auth.SessionManager
@@ -35,11 +35,6 @@ class AuthModule {
         sessionStorage: SessionManager
     ): AuthRepository {
         return DefaultAuthRepository(remoteAuthDataSource, sessionStorage)
-    }
-
-    @Provides
-    fun providePatternValidator(): PatternValidator {
-        return EmailPatternValidator
     }
 
     @Provides

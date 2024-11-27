@@ -1,16 +1,23 @@
 package com.juandgaines.agenda.presentation.agenda_item.components.attendee
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,12 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.juandgaines.agenda.domain.agenda.Attendee
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AttendeeFilter
 import com.juandgaines.agenda.presentation.agenda_item.AttendeeFilter.ALL
 import com.juandgaines.agenda.presentation.agenda_item.AttendeeFilter.GOING
+import com.juandgaines.core.presentation.designsystem.TaskyDarkGray
 import com.juandgaines.core.presentation.designsystem.TaskyGray
+import com.juandgaines.core.presentation.designsystem.TaskyLight
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
 import com.juandgaines.core.presentation.ui.UiText.StringResource
 
@@ -36,19 +44,52 @@ fun AttendeeSection(
     modifier: Modifier = Modifier,
     selectedFilter: AttendeeFilter = ALL,
     isEditing: Boolean,
+    isOwner: Boolean,
+    isCreating: Boolean,
     onSelectFilter: (AttendeeFilter) -> Unit,
     attendeesGoing: List<AttendeeUi>,
     attendeesNotGoing: List<AttendeeUi>,
+    onAddAttendee: () -> Unit
 ) {
     Column (
         modifier = modifier
     ) {
-        Text(
-            text = stringResource(R.string.visitors),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSecondary
-        )
+        Row (
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = stringResource(R.string.visitors),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSecondary
+            )
+
+            Spacer(modifier = Modifier.size(8.dp))
+            if ((isEditing && isOwner) || isCreating) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(32.dp)
+                        .background(
+                            color = TaskyLight,
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .clickable {
+                            onAddAttendee()
+                        }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add),
+                        tint = TaskyDarkGray,
+                        modifier = Modifier.size(15.dp)
+                    )
+                }
+            }
+
+        }
 
         Row (
             modifier = Modifier
@@ -146,7 +187,10 @@ fun PreviewAttendeeSectionFilter() {
             onSelectFilter = {},
             attendeesNotGoing = listOf(),
             attendeesGoing = listOf(),
-            isEditing = false
+            isEditing = false,
+            isOwner = true,
+            isCreating = false,
+            onAddAttendee = {}
         )
     }
 }
