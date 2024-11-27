@@ -46,7 +46,6 @@ class EventModule {
     @Singleton
     fun provideAttendee(
         attendeeApi: AttendeeApi,
-        eventDao: EventDao,
         applicationScope: CoroutineScope,
     ):AttendeeRepository {
         return DefaultAttendeeRepository(
