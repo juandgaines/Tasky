@@ -13,6 +13,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
+import com.juandgaines.agenda.domain.agenda.AttendeeMinimal
 import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
@@ -64,7 +65,6 @@ import com.juandgaines.core.presentation.ui.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -307,8 +307,17 @@ class AgendaItemViewModel @Inject constructor(
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
                                     endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
+                                    attendee = (_state.value.details as AgendaItemDetailsUi.EventDetails).attendees.map {
+                                        AttendeeMinimal(
+                                            email = it.email,
+                                            fullName = it.fullName,
+                                            userId = it.userId,
+                                            isGoing = it.isGoing,
+                                            isUserCreator = it.isUserCreator
+                                        )
+                                    },
                                     remindAt = desiredAlarmDate,
-                                    host = (_state.value.details as EventDetails).host,
+                                    host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
                                     isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
                                 )
                             }
@@ -474,8 +483,8 @@ class AgendaItemViewModel @Inject constructor(
                                             details = updateDetailsIfEvent { d->
                                                 d.copy(
                                                     attendees = d.attendees + AttendeeUi(
-                                                        email = attendee.email ?: action.email,
-                                                        fullName = attendee.fullName ?: action.email,
+                                                        email = attendee.email,
+                                                        fullName = attendee.fullName,
                                                         isGoing = true,
                                                         isUserCreator = false,
                                                         initials = UserInitialsFormatter.format(attendee.fullName ),

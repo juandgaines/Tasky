@@ -33,7 +33,9 @@ fun AgendaItemDetails.toAgendaItemDetailsUi() = when(this){
         finishDate = finishDate,
         host = host,
         isUserCreator = isUserCreator,
-        attendees = attendees.map { it.toAttendeeUi() }
+        attendees = attendees.map {
+            it.toAttendeeUi()
+        }
     )
     is AgendaItemDetails.TaskDetails -> AgendaItemDetailsUi.TaskDetails(isCompleted)
     is AgendaItemDetails.ReminderDetails -> AgendaItemDetailsUi.ReminderDetails

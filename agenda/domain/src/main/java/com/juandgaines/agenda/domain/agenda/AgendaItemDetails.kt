@@ -8,10 +8,10 @@ sealed interface AgendaItemDetails {
         val finishDate:ZonedDateTime = ZonedDateTime.now(),
         val host : String = "",
         val isUserCreator:Boolean = false,
-        val attendees:List<Attendee> = emptyList(),
+        val attendees:List<IAttendee> = emptyList(),
     ): AgendaItemDetails{
-        val isGoing:List<Attendee> = attendees.filter { it.isGoing }
-        val isNotGoing:List<Attendee> = attendees.filter { !it.isGoing }
+        val isGoing:List<IAttendee> = attendees.filter { it.isGoing }
+        val isNotGoing:List<IAttendee> = attendees.filter { !it.isGoing }
     }
 
     data class TaskDetails(val isCompleted:Boolean = false): AgendaItemDetails
