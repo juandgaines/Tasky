@@ -40,6 +40,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.DeletionS
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UserAdded
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DateSection
@@ -83,7 +84,11 @@ fun AgendaItemScreenRoot(
             }
 
             is Error -> {
-
+                Toast.makeText(
+                    context,
+                    agendaItemEvents.uiText.asString(context),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             Updated -> {
                 Toast.makeText(
@@ -125,6 +130,14 @@ fun AgendaItemScreenRoot(
                     Toast.LENGTH_SHORT
                 ).show()
                 navigateBack()
+            }
+
+            is UserAdded -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.visitor_added, agendaItemEvents.email),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -276,22 +289,24 @@ fun AgendaItemScreen(
 
                 }
 
-                if (state.isAddAttendeeDialogVisible) {
+
+                if (state.details is AgendaItemDetailsUi.EventDetails && state.details.isAddAttendeeDialogVisible) {
                     TaskyEditTextDialog(
                         title = stringResource(id = R.string.add_visitor),
                         onDismiss = {
                             onAction(AgendaItemAction.DismissAttendeeDialog)
                         },
-                        textState = state.attendeeEmailBuffer,
-                        isError = state.isEmailError,
+                        textState = state.details.attendeeEmailBuffer,
+                        isError = state.details.isEmailError,
                         primaryButton = {
                             TaskyActionButton(
                                 text = stringResource(id = R.string.add),
-                                isLoading = state.isAddingVisitor,
-                                enabled = state.attendeeEmailBuffer.text.isNotEmpty() && !state.isAddingVisitor,
+                                isLoading = state.details.isAddingVisitor,
+                                enabled = state.details.attendeeEmailBuffer.text.isNotEmpty() && !
+                                state.details.isAddingVisitor,
                                 onClick = {
                                     onAction(AgendaItemAction.AddEmailAsAttendee(
-                                        state.attendeeEmailBuffer.text.toString()
+                                        state.details.attendeeEmailBuffer.text.toString()
                                     ))
                                 },
                             )

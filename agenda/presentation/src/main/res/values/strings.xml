@@ -45,4 +45,7 @@
   <string name="not_going">Not going</string>
   <string name="add">Add</string>
   <string name="add_visitor">Add visitor</string>
+  <string name="user_not_found">User does not exist.</string>
+  <string name="visitor_added">%s added to the event</string>
+  <string name="invalid_email">Invalid email</string>
 </resources>

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AttendeeResponse(
     val doesUserExist: Boolean,
-    val attendee: AttendeeMinimalDto
+    val attendee: AttendeeMinimalDto?
 )
 
 @Serializable

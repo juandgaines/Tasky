@@ -13,12 +13,14 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
+import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.isToday
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
+import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddEmailAsAttendee
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
@@ -47,6 +49,8 @@ import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_SIX
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_TEN
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_THIRTY
+import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeUi
+import com.juandgaines.agenda.presentation.agenda_item.components.attendee.UserInitialsFormatter
 import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
@@ -55,6 +59,7 @@ import com.juandgaines.core.domain.auth.PatternValidator
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
+import com.juandgaines.core.presentation.ui.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -80,7 +85,8 @@ class AgendaItemViewModel @Inject constructor(
     private val reminderRepository: ReminderRepository,
     private val eventRepository: EventRepository,
     private val alarmScheduler: AlarmScheduler,
-    private val emailPatterValidator: PatternValidator
+    private val emailPatterValidator: PatternValidator,
+    private val attendeeRepository: AttendeeRepository
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -451,41 +457,102 @@ class AgendaItemViewModel @Inject constructor(
 
                     updateState { state->
                         state.copy(
-                            isAddingVisitor = true
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    isAddingVisitor = true
+                                )
+                            }
                         )
                     }
                     delay(3000)
                     //TODO: Implement this
                     if (emailPatterValidator.matches(action.email)){
-                        updateState { state->
-                            state.copy(
-                                isEmailError = false,
-                                isAddingVisitor = false
-                            )
-                        }
+                        attendeeRepository.getAttendeeByEmail(action.email)
+                            .onSuccess { attendee->
+                                if (attendee != null){
+                                    updateState { state->
+                                        state.copy(
+                                            details = updateDetailsIfEvent { d->
+                                                d.copy(
+                                                    attendees = d.attendees + AttendeeUi(
+                                                        email = attendee.email ?: action.email,
+                                                        fullName = attendee.fullName ?: action.email,
+                                                        isGoing = true,
+                                                        isUserCreator = false,
+                                                        initials = UserInitialsFormatter.format(attendee.fullName ),
+                                                        userId = attendee.userId,
+                                                        eventId = _navParameters.id ?: "",
+                                                        isCreator = false
+                                                    ),
+                                                    isAddAttendeeDialogVisible = false,
+                                                    isAddingVisitor = false,
+                                                    isEmailError = false
+                                                )
+                                            }
+                                        )
+                                    }
+
+                                    eventChannel.send(AgendaItemEvent.UserAdded(
+                                        UiText.DynamicString(action.email)
+                                    ))
+                                }
+                                else{
+                                    eventChannel.send(AgendaItemEvent.Error(
+                                        UiText.StringResource(R.string.user_not_found)
+                                    ))
+                                    updateState {s ->
+                                        s.copy(
+                                            details = updateDetailsIfEvent { d->
+                                                d.copy(
+                                                    isEmailError = true,
+                                                    isAddingVisitor = false
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+
+                            }
                     }
                     else{
-                        updateState {
-                            it.copy(
-                               isEmailError = true,
-                                isAddingVisitor = false
+                        updateState {s ->
+                            s.copy(
+                                details = updateDetailsIfEvent { d->
+                                    d.copy(
+                                        isEmailError = true,
+                                        isAddingVisitor = false
+                                    )
+                                }
                             )
                         }
+                        eventChannel.send(AgendaItemEvent.Error(
+                            UiText.StringResource(R.string.invalid_email)
+                        ))
                     }
 
                 }
                 ShowAttendeeDialog -> {
-                    updateState {
-                        it.copy(
-                            isAddAttendeeDialogVisible = true
+
+                    updateState {s->
+                        s.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    isAddAttendeeDialogVisible = true
+                                )
+                            }
                         )
                     }
+
                 }
 
                 DismissAttendeeDialog -> {
-                    updateState {
-                        it.copy(
-                            isAddAttendeeDialogVisible = false
+                    updateState {s->
+                        s.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    isAddAttendeeDialogVisible = false
+                                )
+                            }
                         )
                     }
                 }
