@@ -27,7 +27,8 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 @Composable
 fun AttendeeItem(
     modifier: Modifier = Modifier,
-    isEditing: Boolean = true,
+    isEditing: Boolean,
+    isInternetConnected: Boolean,
     attendee: AttendeeUi,
     onRemove: (String) -> Unit = {}
 ) {
@@ -92,8 +93,10 @@ fun PreviewAttendeeItem() {
             isGoing = true,
             isUserCreator = true,
             initials = "JD",
-            isCreator = true
-        )
+            isCreator = true,
+        ),
+            isEditing = true,
+            isInternetConnected = true
         )
     }
 }

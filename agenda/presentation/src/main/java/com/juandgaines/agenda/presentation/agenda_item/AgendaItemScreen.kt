@@ -291,6 +291,7 @@ fun AgendaItemScreen(
 
 
                 if (state.details is AgendaItemDetailsUi.EventDetails && state.details.isAddAttendeeDialogVisible) {
+
                     TaskyEditTextDialog(
                         title = stringResource(id = R.string.add_visitor),
                         onDismiss = {
@@ -305,9 +306,11 @@ fun AgendaItemScreen(
                                 enabled = state.details.attendeeEmailBuffer.text.isNotEmpty() && !
                                 state.details.isAddingVisitor,
                                 onClick = {
-                                    onAction(AgendaItemAction.AddEmailAsAttendee(
-                                        state.details.attendeeEmailBuffer.text.toString()
-                                    ))
+                                    onAction(
+                                        AgendaItemAction.AddEmailAsAttendee(
+                                            state.details.attendeeEmailBuffer.text.toString()
+                                        )
+                                    )
                                 },
                             )
                         }
@@ -396,6 +399,7 @@ fun AgendaItemScreen(
                         attendeesGoing = state.details.isGoing,
                         attendeesNotGoing = state.details.isNotGoing,
                         isEditing = state.isEditing,
+                        isInternetConnected = state.details.isConnectedToInternet,
                         onSelectFilter = { filter ->
                             onAction(AgendaItemAction.SelectAttendeeFilter(filter))
                         },
