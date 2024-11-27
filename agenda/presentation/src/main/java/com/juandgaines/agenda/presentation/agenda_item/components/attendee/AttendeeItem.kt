@@ -45,7 +45,7 @@ fun AttendeeItem(
         ProfileIcon(
             modifier = Modifier
                 .padding(8.dp),
-            initials = attendee.initials.uppercase(), // TODO: Replace with real initials
+            initials = attendee.initials.uppercase(),
             colorBackground = TaskyGray,
             colorLetters = TaskyLight
         )
