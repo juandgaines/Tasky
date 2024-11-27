@@ -29,6 +29,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissD
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.RemoveAttendee
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAttendeeFilter
@@ -305,10 +306,10 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    endTime = (_state.value.details as EventDetails).finishDate,
+                                    endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
                                     remindAt = desiredAlarmDate,
                                     host = (_state.value.details as EventDetails).host,
-                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
                                 )
                             }
                         }
@@ -530,6 +531,17 @@ class AgendaItemViewModel @Inject constructor(
                         ))
                     }
 
+                }
+                is RemoveAttendee -> {
+                    updateState { state->
+                        state.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    attendees = d.attendees.filter { it.userId != action.attendeeId }
+                                )
+                            }
+                        )
+                    }
                 }
                 ShowAttendeeDialog -> {
 
