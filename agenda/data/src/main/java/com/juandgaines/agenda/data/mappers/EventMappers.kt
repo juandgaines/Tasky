@@ -41,6 +41,7 @@ fun Event.toEventRequest() = CreateEventRequest(
     title = title,
     description = description,
     from = time.toInstant().toEpochMilli(),
+    attendeeIds = attendee.map { it.userId },
     to = endTime.toInstant().toEpochMilli(),
     remindAt = remindAt.toInstant().toEpochMilli()
 )
