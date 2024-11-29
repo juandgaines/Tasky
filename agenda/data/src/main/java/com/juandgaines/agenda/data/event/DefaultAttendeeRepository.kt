@@ -13,7 +13,6 @@ import javax.inject.Inject
 
 class DefaultAttendeeRepository @Inject constructor(
     private val attendeeApi: AttendeeApi,
-    private val applicationScope: CoroutineScope,
 ):AttendeeRepository {
 
     override suspend fun getAttendeeByEmail(email: String): Result<AttendeeMinimal?, DataError> {
