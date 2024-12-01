@@ -56,6 +56,7 @@ import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
 import com.juandgaines.core.domain.auth.PatternValidator
+import com.juandgaines.core.domain.network.ConnectivityObserver
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
@@ -85,7 +86,8 @@ class AgendaItemViewModel @Inject constructor(
     private val eventRepository: EventRepository,
     private val alarmScheduler: AlarmScheduler,
     private val emailPatterValidator: PatternValidator,
-    private val attendeeRepository: AttendeeRepository
+    private val attendeeRepository: AttendeeRepository,
+    private val connectivityObserver: ConnectivityObserver
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -103,6 +105,17 @@ class AgendaItemViewModel @Inject constructor(
                 initState()
                 _isInit = true
             }
+        }
+        .combine(
+            connectivityObserver.isConnected
+        ){ state, isConnected->
+            state.copy(
+                details = updateDetailsIfEvent(state.details) { det->
+                    det.copy(
+                        isConnectedToInternet = isConnected
+                    )
+                }
+            )
         }
         .combine(
             _isEditing
@@ -129,7 +142,6 @@ class AgendaItemViewModel @Inject constructor(
             }.onSuccess { item ->
 
                 updateState { event->
-
                     event.copy(
                         isNew = false,
                         title = item.title,
@@ -577,12 +589,13 @@ class AgendaItemViewModel @Inject constructor(
         _state.update { update(it) }
     }
 
-    private fun updateDetailsIfEvent(update: (AgendaItemDetailsUi.EventDetails) -> AgendaItemDetailsUi.EventDetails): AgendaItemDetailsUi {
-        return when (val details = state.value.details) {
+    private fun updateDetailsIfEvent(stateParam:AgendaItemDetailsUi? = null,update: (AgendaItemDetailsUi.EventDetails) -> AgendaItemDetailsUi.EventDetails): AgendaItemDetailsUi {
+        return when (val details = stateParam?:state.value.details) {
             is AgendaItemDetailsUi.EventDetails -> update(details)
             else -> details
         }
     }
+
 
     private fun calculateTimeAlarm():ZonedDateTime {
         val alarm = _state.value.alarm

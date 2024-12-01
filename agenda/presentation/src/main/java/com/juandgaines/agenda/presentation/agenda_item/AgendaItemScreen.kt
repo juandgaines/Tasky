@@ -309,9 +309,11 @@ fun AgendaItemScreen(
                                 enabled =  isEmailValid && !
                                 state.details.isAddingVisitor,
                                 onClick = {
-                                    onAction(AgendaItemAction.AddEmailAsAttendee(
-                                        state.details.attendeeEmailBuffer.text.toString()
-                                    ))
+                                    onAction(
+                                        AgendaItemAction.AddEmailAsAttendee(
+                                            state.details.attendeeEmailBuffer.text.toString()
+                                        )
+                                    )
                                 },
                             )
                         }
@@ -400,6 +402,7 @@ fun AgendaItemScreen(
                         attendeesGoing = state.details.isGoing,
                         attendeesNotGoing = state.details.isNotGoing,
                         isEditing = state.isEditing,
+                        isInternetConnected = state.details.isConnectedToInternet,
                         onSelectFilter = { filter ->
                             onAction(AgendaItemAction.SelectAttendeeFilter(filter))
                         },

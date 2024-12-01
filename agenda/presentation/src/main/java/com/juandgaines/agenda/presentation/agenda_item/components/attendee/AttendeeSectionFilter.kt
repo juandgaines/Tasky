@@ -50,8 +50,9 @@ fun AttendeeSection(
     onSelectFilter: (AttendeeFilter) -> Unit,
     attendeesGoing: List<AttendeeUi>,
     attendeesNotGoing: List<AttendeeUi>,
-    onRemoveAttendee:(String) -> Unit,
+    onRemoveAttendee: (String) -> Unit,
     onAddAttendee: () -> Unit,
+    isInternetConnected: Boolean,
 ) {
     Column (
         modifier = modifier
@@ -78,7 +79,7 @@ fun AttendeeSection(
                             color = TaskyLight,
                             shape = RoundedCornerShape(4.dp)
                         )
-                        .clickable {
+                        .clickable(enabled = isInternetConnected) {
                             onAddAttendee()
                         }
                 ) {
@@ -150,6 +151,7 @@ fun AttendeeSection(
                     AttendeeItem(
                         attendee = attendee,
                         isEditing = isEditing,
+                        isInternetConnected = isInternetConnected,
                         onRemove = onRemoveAttendee
                     )
                 }
@@ -172,6 +174,7 @@ fun AttendeeSection(
                     AttendeeItem(
                         attendee = attendee,
                         isEditing = isEditing,
+                        isInternetConnected = isInternetConnected,
                         onRemove = onRemoveAttendee
                     )
                 }
@@ -190,14 +193,15 @@ fun PreviewAttendeeSectionFilter() {
     TaskyTheme {
         AttendeeSection(
             selectedFilter = AttendeeFilter.ALL,
-            onSelectFilter = {},
-            attendeesNotGoing = listOf(),
-            attendeesGoing = listOf(),
             isEditing = false,
             isOwner = true,
             isCreating = false,
+            onSelectFilter = {},
+            attendeesGoing = listOf(),
+            attendeesNotGoing = listOf(),
+            onRemoveAttendee = {},
             onAddAttendee = {},
-            onRemoveAttendee = {}
+            isInternetConnected = true
         )
     }
 }

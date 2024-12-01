@@ -19,6 +19,7 @@ sealed interface AgendaItemDetailsUi {
         val isAddingVisitor: Boolean = false,
         val doesEmailExist: Boolean = false,
         val isAddAttendeeDialogVisible: Boolean = false,
+        val isConnectedToInternet: Boolean = true,
         private val emailPatterValidator: PatternValidator
     ): AgendaItemDetailsUi{
         val isGoing:List<AttendeeUi> = attendees.filter { it.isGoing }
