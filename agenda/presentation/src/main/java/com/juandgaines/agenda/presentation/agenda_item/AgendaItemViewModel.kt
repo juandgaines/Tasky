@@ -2,13 +2,10 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.EventDetails
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.TaskDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
@@ -131,14 +128,15 @@ class AgendaItemViewModel @Inject constructor(
                 EVENT -> eventRepository.getEventById(idItem)
             }.onSuccess { item ->
 
-
                 updateState { event->
 
                     event.copy(
                         isNew = false,
                         title = item.title,
                         description = item.description,
-                        details = item.agendaItemDetails.toAgendaItemDetailsUi(),
+                        details = item.agendaItemDetails.toAgendaItemDetailsUi(
+                            emailPatterValidator
+                        ),
                         startDateTime = item.date
                     )
                 }
@@ -161,7 +159,9 @@ class AgendaItemViewModel @Inject constructor(
                     details = when (_type) {
                         REMINDER -> AgendaItemDetailsUi.ReminderDetails
                         TASK -> AgendaItemDetailsUi.TaskDetails()
-                        EVENT -> AgendaItemDetailsUi.EventDetails()
+                        EVENT -> AgendaItemDetailsUi.EventDetails(
+                            emailPatterValidator = emailPatterValidator
+                        )
                     }
                 )
             }
@@ -373,6 +373,15 @@ class AgendaItemViewModel @Inject constructor(
                                     time = _state.value.startDateTime,
                                     endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
                                     remindAt = desiredAlarmDate,
+                                    attendee = (_state.value.details as AgendaItemDetailsUi.EventDetails).attendees.map {
+                                        AttendeeMinimal(
+                                            email = it.email,
+                                            fullName = it.fullName,
+                                            userId = it.userId,
+                                            isGoing = it.isGoing,
+                                            isUserCreator = it.isUserCreator
+                                        )
+                                    },
                                     host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
                                     isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
                                 )
@@ -475,7 +484,6 @@ class AgendaItemViewModel @Inject constructor(
                             }
                         )
                     }
-                    if (emailPatterValidator.matches(action.email)){
                         attendeeRepository.getAttendeeByEmail(action.email)
                             .onSuccess { attendee->
                                 if (attendee != null){
@@ -495,7 +503,7 @@ class AgendaItemViewModel @Inject constructor(
                                                     ),
                                                     isAddAttendeeDialogVisible = false,
                                                     isAddingVisitor = false,
-                                                    isEmailError = false
+                                                    doesEmailExist = false
                                                 )
                                             }
                                         )
@@ -513,7 +521,7 @@ class AgendaItemViewModel @Inject constructor(
                                         s.copy(
                                             details = updateDetailsIfEvent { d->
                                                 d.copy(
-                                                    isEmailError = true,
+                                                    doesEmailExist = true,
                                                     isAddingVisitor = false
                                                 )
                                             }
@@ -522,22 +530,6 @@ class AgendaItemViewModel @Inject constructor(
                                 }
 
                             }
-                    }
-                    else{
-                        updateState {s ->
-                            s.copy(
-                                details = updateDetailsIfEvent { d->
-                                    d.copy(
-                                        isEmailError = true,
-                                        isAddingVisitor = false
-                                    )
-                                }
-                            )
-                        }
-                        eventChannel.send(AgendaItemEvent.Error(
-                            UiText.StringResource(R.string.invalid_email)
-                        ))
-                    }
 
                 }
                 is RemoveAttendee -> {
