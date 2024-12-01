@@ -140,12 +140,15 @@ class AgendaItemViewModel @Inject constructor(
                 TASK -> taskRepository.getTaskById(idItem)
                 EVENT -> eventRepository.getEventById(idItem)
             }.onSuccess { item ->
+
                 updateState { event->
                     event.copy(
                         isNew = false,
                         title = item.title,
                         description = item.description,
-                        details = item.agendaItemDetails.toAgendaItemDetailsUi(),
+                        details = item.agendaItemDetails.toAgendaItemDetailsUi(
+                            emailPatterValidator
+                        ),
                         startDateTime = item.date
                     )
                 }
@@ -168,7 +171,9 @@ class AgendaItemViewModel @Inject constructor(
                     details = when (_type) {
                         REMINDER -> AgendaItemDetailsUi.ReminderDetails
                         TASK -> AgendaItemDetailsUi.TaskDetails()
-                        EVENT -> AgendaItemDetailsUi.EventDetails()
+                        EVENT -> AgendaItemDetailsUi.EventDetails(
+                            emailPatterValidator = emailPatterValidator
+                        )
                     }
                 )
             }
@@ -491,7 +496,6 @@ class AgendaItemViewModel @Inject constructor(
                             }
                         )
                     }
-                    if (emailPatterValidator.matches(action.email)){
                         attendeeRepository.getAttendeeByEmail(action.email)
                             .onSuccess { attendee->
                                 if (attendee != null){
@@ -511,7 +515,7 @@ class AgendaItemViewModel @Inject constructor(
                                                     ),
                                                     isAddAttendeeDialogVisible = false,
                                                     isAddingVisitor = false,
-                                                    isEmailError = false
+                                                    doesEmailExist = false
                                                 )
                                             }
                                         )
@@ -529,7 +533,7 @@ class AgendaItemViewModel @Inject constructor(
                                         s.copy(
                                             details = updateDetailsIfEvent { d->
                                                 d.copy(
-                                                    isEmailError = true,
+                                                    doesEmailExist = true,
                                                     isAddingVisitor = false
                                                 )
                                             }
@@ -538,22 +542,6 @@ class AgendaItemViewModel @Inject constructor(
                                 }
 
                             }
-                    }
-                    else{
-                        updateState {s ->
-                            s.copy(
-                                details = updateDetailsIfEvent { d->
-                                    d.copy(
-                                        isEmailError = true,
-                                        isAddingVisitor = false
-                                    )
-                                }
-                            )
-                        }
-                        eventChannel.send(AgendaItemEvent.Error(
-                            UiText.StringResource(R.string.invalid_email)
-                        ))
-                    }
 
                 }
                 is RemoveAttendee -> {

@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +50,7 @@ import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
 import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeSection
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
 import com.juandgaines.agenda.presentation.components.AgendaTimePicker
+import com.juandgaines.core.domain.auth.PatternValidator
 import com.juandgaines.core.presentation.designsystem.CloseIcon
 import com.juandgaines.core.presentation.designsystem.EditIcon
 import com.juandgaines.core.presentation.designsystem.TaskyGray
@@ -291,6 +293,7 @@ fun AgendaItemScreen(
 
 
                 if (state.details is AgendaItemDetailsUi.EventDetails && state.details.isAddAttendeeDialogVisible) {
+                    val isEmailValid by  state.details.isEmailValid.collectAsState(false)
 
                     TaskyEditTextDialog(
                         title = stringResource(id = R.string.add_visitor),
@@ -298,12 +301,12 @@ fun AgendaItemScreen(
                             onAction(AgendaItemAction.DismissAttendeeDialog)
                         },
                         textState = state.details.attendeeEmailBuffer,
-                        isError = state.details.isEmailError,
+                        isError = state.details.doesEmailExist,
                         primaryButton = {
                             TaskyActionButton(
                                 text = stringResource(id = R.string.add),
                                 isLoading = state.details.isAddingVisitor,
-                                enabled = state.details.attendeeEmailBuffer.text.isNotEmpty() && !
+                                enabled =  isEmailValid && !
                                 state.details.isAddingVisitor,
                                 onClick = {
                                     onAction(
@@ -449,7 +452,12 @@ fun AgendaItemScreenPreview() {
                     finishDate = ZonedDateTime.now(),
                     host = "Host",
                     isUserCreator = true,
-                    attendees = emptyList()
+                    attendees = emptyList(),
+                    emailPatterValidator =  object : PatternValidator {
+                        override fun matches(value: String): Boolean {
+                            return true
+                        }
+                    }
                 ),
                 alarm = AlarmOptions.MINUTES_TEN
             ),
