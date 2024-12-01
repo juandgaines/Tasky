@@ -6,26 +6,29 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.EventDetails
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.TaskDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
-import com.juandgaines.agenda.domain.agenda.InitialsCalculator
+import com.juandgaines.agenda.domain.agenda.AttendeeMinimal
+import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
 import com.juandgaines.agenda.domain.utils.isToday
 import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
+import com.juandgaines.agenda.presentation.R
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddEmailAsAttendee
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissAttendeeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.RemoveAttendee
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAttendeeFilter
@@ -33,6 +36,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDa
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeFinish
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectTimeStart
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowAttendeeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateField
@@ -45,13 +49,17 @@ import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_SIX
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_TEN
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.MINUTES_THIRTY
+import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeUi
+import com.juandgaines.agenda.presentation.agenda_item.components.attendee.UserInitialsFormatter
 import com.juandgaines.core.domain.agenda.AgendaItemOption
 import com.juandgaines.core.domain.agenda.AgendaItemOption.EVENT
 import com.juandgaines.core.domain.agenda.AgendaItemOption.REMINDER
 import com.juandgaines.core.domain.agenda.AgendaItemOption.TASK
+import com.juandgaines.core.domain.auth.PatternValidator
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
+import com.juandgaines.core.presentation.ui.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -76,7 +84,8 @@ class AgendaItemViewModel @Inject constructor(
     private val reminderRepository: ReminderRepository,
     private val eventRepository: EventRepository,
     private val alarmScheduler: AlarmScheduler,
-    private val initialsCalculator: InitialsCalculator,
+    private val emailPatterValidator: PatternValidator,
+    private val attendeeRepository: AttendeeRepository
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -119,14 +128,15 @@ class AgendaItemViewModel @Inject constructor(
                 EVENT -> eventRepository.getEventById(idItem)
             }.onSuccess { item ->
 
-
                 updateState { event->
 
                     event.copy(
                         isNew = false,
                         title = item.title,
                         description = item.description,
-                        details = item.agendaItemDetails.toAgendaItemDetailsUi(),
+                        details = item.agendaItemDetails.toAgendaItemDetailsUi(
+                            emailPatterValidator
+                        ),
                         startDateTime = item.date
                     )
                 }
@@ -149,7 +159,9 @@ class AgendaItemViewModel @Inject constructor(
                     details = when (_type) {
                         REMINDER -> AgendaItemDetailsUi.ReminderDetails
                         TASK -> AgendaItemDetailsUi.TaskDetails()
-                        EVENT -> AgendaItemDetailsUi.EventDetails()
+                        EVENT -> AgendaItemDetailsUi.EventDetails(
+                            emailPatterValidator = emailPatterValidator
+                        )
                     }
                 )
             }
@@ -241,7 +253,7 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as TaskDetails).isCompleted,
+                                    isDone = (_state.value.details as AgendaItemDetailsUi.TaskDetails).isCompleted,
                                     remindAt = _state.value.startDateTime
                                 )
                             )
@@ -251,10 +263,10 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    endTime = (_state.value.details as EventDetails).finishDate,
+                                    endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
                                     remindAt = _state.value.startDateTime,
-                                    host = (_state.value.details as EventDetails).host,
-                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
+                                    isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
                                 )
                             )
                         }
@@ -285,7 +297,7 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as TaskDetails).isCompleted,
+                                    isDone = (_state.value.details as AgendaItemDetailsUi.TaskDetails).isCompleted,
                                     remindAt = desiredAlarmDate
                                 )
                             }
@@ -295,10 +307,19 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    endTime = (_state.value.details as EventDetails).finishDate,
+                                    endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
+                                    attendee = (_state.value.details as AgendaItemDetailsUi.EventDetails).attendees.map {
+                                        AttendeeMinimal(
+                                            email = it.email,
+                                            fullName = it.fullName,
+                                            userId = it.userId,
+                                            isGoing = it.isGoing,
+                                            isUserCreator = it.isUserCreator
+                                        )
+                                    },
                                     remindAt = desiredAlarmDate,
-                                    host = (_state.value.details as EventDetails).host,
-                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
+                                    isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
                                 )
                             }
                         }
@@ -352,6 +373,15 @@ class AgendaItemViewModel @Inject constructor(
                                     time = _state.value.startDateTime,
                                     endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
                                     remindAt = desiredAlarmDate,
+                                    attendee = (_state.value.details as AgendaItemDetailsUi.EventDetails).attendees.map {
+                                        AttendeeMinimal(
+                                            email = it.email,
+                                            fullName = it.fullName,
+                                            userId = it.userId,
+                                            isGoing = it.isGoing,
+                                            isUserCreator = it.isUserCreator
+                                        )
+                                    },
                                     host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
                                     isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
                                 )
@@ -439,6 +469,102 @@ class AgendaItemViewModel @Inject constructor(
                     updateState {
                         it.copy(
                             attendeeFilter = action.filter
+                        )
+                    }
+                }
+
+                is AddEmailAsAttendee ->{
+
+                    updateState { state->
+                        state.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    isAddingVisitor = true
+                                )
+                            }
+                        )
+                    }
+                        attendeeRepository.getAttendeeByEmail(action.email)
+                            .onSuccess { attendee->
+                                if (attendee != null){
+                                    updateState { state->
+                                        state.copy(
+                                            details = updateDetailsIfEvent { d->
+                                                d.copy(
+                                                    attendees = d.attendees + AttendeeUi(
+                                                        email = attendee.email,
+                                                        fullName = attendee.fullName,
+                                                        isGoing = true,
+                                                        isUserCreator = false,
+                                                        initials = UserInitialsFormatter.format(attendee.fullName ),
+                                                        userId = attendee.userId,
+                                                        eventId = _navParameters.id ?: "",
+                                                        isCreator = false
+                                                    ),
+                                                    isAddAttendeeDialogVisible = false,
+                                                    isAddingVisitor = false,
+                                                    doesEmailExist = false
+                                                )
+                                            }
+                                        )
+                                    }
+
+                                    eventChannel.send(AgendaItemEvent.UserAdded(
+                                        UiText.DynamicString(action.email)
+                                    ))
+                                }
+                                else{
+                                    eventChannel.send(AgendaItemEvent.Error(
+                                        UiText.StringResource(R.string.user_not_found)
+                                    ))
+                                    updateState {s ->
+                                        s.copy(
+                                            details = updateDetailsIfEvent { d->
+                                                d.copy(
+                                                    doesEmailExist = true,
+                                                    isAddingVisitor = false
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+
+                            }
+
+                }
+                is RemoveAttendee -> {
+                    updateState { state->
+                        state.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    attendees = d.attendees.filter { it.userId != action.attendeeId }
+                                )
+                            }
+                        )
+                    }
+                }
+                ShowAttendeeDialog -> {
+
+                    updateState {s->
+                        s.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    isAddAttendeeDialogVisible = true
+                                )
+                            }
+                        )
+                    }
+
+                }
+
+                DismissAttendeeDialog -> {
+                    updateState {s->
+                        s.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    isAddAttendeeDialogVisible = false
+                                )
+                            }
                         )
                     }
                 }

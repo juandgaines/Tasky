@@ -1,5 +1,7 @@
 package com.juandgaines.auth.domain
 
+import com.juandgaines.core.domain.auth.PatternValidator
+
 class UserDataValidator (
     private val patternValidator: PatternValidator
 ) {

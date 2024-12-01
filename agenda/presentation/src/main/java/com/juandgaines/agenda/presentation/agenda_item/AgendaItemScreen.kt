@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,8 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails.EventDetails
 import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
@@ -42,6 +41,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.DeletionS
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UserAdded
 import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemTypeSection
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DateSection
@@ -50,11 +50,14 @@ import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
 import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeSection
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
 import com.juandgaines.agenda.presentation.components.AgendaTimePicker
+import com.juandgaines.core.domain.auth.PatternValidator
 import com.juandgaines.core.presentation.designsystem.CloseIcon
 import com.juandgaines.core.presentation.designsystem.EditIcon
 import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyLight
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
+import com.juandgaines.core.presentation.designsystem.components.TaskyActionButton
+import com.juandgaines.core.presentation.designsystem.components.TaskyEditTextDialog
 import com.juandgaines.core.presentation.designsystem.components.TaskyScaffold
 import com.juandgaines.core.presentation.ui.ObserveAsEvents
 import java.time.ZonedDateTime
@@ -83,7 +86,11 @@ fun AgendaItemScreenRoot(
             }
 
             is Error -> {
-
+                Toast.makeText(
+                    context,
+                    agendaItemEvents.uiText.asString(context),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             Updated -> {
                 Toast.makeText(
@@ -125,6 +132,14 @@ fun AgendaItemScreenRoot(
                     Toast.LENGTH_SHORT
                 ).show()
                 navigateBack()
+            }
+
+            is UserAdded -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.visitor_added, agendaItemEvents.email.asString(context)),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -275,6 +290,33 @@ fun AgendaItemScreen(
                     )
 
                 }
+
+
+                if (state.details is AgendaItemDetailsUi.EventDetails && state.details.isAddAttendeeDialogVisible) {
+                    val isEmailValid by  state.details.isEmailValid.collectAsState(false)
+
+                    TaskyEditTextDialog(
+                        title = stringResource(id = R.string.add_visitor),
+                        onDismiss = {
+                            onAction(AgendaItemAction.DismissAttendeeDialog)
+                        },
+                        textState = state.details.attendeeEmailBuffer,
+                        isError = state.details.doesEmailExist,
+                        primaryButton = {
+                            TaskyActionButton(
+                                text = stringResource(id = R.string.add),
+                                isLoading = state.details.isAddingVisitor,
+                                enabled =  isEmailValid && !
+                                state.details.isAddingVisitor,
+                                onClick = {
+                                    onAction(AgendaItemAction.AddEmailAsAttendee(
+                                        state.details.attendeeEmailBuffer.text.toString()
+                                    ))
+                                },
+                            )
+                        }
+                    )
+                }
             }
         ){
             Column (
@@ -361,6 +403,14 @@ fun AgendaItemScreen(
                         onSelectFilter = { filter ->
                             onAction(AgendaItemAction.SelectAttendeeFilter(filter))
                         },
+                        isOwner = state.details.isUserCreator,
+                        isCreating = state.isNew,
+                        onRemoveAttendee = { attendeeId ->
+                            onAction(AgendaItemAction.RemoveAttendee(attendeeId))
+                        },
+                        onAddAttendee = {
+                            onAction(AgendaItemAction.ShowAttendeeDialog)
+                        },
                     )
                 }
 
@@ -399,7 +449,12 @@ fun AgendaItemScreenPreview() {
                     finishDate = ZonedDateTime.now(),
                     host = "Host",
                     isUserCreator = true,
-                    attendees = emptyList()
+                    attendees = emptyList(),
+                    emailPatterValidator =  object : PatternValidator {
+                        override fun matches(value: String): Boolean {
+                            return true
+                        }
+                    }
                 ),
                 alarm = AlarmOptions.MINUTES_TEN
             ),

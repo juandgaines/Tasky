@@ -1,8 +1,10 @@
 package com.juandgaines.core.data.di
 
 import com.juandgaines.core.data.auth.DefaultAuthCoreService
+import com.juandgaines.core.data.auth.EmailPatternValidator
 import com.juandgaines.core.data.auth.TokenApi
 import com.juandgaines.core.domain.auth.AuthCoreService
+import com.juandgaines.core.domain.auth.PatternValidator
 import com.juandgaines.core.domain.auth.SessionManager
 import dagger.Module
 import dagger.Provides
@@ -24,5 +26,10 @@ class AuthCoreServiceModule {
             tokenApi = tokenApi,
             sessionManager = sessionManager
         )
+    }
+
+    @Provides
+    fun providePatternValidator(): PatternValidator {
+        return EmailPatternValidator
     }
 }

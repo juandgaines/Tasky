@@ -1,6 +1,7 @@
 package com.juandgaines.agenda.presentation.agenda_item.components.attendee
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -15,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.juandgaines.agenda.domain.agenda.Attendee
 import com.juandgaines.agenda.presentation.home.componets.ProfileIcon
 import com.juandgaines.core.presentation.designsystem.TaskyBlack
 import com.juandgaines.core.presentation.designsystem.TaskyDarkGray
@@ -23,13 +23,13 @@ import com.juandgaines.core.presentation.designsystem.TaskyGray
 import com.juandgaines.core.presentation.designsystem.TaskyLight
 import com.juandgaines.core.presentation.designsystem.TaskyLightBlue
 import com.juandgaines.core.presentation.designsystem.TaskyTheme
-import java.time.ZonedDateTime
 
 @Composable
 fun AttendeeItem(
     modifier: Modifier = Modifier,
     isEditing: Boolean = true,
-    attendee: AttendeeUi
+    attendee: AttendeeUi,
+    onRemove: (String) -> Unit = {}
 ) {
 
     Row (
@@ -45,7 +45,7 @@ fun AttendeeItem(
         ProfileIcon(
             modifier = Modifier
                 .padding(8.dp),
-            initials = attendee.initials.uppercase(), // TODO: Replace with real initials
+            initials = attendee.initials.uppercase(),
             colorBackground = TaskyGray,
             colorLetters = TaskyLight
         )
@@ -68,7 +68,10 @@ fun AttendeeItem(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Edit",
-                        tint = TaskyBlack
+                        tint = TaskyBlack,
+                        modifier = Modifier.clickable {
+                            onRemove(attendee.userId)
+                        }
                     )
                 }
             }

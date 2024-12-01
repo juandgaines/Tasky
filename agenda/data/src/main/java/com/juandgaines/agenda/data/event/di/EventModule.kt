@@ -1,8 +1,11 @@
 package com.juandgaines.agenda.data.event.di
 
+import com.juandgaines.agenda.data.event.DefaultAttendeeRepository
 import com.juandgaines.agenda.data.event.DefaultEventRepository
+import com.juandgaines.agenda.data.event.remote.AttendeeApi
 import com.juandgaines.agenda.data.event.remote.EventApi
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
+import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.core.data.database.event.EventDao
 import dagger.Module
@@ -24,6 +27,12 @@ class EventModule {
 
     @Provides
     @Singleton
+    fun provideAttendeeApi(retrofit: Retrofit): AttendeeApi {
+        return retrofit.create(AttendeeApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideEventRepository(
         eventDao: EventDao,
         eventApi: EventApi,
@@ -31,5 +40,15 @@ class EventModule {
         agendaSyncScheduler: AgendaSyncScheduler
     ): EventRepository {
         return DefaultEventRepository(eventDao, eventApi,applicationScope,agendaSyncScheduler)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAttendee(
+        attendeeApi: AttendeeApi,
+    ):AttendeeRepository {
+        return DefaultAttendeeRepository(
+            attendeeApi,
+        )
     }
 }

@@ -1,7 +1,7 @@
 package com.juandgaines.agenda.presentation.agenda_item.components.attendee
 
-import android.provider.ContactsContract.CommonDataKinds.Email
 import com.juandgaines.agenda.domain.agenda.Attendee
+import com.juandgaines.agenda.domain.agenda.IAttendee
 
 data class AttendeeUi(
     val initials: String,
@@ -19,6 +19,17 @@ fun Attendee.toAttendeeUi() = AttendeeUi(
     fullName = fullName,
     userId = userId,
     eventId = eventId,
+    isGoing = isGoing,
+    isUserCreator = isUserCreator,
+    initials = UserInitialsFormatter.format(fullName),
+    isCreator = isUserCreator
+)
+
+fun IAttendee.toAttendeeUi() = AttendeeUi(
+    email = email,
+    fullName = fullName,
+    userId = userId,
+    eventId = "",
     isGoing = isGoing,
     isUserCreator = isUserCreator,
     initials = UserInitialsFormatter.format(fullName),

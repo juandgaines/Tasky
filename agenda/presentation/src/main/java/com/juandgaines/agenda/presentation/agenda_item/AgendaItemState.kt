@@ -1,6 +1,6 @@
 package com.juandgaines.agenda.presentation.agenda_item
 
-import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
+import androidx.compose.foundation.text.input.TextFieldState
 import java.time.ZonedDateTime
 
 data class AgendaItemState(
