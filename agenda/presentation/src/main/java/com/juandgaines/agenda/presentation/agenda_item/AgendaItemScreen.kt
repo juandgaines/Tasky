@@ -40,6 +40,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationS
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.DeletionScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Left
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UserAdded
@@ -142,6 +143,15 @@ fun AgendaItemScreenRoot(
                     Toast.LENGTH_SHORT
                 ).show()
             }
+
+            Left -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.item_left),
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateBack()
+            }
         }
     }
 
@@ -190,277 +200,288 @@ fun AgendaItemScreen(
         is AgendaItemDetailsUi.EventDetails -> stringResource(id = R.string.event)
         is AgendaItemDetailsUi.TaskDetails -> stringResource(id = R.string.task)
     }
-        TaskyScaffold (
-            topAppBar = {
-                Row (
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ){
-                    Icon(
-                        imageVector = CloseIcon,
-                        contentDescription = "Close",
-                        modifier = Modifier.clickable {
-                            onAction(AgendaItemAction.Close)
-                        }
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = state.title,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Box(
-                        contentAlignment = Alignment.Center,
-                    ){
-                        if (state.isEditing) {
-                            Text(
-                                text = stringResource(R.string.save),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier.clickable {
-                                    onAction(AgendaItemAction.Save)
-                                }
-                            )
-                        }
-                        else {
-                            Icon(
-                                imageVector = EditIcon,
-                                contentDescription = "Edit",
-                                tint = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.clickable {
-                                    onAction(AgendaItemAction.Edit)
-                                }
-                            )
-                        }
+
+    val canEditField = when (state.details) {
+        is AgendaItemDetailsUi.EventDetails -> state.details.isUserCreator || state.isNew
+        else -> true
+    }
+
+    TaskyScaffold (
+        topAppBar = {
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ){
+                Icon(
+                    imageVector = CloseIcon,
+                    contentDescription = "Close",
+                    modifier = Modifier.clickable {
+                        onAction(AgendaItemAction.Close)
                     }
-                }
-            },
-            loading = {
-                if(state.isSelectDateDialog){
-                    AgendaDatePicker(
-                        onDateSelected = { date->
-                            when(state.details) {
-                                is AgendaItemDetailsUi.EventDetails ->{
-                                    if (state.isEditingEndDate) {
-                                        onAction(AgendaItemAction.SelectDateFinish(date))
-                                    }
-                                    else {
-                                        onAction(SelectDateStart(date))
-                                    }
-                                }
-                                else -> onAction(SelectDateStart(date))
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = state.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Box(
+                    contentAlignment = Alignment.Center,
+                ){
+                    if (state.isEditing) {
+                        Text(
+                            text = stringResource(R.string.save),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.clickable {
+                                onAction(AgendaItemAction.Save)
                             }
-                        },
-                        onDismissDialog = {
-                            onAction(DismissDateDialog)
-                        },
-                        initialDate = state.startDateTime.toLocalDate()
-                    )
-                }
-
-                if (state.isSelectTimeDialogVisible) {
-                    val hour = state.startDateTime.hour
-                    val minute = state.startDateTime.minute
-                    AgendaTimePicker(
-                        modifier = Modifier.align(
-                            Alignment.Center
-                        ),
-                        onTimeSelected = { h, m ->
-                            when(state.details) {
-                                is AgendaItemDetailsUi.EventDetails ->{
-                                    if (state.isEditingEndDate) {
-                                        onAction(AgendaItemAction.SelectTimeFinish(h, m))
-                                    }
-                                    else {
-                                        onAction(AgendaItemAction.SelectTimeStart(h, m))
-                                    }
-                                }
-                                else -> onAction(AgendaItemAction.SelectTimeStart(h, m))
+                        )
+                    }
+                    else {
+                        Icon(
+                            imageVector = EditIcon,
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.clickable {
+                                onAction(AgendaItemAction.Edit)
                             }
-                        },
-                        onDismissDialog = {
-                            onAction(AgendaItemAction.DismissTimeDialog)
-                        },
-                        initialHour = hour,
-                        initialMinutes = minute
-                    )
-
-                }
-
-
-                if (state.details is AgendaItemDetailsUi.EventDetails && state.details.isAddAttendeeDialogVisible) {
-                    val isEmailValid by  state.details.isEmailValid.collectAsState(false)
-
-                    TaskyEditTextDialog(
-                        title = stringResource(id = R.string.add_visitor),
-                        onDismiss = {
-                            onAction(AgendaItemAction.DismissAttendeeDialog)
-                        },
-                        textState = state.details.attendeeEmailBuffer,
-                        isError = state.details.doesEmailExist,
-                        primaryButton = {
-                            TaskyActionButton(
-                                text = stringResource(id = R.string.add),
-                                isLoading = state.details.isAddingVisitor,
-                                enabled =  isEmailValid && !
-                                state.details.isAddingVisitor,
-                                onClick = {
-                                    onAction(AgendaItemAction.AddEmailAsAttendee(
-                                        state.details.attendeeEmailBuffer.text.toString()
-                                    ))
-                                },
-                            )
-                        }
-                    )
+                        )
+                    }
                 }
             }
-        ){
-            Column (
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ){
-                AgendaItemTypeSection(
-                    agendaItemDetails = state.details,
-                    agendaItemName = agendaItemName
-                )
-                TitleSection(
-                    title = state.title,
-                    isEditing = state.isEditing,
-                    onEditTitle = {
-                        onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_KEY, state.title))
-                    }
-                )
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    color = TaskyLight
-                )
-
-                DescriptionSection(
-                    description = state.description,
-                    isEditing = state.isEditing,
-                    onEditDescription = {
-                        onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION, state.description))
-                    }
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    color = TaskyLight
-                )
-
-                DateSection(
-                    date = state.startDateTime,
-                    isEditing = state.isEditing,
-                    onEditStartDate = {
-                        onAction(AgendaItemAction.ShowDateDialog())
-                    },
-                    onEditStartTime = {
-                        onAction(AgendaItemAction.ShowTimeDialog())
-                    },
-                    title =stringResource(id = R.string.from)
-                )
-                if (state.details is AgendaItemDetailsUi.EventDetails) {
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        color = TaskyLight
-                    )
-                    DateSection(
-                        date = state.details.finishDate,
-                        isEditing = state.isEditing,
-                        onEditStartDate = {
-                            onAction(AgendaItemAction.ShowDateDialog(true))
-                        },
-                        onEditStartTime = {
-                            onAction(AgendaItemAction.ShowTimeDialog(true))
-                        },
-                        title = stringResource(id = R.string.to)
-                    )
-                }
-
-                AlarmSection(
-                    alarm = state.alarm,
-                    isEditing = state.isEditing,
-                    onSelectAlarmTime = { alarm->
-                        onAction(AgendaItemAction.SelectAlarm(alarm))
-                    }
-                )
-                if (state.details is AgendaItemDetailsUi.EventDetails) {
-
-                    AttendeeSection(
-                        selectedFilter = state.attendeeFilter,
-                        attendeesGoing = state.details.isGoing,
-                        attendeesNotGoing = state.details.isNotGoing,
-                        isEditing = state.isEditing,
-                        onSelectFilter = { filter ->
-                            onAction(AgendaItemAction.SelectAttendeeFilter(filter))
-                        },
-                        isOwner = state.details.isUserCreator,
-                        isCreating = state.isNew,
-                        onRemoveAttendee = { attendeeId ->
-                            onAction(AgendaItemAction.RemoveAttendee(attendeeId))
-                        },
-                        onAddAttendee = {
-                            onAction(AgendaItemAction.ShowAttendeeDialog)
-                        },
-                    )
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                if(!state.isNew){
-                    when (state.details){
-                        is EventDetails -> {
-                            val text = if (state.details.isUserCreator ) {
-                                stringResource(id = R.string.delete_item, agendaItemName).uppercase()
-                            } else {
-                                stringResource(id = R.string.leave_item, agendaItemName).uppercase()
+        },
+        loading = {
+            if(state.isSelectDateDialog){
+                AgendaDatePicker(
+                    onDateSelected = { date->
+                        when(state.details) {
+                            is AgendaItemDetailsUi.EventDetails ->{
+                                if (state.isEditingEndDate) {
+                                    onAction(AgendaItemAction.SelectDateFinish(date))
+                                }
+                                else {
+                                    onAction(SelectDateStart(date))
+                                }
                             }
-                            Text(
-                                text = text,
-                                style = MaterialTheme.typography.titleSmall,
-                                color = TaskyGray,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        if (
-                                            state.details.isUserCreator
-                                        ) {
-                                            onAction(AgendaItemAction.Delete)
-                                        } else {
-                                            onAction(AgendaItemAction.Leave)
-                                        }
-                                    }
-                            )
+                            else -> onAction(SelectDateStart(date))
                         }
-                        else ->{
-                            Text(
-                                text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = TaskyGray,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth()
-                                    .clickable { onAction(AgendaItemAction.Delete) }
-                            )
-                        }
-                    }
+                    },
+                    onDismissDialog = {
+                        onAction(DismissDateDialog)
+                    },
+                    initialDate = state.startDateTime.toLocalDate()
+                )
+            }
 
-                }
+            if (state.isSelectTimeDialogVisible) {
+                val hour = state.startDateTime.hour
+                val minute = state.startDateTime.minute
+                AgendaTimePicker(
+                    modifier = Modifier.align(
+                        Alignment.Center
+                    ),
+                    onTimeSelected = { h, m ->
+                        when(state.details) {
+                            is AgendaItemDetailsUi.EventDetails ->{
+                                if (state.isEditingEndDate) {
+                                    onAction(AgendaItemAction.SelectTimeFinish(h, m))
+                                }
+                                else {
+                                    onAction(AgendaItemAction.SelectTimeStart(h, m))
+                                }
+                            }
+                            else -> onAction(AgendaItemAction.SelectTimeStart(h, m))
+                        }
+                    },
+                    onDismissDialog = {
+                        onAction(AgendaItemAction.DismissTimeDialog)
+                    },
+                    initialHour = hour,
+                    initialMinutes = minute
+                )
+
+            }
+
+
+            if (state.details is AgendaItemDetailsUi.EventDetails && state.details.isAddAttendeeDialogVisible) {
+                val isEmailValid by  state.details.isEmailValid.collectAsState(false)
+
+                TaskyEditTextDialog(
+                    title = stringResource(id = R.string.add_visitor),
+                    onDismiss = {
+                        onAction(AgendaItemAction.DismissAttendeeDialog)
+                    },
+                    textState = state.details.attendeeEmailBuffer,
+                    isError = state.details.doesEmailExist,
+                    primaryButton = {
+                        TaskyActionButton(
+                            text = stringResource(id = R.string.add),
+                            isLoading = state.details.isAddingVisitor,
+                            enabled =  isEmailValid && !
+                            state.details.isAddingVisitor,
+                            onClick = {
+                                onAction(AgendaItemAction.AddEmailAsAttendee(
+                                    state.details.attendeeEmailBuffer.text.toString()
+                                ))
+                            },
+                        )
+                    }
+                )
             }
         }
+    ){
+        Column (
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ){
+            AgendaItemTypeSection(
+                agendaItemDetails = state.details,
+                agendaItemName = agendaItemName
+            )
+            TitleSection(
+                title = state.title,
+                isEditing = state.isEditing,
+                canEditField = canEditField,
+                onEditTitle = {
+                    onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_KEY, state.title))
+                }
+            )
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                color = TaskyLight
+            )
+
+            DescriptionSection(
+                description = state.description,
+                isEditing = state.isEditing,
+                canEditField = canEditField,
+                onEditDescription = {
+                    onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION, state.description))
+                }
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                color = TaskyLight
+            )
+
+            DateSection(
+                date = state.startDateTime,
+                isEditing = state.isEditing,
+                canEditField = canEditField,
+                onEditStartDate = {
+                    onAction(AgendaItemAction.ShowDateDialog())
+                },
+                onEditStartTime = {
+                    onAction(AgendaItemAction.ShowTimeDialog())
+                },
+                title =stringResource(id = R.string.from)
+            )
+            if (state.details is AgendaItemDetailsUi.EventDetails) {
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    color = TaskyLight
+                )
+                DateSection(
+                    date = state.details.finishDate,
+                    title = stringResource(id = R.string.to),
+                    isEditing = state.isEditing,
+                    onEditStartDate = {
+                        onAction(AgendaItemAction.ShowDateDialog(true))
+                    },
+                    onEditStartTime = {
+                        onAction(AgendaItemAction.ShowTimeDialog(true))
+                    },
+                    canEditField = canEditField
+                )
+            }
+
+            AlarmSection(
+                alarm = state.alarm,
+                isEditing = state.isEditing,
+                onSelectAlarmTime = { alarm->
+                    onAction(AgendaItemAction.SelectAlarm(alarm))
+                }
+            )
+            if (state.details is AgendaItemDetailsUi.EventDetails) {
+
+                AttendeeSection(
+                    selectedFilter = state.attendeeFilter,
+                    attendeesGoing = state.details.isGoing,
+                    canEditField = canEditField,
+                    attendeesNotGoing = state.details.isNotGoing,
+                    isEditing = state.isEditing,
+                    onSelectFilter = { filter ->
+                        onAction(AgendaItemAction.SelectAttendeeFilter(filter))
+                    },
+                    isOwner = state.details.isUserCreator,
+                    isCreating = state.isNew,
+                    onRemoveAttendee = { attendeeId ->
+                        onAction(AgendaItemAction.RemoveAttendee(attendeeId))
+                    },
+                    onAddAttendee = {
+                        onAction(AgendaItemAction.ShowAttendeeDialog)
+                    },
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            if(!state.isNew){
+                when (state.details){
+                    is EventDetails -> {
+                        val text = if (state.details.isUserCreator ) {
+                            stringResource(id = R.string.delete_item, agendaItemName).uppercase()
+                        } else {
+                            stringResource(id = R.string.leave_item, agendaItemName).uppercase()
+                        }
+                        Text(
+                            text = text,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = TaskyGray,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (
+                                        state.details.isUserCreator
+                                    ) {
+                                        onAction(AgendaItemAction.Delete)
+                                    } else {
+                                        onAction(AgendaItemAction.Leave)
+                                    }
+                                }
+                        )
+                    }
+                    else ->{
+                        Text(
+                            text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = TaskyGray,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                                .clickable { onAction(AgendaItemAction.Delete) }
+                        )
+                    }
+                }
+
+            }
+        }
+    }
 }
 
 

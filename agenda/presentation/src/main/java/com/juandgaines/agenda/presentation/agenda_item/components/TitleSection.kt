@@ -26,17 +26,14 @@ fun TitleSection(
     modifier: Modifier = Modifier,
     title: String,
     isEditing: Boolean = true,
-    onEditTitle: () -> Unit = {}
+    canEditField: Boolean,
+    onEditTitle: () -> Unit = {},
 ){
     Row (
         modifier = modifier
-            .then(
-                if (isEditing)
-                    Modifier.clickable {
-                        onEditTitle()
-                    }
-                else Modifier
-            ),
+            .clickable(isEditing && canEditField) {
+                onEditTitle()
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
 
@@ -60,7 +57,7 @@ fun TitleSection(
             color = MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.weight(1f)
         )
-        if (isEditing) {
+        if (isEditing && canEditField) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Edit",
@@ -76,6 +73,6 @@ fun TitleSection(
 @Composable
 fun TitleSectionPreview() {
     TaskyTheme {
-        TitleSection(title = "Title")
+        TitleSection(title = "Title", canEditField = false)
     }
 }

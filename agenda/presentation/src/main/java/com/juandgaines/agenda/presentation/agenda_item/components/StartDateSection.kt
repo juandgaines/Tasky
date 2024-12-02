@@ -25,10 +25,11 @@ import java.time.ZonedDateTime
 fun DateSection(
     modifier: Modifier = Modifier,
     date: ZonedDateTime,
-    title : String,
+    title: String,
     isEditing: Boolean,
+    canEditField: Boolean,
     onEditStartDate: () -> Unit,
-    onEditStartTime: () -> Unit
+    onEditStartTime: () -> Unit,
 ){
     Row (
         modifier = modifier
@@ -48,7 +49,7 @@ fun DateSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier.weight(1f)
-                .clickable (enabled = isEditing) {
+                .clickable (enabled = isEditing && canEditField) {
                     onEditStartTime()
                 },
         ){
@@ -59,7 +60,7 @@ fun DateSection(
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSecondary,
             )
-            if (isEditing) {
+            if (isEditing && canEditField) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Edit",
@@ -72,7 +73,7 @@ fun DateSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier.weight(1f)
-                .clickable (enabled = isEditing) {
+                .clickable (enabled = isEditing && canEditField) {
                     onEditStartDate()
                 }
         ) {
@@ -84,7 +85,7 @@ fun DateSection(
                 color = MaterialTheme.colorScheme.onSecondary,
                 modifier = Modifier.weight(1f)
             )
-            if (isEditing) {
+            if (isEditing && canEditField) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Edit",
@@ -104,10 +105,11 @@ fun StartDateSectionPreview() {
     TaskyTheme {
         DateSection(
             date = ZonedDateTime.now(),
+            title = stringResource(id = R.string.from),
             isEditing = false,
             onEditStartDate = {},
             onEditStartTime = {},
-            title = stringResource(id = R.string.from)
+            canEditField = true
         )
     }
 }

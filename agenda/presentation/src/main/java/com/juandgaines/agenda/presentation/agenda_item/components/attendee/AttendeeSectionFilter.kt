@@ -47,10 +47,11 @@ fun AttendeeSection(
     isEditing: Boolean,
     isOwner: Boolean,
     isCreating: Boolean,
+    canEditField: Boolean,
     onSelectFilter: (AttendeeFilter) -> Unit,
     attendeesGoing: List<AttendeeUi>,
     attendeesNotGoing: List<AttendeeUi>,
-    onRemoveAttendee:(String) -> Unit,
+    onRemoveAttendee: (String) -> Unit,
     onAddAttendee: () -> Unit,
 ) {
     Column (
@@ -70,7 +71,7 @@ fun AttendeeSection(
             )
 
             Spacer(modifier = Modifier.size(8.dp))
-            if ((isEditing && isOwner) || isCreating) {
+            if (canEditField || isCreating) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.size(32.dp)
@@ -149,7 +150,8 @@ fun AttendeeSection(
                 items(attendeesGoing) { attendee ->
                     AttendeeItem(
                         attendee = attendee,
-                        isUserCreator = ((isEditing && isOwner) || isCreating),
+                        canEditField = canEditField,
+                        isUserCreator =  isCreating,
                         isEditing = isEditing,
                         onRemove = onRemoveAttendee
                     )
@@ -172,6 +174,8 @@ fun AttendeeSection(
                 items(attendeesNotGoing) { attendee ->
                     AttendeeItem(
                         attendee = attendee,
+                        canEditField = canEditField,
+                        isUserCreator =  isCreating,
                         isEditing = isEditing,
                         onRemove = onRemoveAttendee
                     )
@@ -191,14 +195,15 @@ fun PreviewAttendeeSectionFilter() {
     TaskyTheme {
         AttendeeSection(
             selectedFilter = AttendeeFilter.ALL,
-            onSelectFilter = {},
-            attendeesNotGoing = listOf(),
-            attendeesGoing = listOf(),
             isEditing = false,
             isOwner = true,
             isCreating = false,
+            onSelectFilter = {},
+            attendeesGoing = listOf(),
+            attendeesNotGoing = listOf(),
+            onRemoveAttendee = {},
             onAddAttendee = {},
-            onRemoveAttendee = {}
+            canEditField = false
         )
     }
 }

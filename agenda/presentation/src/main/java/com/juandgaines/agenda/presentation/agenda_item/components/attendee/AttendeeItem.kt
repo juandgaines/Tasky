@@ -29,8 +29,9 @@ fun AttendeeItem(
     modifier: Modifier = Modifier,
     isEditing: Boolean = true,
     isUserCreator: Boolean = false,
+    canEditField: Boolean,
     attendee: AttendeeUi,
-    onRemove: (String) -> Unit = {}
+    onRemove: (String) -> Unit = {},
 ) {
 
     Row (
@@ -65,7 +66,7 @@ fun AttendeeItem(
                 )
             }
             else -> {
-                if (isEditing && isUserCreator) {
+                if (isEditing && canEditField) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Edit",
@@ -85,16 +86,17 @@ fun AttendeeItem(
 @Preview
 fun PreviewAttendeeItem() {
     TaskyTheme {
-        AttendeeItem(attendee = AttendeeUi(
-            email = "j123@gmail.com",
-            fullName = "Juan David",
-            userId = "j123",
-            eventId = "e123",
-            isGoing = true,
-            isUserCreator = true,
-            initials = "JD",
-            isCreator = true
-        )
+        AttendeeItem(
+            attendee = AttendeeUi(
+                email = "j123@gmail.com",
+                fullName = "Juan David",
+                userId = "j123",
+                eventId = "e123",
+                isGoing = true,
+                isUserCreator = true,
+                initials = "JD",
+                isCreator = true
+            ), canEditField = true
         )
     }
 }

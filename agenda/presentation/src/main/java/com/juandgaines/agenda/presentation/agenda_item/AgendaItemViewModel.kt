@@ -28,6 +28,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissD
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Leave
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.RemoveAttendee
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
@@ -40,10 +41,14 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowAtte
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.ShowTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.UpdateField
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetailsUi.EventDetails
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetailsUi.TaskDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UserAdded
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.DAY_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_ONE
 import com.juandgaines.agenda.presentation.agenda_item.AlarmOptions.HOUR_SIX
@@ -59,7 +64,8 @@ import com.juandgaines.core.domain.auth.PatternValidator
 import com.juandgaines.core.domain.util.onError
 import com.juandgaines.core.domain.util.onSuccess
 import com.juandgaines.core.presentation.navigation.ScreenNav.AgendaItem
-import com.juandgaines.core.presentation.ui.UiText
+import com.juandgaines.core.presentation.ui.UiText.DynamicString
+import com.juandgaines.core.presentation.ui.UiText.StringResource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -129,7 +135,6 @@ class AgendaItemViewModel @Inject constructor(
             }.onSuccess { item ->
 
                 updateState { event->
-
                     event.copy(
                         isNew = false,
                         title = item.title,
@@ -198,7 +203,6 @@ class AgendaItemViewModel @Inject constructor(
                             isSelectTimeDialogVisible = false
                         )
                     }
-
                 }
                 is SelectDateFinish -> {
 
@@ -221,7 +225,7 @@ class AgendaItemViewModel @Inject constructor(
                     }
                 }
                 is SelectTimeFinish -> {
-                    val details = _state.value.details as AgendaItemDetailsUi.EventDetails
+                    val details = _state.value.details as EventDetails
                     updateState {
                         it.copy(
                             details = details.copy(
@@ -237,7 +241,7 @@ class AgendaItemViewModel @Inject constructor(
                     val agendaItemId = _navParameters.id
                     if (agendaItemId != null) {
                         alarmScheduler.cancelAlarm(agendaItemId)
-                        when (_type) {
+                        val response = when (_type) {
                             REMINDER -> reminderRepository.deleteReminder(
                                 Reminder(
                                     id = agendaItemId,
@@ -253,7 +257,7 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as AgendaItemDetailsUi.TaskDetails).isCompleted,
+                                    isDone = (_state.value.details as TaskDetails).isCompleted,
                                     remindAt = _state.value.startDateTime
                                 )
                             )
@@ -263,13 +267,22 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
+                                    endTime = (_state.value.details as EventDetails).finishDate,
                                     remindAt = _state.value.startDateTime,
-                                    host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
-                                    isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
+                                    host = (_state.value.details as EventDetails).host,
+                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                                 )
                             )
                         }
+
+                        response
+                            .onSuccess {
+                                eventChannel.send(AgendaItemEvent.Deleted)
+                            }.onError {
+                                eventChannel.send(
+                                    AgendaItemEvent.DeletionScheduled
+                                )
+                            }
                     }
                 }
                 Edit -> {
@@ -297,7 +310,7 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as AgendaItemDetailsUi.TaskDetails).isCompleted,
+                                    isDone = (_state.value.details as TaskDetails).isCompleted,
                                     remindAt = desiredAlarmDate
                                 )
                             }
@@ -307,8 +320,8 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
-                                    attendee = (_state.value.details as AgendaItemDetailsUi.EventDetails).attendees.map {
+                                    endTime = (_state.value.details as EventDetails).finishDate,
+                                    attendee = (_state.value.details as EventDetails).attendees.map {
                                         AttendeeMinimal(
                                             email = it.email,
                                             fullName = it.fullName,
@@ -318,8 +331,8 @@ class AgendaItemViewModel @Inject constructor(
                                         )
                                     },
                                     remindAt = desiredAlarmDate,
-                                    host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
-                                    isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
+                                    host = (_state.value.details as EventDetails).host,
+                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                                 )
                             }
                         }
@@ -361,7 +374,7 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    isDone = (_state.value.details as AgendaItemDetailsUi.TaskDetails).isCompleted,
+                                    isDone = (_state.value.details as TaskDetails).isCompleted,
                                     remindAt = desiredAlarmDate
                                 )
                             }
@@ -371,9 +384,9 @@ class AgendaItemViewModel @Inject constructor(
                                     title = _state.value.title,
                                     description = _state.value.description,
                                     time = _state.value.startDateTime,
-                                    endTime = (_state.value.details as AgendaItemDetailsUi.EventDetails).finishDate,
+                                    endTime = (_state.value.details as EventDetails).finishDate,
                                     remindAt = desiredAlarmDate,
-                                    attendee = (_state.value.details as AgendaItemDetailsUi.EventDetails).attendees.map {
+                                    attendee = (_state.value.details as EventDetails).attendees.map {
                                         AttendeeMinimal(
                                             email = it.email,
                                             fullName = it.fullName,
@@ -382,8 +395,8 @@ class AgendaItemViewModel @Inject constructor(
                                             isUserCreator = it.isUserCreator
                                         )
                                     },
-                                    host = (_state.value.details as AgendaItemDetailsUi.EventDetails).host,
-                                    isUserEventCreator = (_state.value.details as AgendaItemDetailsUi.EventDetails).isUserCreator,
+                                    host = (_state.value.details as EventDetails).host,
+                                    isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                                 )
                             }
                         }
@@ -509,14 +522,18 @@ class AgendaItemViewModel @Inject constructor(
                                         )
                                     }
 
-                                    eventChannel.send(AgendaItemEvent.UserAdded(
-                                        UiText.DynamicString(action.email)
-                                    ))
+                                    eventChannel.send(
+                                        UserAdded(
+                                        DynamicString(action.email)
+                                    )
+                                    )
                                 }
                                 else{
-                                    eventChannel.send(AgendaItemEvent.Error(
-                                        UiText.StringResource(R.string.user_not_found)
-                                    ))
+                                    eventChannel.send(
+                                        Error(
+                                        StringResource(R.string.user_not_found)
+                                    )
+                                    )
                                     updateState {s ->
                                         s.copy(
                                             details = updateDetailsIfEvent { d->
@@ -567,6 +584,10 @@ class AgendaItemViewModel @Inject constructor(
                             }
                         )
                     }
+                }
+
+                Leave -> {
+                    //TODO: Implement leave
                 }
             }
         }

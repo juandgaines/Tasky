@@ -25,18 +25,15 @@ fun DescriptionSection(
     modifier: Modifier = Modifier,
     description: String,
     isEditing: Boolean,
-    onEditDescription: () -> Unit
+    canEditField: Boolean,
+    onEditDescription: () -> Unit,
 ){
     Row (
         modifier = modifier
             .fillMaxWidth()
-            .then(
-                if (isEditing)
-                    Modifier.clickable {
-                        onEditDescription()
-                    }
-                else Modifier
-            ),
+            .clickable(isEditing && canEditField) {
+                onEditDescription()
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
 
@@ -54,7 +51,7 @@ fun DescriptionSection(
                 MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.weight(1f)
         )
-        if (isEditing) {
+        if (isEditing && canEditField) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Edit",
@@ -72,7 +69,8 @@ fun DescriptionSectionPreview() {
         DescriptionSection(
             description = "This is a description",
             isEditing = true,
-            onEditDescription = {}
+            onEditDescription = {},
+            canEditField = true
         )
     }
 }
