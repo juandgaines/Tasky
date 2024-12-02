@@ -53,6 +53,7 @@ fun AttendeeSection(
     attendeesNotGoing: List<AttendeeUi>,
     onRemoveAttendee: (String) -> Unit,
     onAddAttendee: () -> Unit,
+    isInternetConnected: Boolean,
 ) {
     Column (
         modifier = modifier
@@ -79,7 +80,7 @@ fun AttendeeSection(
                             color = TaskyLight,
                             shape = RoundedCornerShape(4.dp)
                         )
-                        .clickable {
+                        .clickable(enabled = isInternetConnected) {
                             onAddAttendee()
                         }
                 ) {
@@ -153,6 +154,7 @@ fun AttendeeSection(
                         canEditField = canEditField,
                         isUserCreator =  isCreating,
                         isEditing = isEditing,
+                        isInternetConnected = isInternetConnected,
                         onRemove = onRemoveAttendee
                     )
                 }
@@ -177,6 +179,7 @@ fun AttendeeSection(
                         canEditField = canEditField,
                         isUserCreator =  isCreating,
                         isEditing = isEditing,
+                        isInternetConnected = isInternetConnected,
                         onRemove = onRemoveAttendee
                     )
                 }
@@ -203,6 +206,7 @@ fun PreviewAttendeeSectionFilter() {
             attendeesNotGoing = listOf(),
             onRemoveAttendee = {},
             onAddAttendee = {},
+            isInternetConnected = true,
             canEditField = false
         )
     }

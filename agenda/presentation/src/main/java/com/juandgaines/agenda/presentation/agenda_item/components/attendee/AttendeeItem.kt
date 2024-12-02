@@ -30,6 +30,7 @@ fun AttendeeItem(
     isEditing: Boolean = true,
     isUserCreator: Boolean = false,
     canEditField: Boolean,
+    isInternetConnected: Boolean,
     attendee: AttendeeUi,
     onRemove: (String) -> Unit = {},
 ) {
@@ -95,8 +96,10 @@ fun PreviewAttendeeItem() {
                 isGoing = true,
                 isUserCreator = true,
                 initials = "JD",
-                isCreator = true
-            ), canEditField = true
-        )
+                isCreator = true,
+        ),
+            isEditing = true,
+            isInternetConnected = true,
+            canEditField = true,
     }
 }

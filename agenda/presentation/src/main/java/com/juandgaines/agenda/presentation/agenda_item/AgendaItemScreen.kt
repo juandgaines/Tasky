@@ -326,9 +326,11 @@ fun AgendaItemScreen(
                             enabled =  isEmailValid && !
                             state.details.isAddingVisitor,
                             onClick = {
-                                onAction(AgendaItemAction.AddEmailAsAttendee(
-                                    state.details.attendeeEmailBuffer.text.toString()
-                                ))
+                                onAction(
+                                    AgendaItemAction.AddEmailAsAttendee(
+                                        state.details.attendeeEmailBuffer.text.toString()
+                                    )
+                                )
                             },
                         )
                     }
@@ -416,25 +418,26 @@ fun AgendaItemScreen(
             )
             if (state.details is AgendaItemDetailsUi.EventDetails) {
 
-                AttendeeSection(
-                    selectedFilter = state.attendeeFilter,
-                    attendeesGoing = state.details.isGoing,
-                    canEditField = canEditField,
-                    attendeesNotGoing = state.details.isNotGoing,
-                    isEditing = state.isEditing,
-                    onSelectFilter = { filter ->
-                        onAction(AgendaItemAction.SelectAttendeeFilter(filter))
-                    },
-                    isOwner = state.details.isUserCreator,
-                    isCreating = state.isNew,
-                    onRemoveAttendee = { attendeeId ->
-                        onAction(AgendaItemAction.RemoveAttendee(attendeeId))
-                    },
-                    onAddAttendee = {
-                        onAction(AgendaItemAction.ShowAttendeeDialog)
-                    },
-                )
-            }
+                    AttendeeSection(
+                        selectedFilter = state.attendeeFilter,
+                        attendeesGoing = state.details.isGoing,
+                        attendeesNotGoing = state.details.isNotGoing,
+                        isEditing = state.isEditing,
+                        canEditField = canEditField,
+                        isInternetConnected = state.details.isConnectedToInternet,
+                        onSelectFilter = { filter ->
+                            onAction(AgendaItemAction.SelectAttendeeFilter(filter))
+                        },
+                        isOwner = state.details.isUserCreator,
+                        isCreating = state.isNew,
+                        onRemoveAttendee = { attendeeId ->
+                            onAction(AgendaItemAction.RemoveAttendee(attendeeId))
+                        },
+                        onAddAttendee = {
+                            onAction(AgendaItemAction.ShowAttendeeDialog)
+                        },
+                    )
+                }
 
             Spacer(modifier = Modifier.weight(1f))
 
