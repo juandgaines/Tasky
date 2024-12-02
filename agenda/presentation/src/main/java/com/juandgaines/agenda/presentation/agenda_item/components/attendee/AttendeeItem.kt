@@ -28,6 +28,7 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 fun AttendeeItem(
     modifier: Modifier = Modifier,
     isEditing: Boolean = true,
+    isUserCreator: Boolean = false,
     attendee: AttendeeUi,
     onRemove: (String) -> Unit = {}
 ) {
@@ -64,7 +65,7 @@ fun AttendeeItem(
                 )
             }
             else -> {
-                if (isEditing) {
+                if (isEditing && isUserCreator) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Edit",

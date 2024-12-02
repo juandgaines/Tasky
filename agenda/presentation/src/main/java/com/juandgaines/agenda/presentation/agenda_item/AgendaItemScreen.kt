@@ -34,6 +34,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectDateStart
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetailsUi.EventDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
@@ -417,21 +418,49 @@ fun AgendaItemScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 if(!state.isNew){
-                    Text(
-                        text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = TaskyGray,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                            .clickable { onAction(AgendaItemAction.Delete) }
-                    )
+                    when (state.details){
+                        is EventDetails -> {
+                            val text = if (state.details.isUserCreator ) {
+                                stringResource(id = R.string.delete_item, agendaItemName).uppercase()
+                            } else {
+                                stringResource(id = R.string.leave_item, agendaItemName).uppercase()
+                            }
+                            Text(
+                                text = text,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = TaskyGray,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        if (
+                                            state.details.isUserCreator
+                                        ) {
+                                            onAction(AgendaItemAction.Delete)
+                                        } else {
+                                            onAction(AgendaItemAction.Leave)
+                                        }
+                                    }
+                            )
+                        }
+                        else ->{
+                            Text(
+                                text = stringResource(id = R.string.delete_item, agendaItemName).uppercase(),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = TaskyGray,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth()
+                                    .clickable { onAction(AgendaItemAction.Delete) }
+                            )
+                        }
+                    }
+
                 }
             }
-
         }
-
 }
 
 

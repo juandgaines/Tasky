@@ -149,6 +149,7 @@ fun AttendeeSection(
                 items(attendeesGoing) { attendee ->
                     AttendeeItem(
                         attendee = attendee,
+                        isUserCreator = ((isEditing && isOwner) || isCreating),
                         isEditing = isEditing,
                         onRemove = onRemoveAttendee
                     )

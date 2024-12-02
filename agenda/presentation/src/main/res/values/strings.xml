@@ -11,6 +11,7 @@
   <string name="edit">Edit</string>
   <string name="delete">Delete</string>
   <string name="delete_item">Delete %s</string>
+  <string name="leave_item">Leave %s</string>
   <string name="task_deleted">Task has been deleted</string>
   <string name="task_updated">Task has been updated</string>
   <string name="no_description">Description…</string>
