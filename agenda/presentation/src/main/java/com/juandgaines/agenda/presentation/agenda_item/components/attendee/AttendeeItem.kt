@@ -67,12 +67,12 @@ fun AttendeeItem(
                 )
             }
             else -> {
-                if (isEditing && canEditField) {
+                if (isEditing && canEditField ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Edit",
                         tint = TaskyBlack,
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.clickable (isInternetConnected) {
                             onRemove(attendee.userId)
                         }
                     )
@@ -101,5 +101,6 @@ fun PreviewAttendeeItem() {
             isEditing = true,
             isInternetConnected = true,
             canEditField = true,
+        )
     }
 }
