@@ -65,9 +65,10 @@ class DefaultAgendaRepository @Inject constructor(
     override suspend fun fetchItems(time: Long): EmptyDataResult<Network> = safeCall {
         agendaApi.getAgenda(time)
     }.onSuccess { response->
+        val sessionManager = sessionManager.get() ?: return@onSuccess
         val taskItems= response.tasks.map { it.toTask() }
         val reminderItems= response.reminders.map { it.toReminder() }
-        val eventsItems = response.events.map { it.toEvent() }
+        val eventsItems = response.events.map { it.toEvent(sessionManager.userId) }
         applicationScope.launch {
             launch {
                 reminderRepository.upsertReminders(reminderItems)

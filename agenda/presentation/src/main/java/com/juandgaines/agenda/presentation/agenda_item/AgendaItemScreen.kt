@@ -40,6 +40,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationS
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.DeletionScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Joined
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Left
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
@@ -148,6 +149,14 @@ fun AgendaItemScreenRoot(
                 Toast.makeText(
                     context,
                     context.getString(R.string.item_left),
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateBack()
+            }
+            Joined -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.item_joined),
                     Toast.LENGTH_SHORT
                 ).show()
                 navigateBack()
@@ -444,11 +453,19 @@ fun AgendaItemScreen(
             if(!state.isNew){
                 when (state.details){
                     is EventDetails -> {
-                        val text = if (state.details.isUserCreator ) {
-                            stringResource(id = R.string.delete_item, agendaItemName).uppercase()
-                        } else {
-                            stringResource(id = R.string.leave_item, agendaItemName).uppercase()
+
+                        val text = when{
+                            state.details.isUserCreator->{
+                                stringResource(id = R.string.delete_item, agendaItemName).uppercase()
+                            }
+                            state.details.isGoingUser -> {
+                                stringResource(id = R.string.leave_item, agendaItemName).uppercase()
+                            }
+                            else -> {
+                                stringResource(id = R.string.join_item, agendaItemName).uppercase()
+                            }
                         }
+
                         Text(
                             text = text,
                             style = MaterialTheme.typography.titleSmall,
@@ -458,12 +475,17 @@ fun AgendaItemScreen(
                                 .padding(16.dp)
                                 .fillMaxWidth()
                                 .clickable {
-                                    if (
-                                        state.details.isUserCreator
-                                    ) {
-                                        onAction(AgendaItemAction.Delete)
-                                    } else {
-                                        onAction(AgendaItemAction.Leave)
+
+                                    when{
+                                        state.details.isUserCreator -> {
+                                            onAction(AgendaItemAction.Delete)
+                                        }
+                                        state.details.isGoingUser -> {
+                                            onAction(AgendaItemAction.Leave)
+                                        }
+                                        else -> {
+                                            onAction(AgendaItemAction.Join)
+                                        }
                                     }
                                 }
                         )
@@ -507,7 +529,8 @@ fun AgendaItemScreenPreview() {
                         override fun matches(value: String): Boolean {
                             return true
                         }
-                    }
+                    },
+                    isGoingUser = true
                 ),
                 alarm = AlarmOptions.MINUTES_TEN
             ),

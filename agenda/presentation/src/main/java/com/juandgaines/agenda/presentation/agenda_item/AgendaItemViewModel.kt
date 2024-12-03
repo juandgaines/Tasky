@@ -28,6 +28,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissD
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Join
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Leave
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.RemoveAttendee
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
@@ -178,7 +179,8 @@ class AgendaItemViewModel @Inject constructor(
                         REMINDER -> AgendaItemDetailsUi.ReminderDetails
                         TASK -> AgendaItemDetailsUi.TaskDetails()
                         EVENT -> AgendaItemDetailsUi.EventDetails(
-                            emailPatterValidator = emailPatterValidator
+                            emailPatterValidator = emailPatterValidator,
+                            isGoingUser = true
                         )
                     }
                 )
@@ -284,6 +286,7 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = _state.value.startDateTime,
                                     host = (_state.value.details as EventDetails).host,
                                     isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    isGoing = (_state.value.details as EventDetails).isGoingUser,
                                 )
                             )
                         }
@@ -346,6 +349,7 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = desiredAlarmDate,
                                     host = (_state.value.details as EventDetails).host,
                                     isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    isGoing = (_state.value.details as EventDetails).isGoingUser,
                                 )
                             }
                         }
@@ -409,6 +413,7 @@ class AgendaItemViewModel @Inject constructor(
                                         )
                                     },
                                     host = (_state.value.details as EventDetails).host,
+                                    isGoing = (_state.value.details as EventDetails).isGoingUser,
                                     isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                                 )
                             }
@@ -600,7 +605,84 @@ class AgendaItemViewModel @Inject constructor(
                 }
 
                 Leave -> {
-                    //TODO: Implement leave
+                    val agendaItemId = _navParameters.id
+                    agendaItemId?.let {
+                        val desiredAlarmDate = calculateTimeAlarm()
+                        val event = Event(
+                            id = _navParameters.id!!,
+                            title = _state.value.title,
+                            description = _state.value.description,
+                            time = _state.value.startDateTime,
+                            endTime = (_state.value.details as EventDetails).finishDate,
+                            attendee = (_state.value.details as EventDetails).attendees.map {
+                                AttendeeMinimal(
+                                    email = it.email,
+                                    fullName = it.fullName,
+                                    userId = it.userId,
+                                    isGoing = it.isGoing,
+                                    isUserCreator = it.isUserCreator
+                                )
+                            },
+                            remindAt = desiredAlarmDate,
+                            host = (_state.value.details as EventDetails).host,
+                            isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                            isGoing = false
+                        )
+                        eventRepository.updateEvent(event)
+                            .onSuccess {
+                                eventChannel.send(AgendaItemEvent.Left)
+                            }.onError {
+                                eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
+                            }
+                    }?:run {
+                        eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
+                    }
+
+                    /*
+                    attendeeRepository.deleteAttendee(_navParameters.id!!)
+                        .onSuccess {
+                            eventChannel.send(AgendaItemEvent.Left)
+                        }.onError {
+                            eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
+                        }
+
+                     */
+                }
+
+                Join -> {
+                    val agendaItemId = _navParameters.id
+                    agendaItemId?.let {
+                        val desiredAlarmDate = calculateTimeAlarm()
+                        val event = Event(
+                            id = _navParameters.id!!,
+                            title = _state.value.title,
+                            description = _state.value.description,
+                            time = _state.value.startDateTime,
+                            endTime = (_state.value.details as EventDetails).finishDate,
+                            attendee = (_state.value.details as EventDetails).attendees.map {
+                                AttendeeMinimal(
+                                    email = it.email,
+                                    fullName = it.fullName,
+                                    userId = it.userId,
+                                    isGoing = it.isGoing,
+                                    isUserCreator = it.isUserCreator
+                                )
+                            },
+                            remindAt = desiredAlarmDate,
+                            host = (_state.value.details as EventDetails).host,
+                            isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                            isGoing = true
+                        )
+                        eventRepository.updateEvent(event)
+                            .onSuccess {
+                                eventChannel.send(AgendaItemEvent.Joined)
+                            }.onError {
+                                eventChannel.send(Error(StringResource(R.string.error_joining_event)))
+                            }
+                    }?:run {
+                        eventChannel.send(Error(StringResource(R.string.error_joining_event)))
+                    }
+
                 }
             }
         }

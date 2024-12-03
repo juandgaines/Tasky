@@ -18,6 +18,7 @@ sealed interface AgendaItemDetailsUi {
         val attendeeEmailBuffer: TextFieldState = TextFieldState(),
         val isAddingVisitor: Boolean = false,
         val doesEmailExist: Boolean = false,
+        val isGoingUser: Boolean,
         val isAddAttendeeDialogVisible: Boolean = false,
         val isConnectedToInternet: Boolean = true,
         private val emailPatterValidator: PatternValidator
@@ -43,6 +44,7 @@ fun AgendaItemDetails.toAgendaItemDetailsUi(emailPatterValidator: PatternValidat
         attendees = attendees.map {
             it.toAttendeeUi()
         },
+        isGoingUser = isGoingUser,
         emailPatterValidator = emailPatterValidator
     )
     is AgendaItemDetails.TaskDetails -> AgendaItemDetailsUi.TaskDetails(isCompleted)

@@ -17,5 +17,7 @@ data class EventEntity(
     val host : String,
     @ColumnInfo(name = "is_user_event_creator")
     val isUserEventCreator: Boolean,
+    @ColumnInfo(name = "is_going")
+    val isGoing: Boolean,
     val attendees: List<AttendeeEntity>
 )

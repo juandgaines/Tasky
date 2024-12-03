@@ -14,7 +14,7 @@ import com.juandgaines.core.data.database.event.AttendeeEntity
 import com.juandgaines.core.data.database.event.EventEntity
 import java.time.ZonedDateTime
 
-fun EventResponse.toEvent() = Event(
+fun EventResponse.toEvent( userId:String?) = Event(
     id = id,
     title = title,
     description = description,
@@ -23,7 +23,8 @@ fun EventResponse.toEvent() = Event(
     remindAt = remindAt.toZonedDateTime(),
     host = host,
     isUserEventCreator = isUserEventCreator,
-    attendee = attendees.map { it.toAttendee(host) }
+    attendee = attendees.map { it.toAttendee(host) },
+    isGoing = attendees.find { it.userId == userId }?.isGoing?:true
 )
 
 fun AttendeeDto.toAttendee(id:String) = Attendee(
@@ -46,7 +47,7 @@ fun Event.toEventRequest() = CreateEventRequest(
     remindAt = remindAt.toInstant().toEpochMilli()
 )
 
-fun Event.toUpdateEventRequest(isGoing:Boolean = true) = UpdateEventRequest(
+fun Event.toUpdateEventRequest() = UpdateEventRequest(
     id = id,
     title = title,
     description = description,
@@ -66,6 +67,7 @@ fun Event.toEventEntity() = EventEntity(
     timeEnd = endTime.toInstant().toEpochMilli(),
     remindAt = remindAt.toInstant().toEpochMilli(),
     host = host,
+    isGoing = isGoing,
     isUserEventCreator = isUserEventCreator,
     attendees = attendee.map { it.toAttendeeEntity() }
 )
@@ -78,6 +80,7 @@ fun EventEntity.toEvent() = Event(
     endTime = timeEnd.toZonedDateTime(),
     remindAt = remindAt.toZonedDateTime(),
     host = host,
+    isGoing = isGoing,
     isUserEventCreator = isUserEventCreator,
     attendee = attendees.map { it.toAttendee() }
 )
