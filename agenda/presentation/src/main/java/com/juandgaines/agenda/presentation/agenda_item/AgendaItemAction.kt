@@ -21,4 +21,6 @@ sealed interface AgendaItemAction{
     data object Save: AgendaItemAction
     data object Close: AgendaItemAction
     data object Delete: AgendaItemAction
+    data object Leave: AgendaItemAction
+    data object Join: AgendaItemAction
 }

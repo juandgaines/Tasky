@@ -55,7 +55,7 @@ class DefaultEventRepository @Inject constructor(
                     else -> Unit
                 }
             }.onSuccess {
-                val newEvent = it.toEvent()
+                val newEvent = it.toEvent(null)
                 eventDao.upsertEvent(newEvent.toEventEntity())
             }.asEmptyDataResult()
             response

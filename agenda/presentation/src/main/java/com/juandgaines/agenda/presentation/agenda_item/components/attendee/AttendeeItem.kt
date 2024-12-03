@@ -28,8 +28,11 @@ import com.juandgaines.core.presentation.designsystem.TaskyTheme
 fun AttendeeItem(
     modifier: Modifier = Modifier,
     isEditing: Boolean = true,
+    isUserCreator: Boolean = false,
+    canEditField: Boolean,
+    isInternetConnected: Boolean,
     attendee: AttendeeUi,
-    onRemove: (String) -> Unit = {}
+    onRemove: (String) -> Unit = {},
 ) {
 
     Row (
@@ -64,12 +67,12 @@ fun AttendeeItem(
                 )
             }
             else -> {
-                if (isEditing) {
+                if (isEditing && canEditField ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Edit",
                         tint = TaskyBlack,
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.clickable (isInternetConnected) {
                             onRemove(attendee.userId)
                         }
                     )
@@ -84,16 +87,20 @@ fun AttendeeItem(
 @Preview
 fun PreviewAttendeeItem() {
     TaskyTheme {
-        AttendeeItem(attendee = AttendeeUi(
-            email = "j123@gmail.com",
-            fullName = "Juan David",
-            userId = "j123",
-            eventId = "e123",
-            isGoing = true,
-            isUserCreator = true,
-            initials = "JD",
-            isCreator = true
-        )
+        AttendeeItem(
+            attendee = AttendeeUi(
+                email = "j123@gmail.com",
+                fullName = "Juan David",
+                userId = "j123",
+                eventId = "e123",
+                isGoing = true,
+                isUserCreator = true,
+                initials = "JD",
+                isCreator = true,
+        ),
+            isEditing = true,
+            isInternetConnected = true,
+            canEditField = true,
         )
     }
 }

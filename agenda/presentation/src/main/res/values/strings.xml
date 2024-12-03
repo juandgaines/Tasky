@@ -11,6 +11,8 @@
   <string name="edit">Edit</string>
   <string name="delete">Delete</string>
   <string name="delete_item">Delete %s</string>
+  <string name="leave_item">Leave %s</string>
+  <string name="join_item">Join %s</string>
   <string name="task_deleted">Task has been deleted</string>
   <string name="task_updated">Task has been updated</string>
   <string name="no_description">Description…</string>
@@ -48,4 +50,8 @@
   <string name="user_not_found">User does not exist.</string>
   <string name="visitor_added">%s added to the event</string>
   <string name="invalid_email">Invalid email</string>
+  <string name="item_left">You left the event</string>
+  <string name="item_joined">You joined the event</string>
+  <string name="error_leaving_event">Error leaving event</string>
+  <string name="error_joining_event">Error joining event</string>
 </resources>
