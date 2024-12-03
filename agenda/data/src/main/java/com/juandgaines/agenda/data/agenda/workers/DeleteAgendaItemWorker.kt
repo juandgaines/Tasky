@@ -6,6 +6,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.juandgaines.agenda.data.agenda.remote.AgendaApi
 import com.juandgaines.agenda.data.agenda.remote.SyncAgendaRequest
+import com.juandgaines.agenda.data.mappers.toEvent
+import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.core.data.database.agenda.AgendaSyncDao
 import com.juandgaines.core.data.network.safeCall
 import com.juandgaines.core.domain.auth.SessionManager
@@ -20,6 +22,7 @@ class DeleteAgendaItemWorker @AssistedInject constructor(
     private val agendaApi: AgendaApi,
     private val sessionManager: SessionManager,
     private val agendaSyncDao: AgendaSyncDao,
+    private val attendeeRepository: AttendeeRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -30,7 +33,12 @@ class DeleteAgendaItemWorker @AssistedInject constructor(
 
         val reminderDeleteList = agendaSyncDao.getAllDeleteReminderSync(userId)
         val taskDeleteList = agendaSyncDao.getAllDeleteTaskSync(userId)
-        val eventDeleteList = agendaSyncDao.getAllDeleteEventSync(userId)
+        val eventDeleteList = agendaSyncDao.getAllDeleteEventSync(userId).filter {
+            it.event.isUserEventCreator
+        }
+        val eventAttendeeDeleted = agendaSyncDao.getAllDeleteEventSync(userId).filter {
+            !it.event.isUserEventCreator
+        }
 
         val response = safeCall {
             agendaApi.syncAgenda(
@@ -49,6 +57,10 @@ class DeleteAgendaItemWorker @AssistedInject constructor(
             }
             eventDeleteList.forEach {
                 agendaSyncDao.deleteDeleteEventSync(it.eventId)
+            }
+
+            eventAttendeeDeleted.forEach {
+                attendeeRepository.deleteAttendee(it.event.toEvent())
             }
         }
 
