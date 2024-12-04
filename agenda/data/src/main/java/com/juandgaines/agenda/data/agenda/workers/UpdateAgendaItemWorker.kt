@@ -137,7 +137,9 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
     private suspend fun updateAgendaItemEventPendingSync(agendaId: String): Result {
         val updatedPendingAgendaItem = agendaSyncDao.getUpdateEventSync(agendaId)
         return updatedPendingAgendaItem?.let {
-            val response = eventRepository.updateEvent(updatedPendingAgendaItem.event.toEvent())
+            val response = eventRepository.updateEvent(
+                updatedPendingAgendaItem.event.toEvent(), emptyList()
+            )
             return if (response is Error) {
                 response.error.toWorkerResult()
             } else {

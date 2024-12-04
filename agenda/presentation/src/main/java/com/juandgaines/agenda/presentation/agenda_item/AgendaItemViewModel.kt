@@ -2,6 +2,7 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -338,6 +339,7 @@ class AgendaItemViewModel @Inject constructor(
                                 )
                             }
                             EVENT -> {
+                                val compressedPhotos = fileCompressor.compressLocalFiles((_state.value.details as EventDetails).localPhotos.map { it.toString() })
                                 Event(
                                     id = agendaItemId,
                                     title = _state.value.title,
@@ -357,6 +359,7 @@ class AgendaItemViewModel @Inject constructor(
                                     host = (_state.value.details as EventDetails).host,
                                     isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                                     isGoing = (_state.value.details as EventDetails).isGoingUser,
+                                    localPhotos = compressedPhotos.listFiles
                                 )
                             }
                         }
@@ -369,7 +372,8 @@ class AgendaItemViewModel @Inject constructor(
                                 data
                             )
                             is Event -> eventRepository.updateEvent(
-                                data
+                                data,
+                                data.localPhotos
                             )
                         }
                         response
@@ -403,7 +407,7 @@ class AgendaItemViewModel @Inject constructor(
                                 )
                             }
                             EVENT -> {
-                                val compressPhoto = fileCompressor.compressLocalFiles((_state.value.details as EventDetails).photos.map { it.toString() })
+                                val compressPhoto = fileCompressor.compressLocalFiles((_state.value.details as EventDetails).localPhotos.map { it.toString() })
                                 Event(
                                     id = UUID.randomUUID().toString(),
                                     title = _state.value.title,
@@ -638,7 +642,7 @@ class AgendaItemViewModel @Inject constructor(
                             isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                             isGoing = false
                         )
-                        eventRepository.updateEvent(event)
+                        eventRepository.updateEvent(event, emptyList())
                             .onSuccess {
                                 eventChannel.send(Left)
                             }.onError {
@@ -683,7 +687,7 @@ class AgendaItemViewModel @Inject constructor(
                             isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                             isGoing = true
                         )
-                        eventRepository.updateEvent(event)
+                        eventRepository.updateEvent(event, emptyList())
                             .onSuccess {
                                 eventChannel.send(Joined)
                             }.onError {

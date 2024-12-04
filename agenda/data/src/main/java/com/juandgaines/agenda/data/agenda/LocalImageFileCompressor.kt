@@ -60,7 +60,6 @@ class LocalImageFileCompressor @Inject constructor(
                 failedFiles++
             }
         }
-        compressedFiles.first().length()
 
         return FileCompressionResult(failedFiles, compressedFiles)
     }

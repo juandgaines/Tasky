@@ -8,7 +8,10 @@ import java.io.File
 
 interface EventRepository {
     suspend fun insertEvent(event: Event, photos:List<File>): Result<Unit, DataError>
-    suspend fun updateEvent(event: Event): Result<Unit, DataError>
+    suspend fun updateEvent(
+        event: Event,
+        localPhotos: List<File>
+    ): Result<Unit, DataError>
     suspend fun upsertEvents(list: List<Event>): Result<Unit, DataError>
     suspend fun getEventById(eventId: String): Result<Event, DataError>
     fun getEventByIdFlow(eventId: String): Flow<Event?>

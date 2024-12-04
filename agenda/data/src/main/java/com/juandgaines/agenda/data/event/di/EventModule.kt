@@ -11,6 +11,7 @@ import com.juandgaines.agenda.domain.agenda.FileCompressor
 import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.core.data.database.event.EventDao
+import com.juandgaines.core.domain.auth.SessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,9 +42,10 @@ class EventModule {
         eventDao: EventDao,
         eventApi: EventApi,
         applicationScope: CoroutineScope,
-        agendaSyncScheduler: AgendaSyncScheduler
+        agendaSyncScheduler: AgendaSyncScheduler,
+        sessionManager: SessionManager
     ): EventRepository {
-        return DefaultEventRepository(eventDao, eventApi,applicationScope,agendaSyncScheduler)
+        return DefaultEventRepository(eventDao, eventApi,applicationScope,agendaSyncScheduler, sessionManager)
     }
 
     @Provides

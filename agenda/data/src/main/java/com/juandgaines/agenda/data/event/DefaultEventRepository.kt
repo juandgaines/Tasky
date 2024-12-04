@@ -15,6 +15,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.core.data.database.event.EventDao
 import com.juandgaines.core.data.network.safeCall
+import com.juandgaines.core.domain.auth.SessionManager
 import com.juandgaines.core.domain.util.DataError
 import com.juandgaines.core.domain.util.DataError.LocalError
 import com.juandgaines.core.domain.util.Result
@@ -32,7 +33,8 @@ class DefaultEventRepository @Inject constructor(
     private val eventDao: EventDao,
     private val eventApi: EventApi,
     private val applicationScope: CoroutineScope,
-    private val agendaItemScheduler: AgendaSyncScheduler
+    private val agendaItemScheduler: AgendaSyncScheduler,
+    private val sessionManager: SessionManager
 ):EventRepository {
     override suspend fun insertEvent(event: Event, photos:List<File>): Result<Unit, DataError> {
         return try {
@@ -68,7 +70,10 @@ class DefaultEventRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateEvent(event: Event): Result<Unit, DataError> {
+    override suspend fun updateEvent(
+        event: Event,
+        localPhotos: List<File>
+    ): Result<Unit, DataError> {
         return try {
             val entity = event.toEventEntity()
             eventDao.upsertEvent(entity)
@@ -76,7 +81,8 @@ class DefaultEventRepository @Inject constructor(
             val response = safeCall {
                 val request = event.toUpdateEventRequest()
                 val eventBody = updateEventRequestBody(request)
-                eventApi.updateEvent(eventBody)
+                val photoParts = createPhotoParts(localPhotos)
+                eventApi.updateEvent(eventBody, photoParts)
             }.onError {
                 when (it) {
                     DataError.Network.SERVER_ERROR,
@@ -90,7 +96,11 @@ class DefaultEventRepository @Inject constructor(
                     }
                     else -> Unit
                 }
-            }.asEmptyDataResult()
+            }.onSuccess {
+                val userId = sessionManager.get()?.userId
+                val newEvent = it.toEvent(userId)
+                eventDao.upsertEvent(newEvent.toEventEntity())
+            }.asEmptyDataResult().asEmptyDataResult()
             response
         }
         catch (e: SQLiteException) {
