@@ -87,7 +87,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.LocalTime
+import java.time.Period
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -164,6 +166,13 @@ class AgendaItemViewModel @Inject constructor(
                         details = item.agendaItemDetails.toAgendaItemDetailsUi(
                             emailPatterValidator,
                         ),
+                        alarm = when  {
+                            Duration.between(item.alarmDate, item.date).toMinutes() <= 10L -> MINUTES_TEN
+                            Duration.between(item.alarmDate, item.date).toMinutes() in 11..30L -> MINUTES_THIRTY
+                            Duration.between(item.alarmDate, item.date).toHours() == 1L -> HOUR_ONE
+                            Duration.between(item.alarmDate, item.date).toHours() == 6L -> HOUR_SIX
+                            else -> DAY_ONE
+                        },
                         startDateTime = item.date
                     )
                 }
