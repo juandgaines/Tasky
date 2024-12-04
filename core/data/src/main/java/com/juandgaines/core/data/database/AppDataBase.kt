@@ -16,6 +16,7 @@ import com.juandgaines.core.data.database.agenda.UpdateTaskSyncEntity
 import com.juandgaines.core.data.database.event.EventConverters
 import com.juandgaines.core.data.database.event.EventDao
 import com.juandgaines.core.data.database.event.EventEntity
+import com.juandgaines.core.data.database.event.PhotoConverters
 import com.juandgaines.core.data.database.reminder.ReminderDao
 import com.juandgaines.core.data.database.reminder.ReminderEntity
 import com.juandgaines.core.data.database.task.TaskDao
@@ -36,7 +37,10 @@ import com.juandgaines.core.data.database.task.TaskEntity
         CreateReminderSyncEntity::class,
         CreateEventSyncEntity::class
     ], version = 1)
-@TypeConverters(EventConverters::class)
+@TypeConverters(
+    EventConverters::class,
+    PhotoConverters::class
+)
 abstract class TaskyDataBase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun reminderDao(): ReminderDao

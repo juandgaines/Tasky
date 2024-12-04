@@ -19,5 +19,6 @@ data class EventEntity(
     val isUserEventCreator: Boolean,
     @ColumnInfo(name = "is_going")
     val isGoing: Boolean,
+    val photos: List<PhotoEntity>,
     val attendees: List<AttendeeEntity>
 )

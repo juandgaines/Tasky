@@ -2,6 +2,7 @@
 
 package com.juandgaines.agenda.presentation.agenda_item
 
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.agenda.AttendeeMinimal
+import com.juandgaines.agenda.domain.agenda.FileCompressor
 import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
@@ -21,6 +23,7 @@ import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddEmailAsAttendee
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddPicture
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissAttendeeDialog
@@ -46,7 +49,11 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetailsUi.Event
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetailsUi.TaskDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.DeletionScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Joined
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Left
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UserAdded
@@ -80,7 +87,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.LocalTime
+import java.time.Period
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -94,7 +103,8 @@ class AgendaItemViewModel @Inject constructor(
     private val alarmScheduler: AlarmScheduler,
     private val emailPatterValidator: PatternValidator,
     private val attendeeRepository: AttendeeRepository,
-    private val connectivityObserver: ConnectivityObserver
+    private val connectivityObserver: ConnectivityObserver,
+    private val fileCompressor: FileCompressor
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -154,8 +164,15 @@ class AgendaItemViewModel @Inject constructor(
                         title = item.title,
                         description = item.description,
                         details = item.agendaItemDetails.toAgendaItemDetailsUi(
-                            emailPatterValidator
+                            emailPatterValidator,
                         ),
+                        alarm = when  {
+                            Duration.between(item.alarmDate, item.date).toMinutes() <= 10L -> MINUTES_TEN
+                            Duration.between(item.alarmDate, item.date).toMinutes() in 11..30L -> MINUTES_THIRTY
+                            Duration.between(item.alarmDate, item.date).toHours() == 1L -> HOUR_ONE
+                            Duration.between(item.alarmDate, item.date).toHours() == 6L -> HOUR_SIX
+                            else -> DAY_ONE
+                        },
                         startDateTime = item.date
                     )
                 }
@@ -293,10 +310,10 @@ class AgendaItemViewModel @Inject constructor(
 
                         response
                             .onSuccess {
-                                eventChannel.send(AgendaItemEvent.Deleted)
+                                eventChannel.send(Deleted)
                             }.onError {
                                 eventChannel.send(
-                                    AgendaItemEvent.DeletionScheduled
+                                    DeletionScheduled
                                 )
                             }
                     }
@@ -331,6 +348,7 @@ class AgendaItemViewModel @Inject constructor(
                                 )
                             }
                             EVENT -> {
+                                val compressedPhotos = fileCompressor.compressLocalFiles((_state.value.details as EventDetails).localPhotos.map { it.toString() })
                                 Event(
                                     id = agendaItemId,
                                     title = _state.value.title,
@@ -350,6 +368,7 @@ class AgendaItemViewModel @Inject constructor(
                                     host = (_state.value.details as EventDetails).host,
                                     isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                                     isGoing = (_state.value.details as EventDetails).isGoingUser,
+                                    localPhotos = compressedPhotos.listFiles
                                 )
                             }
                         }
@@ -362,7 +381,8 @@ class AgendaItemViewModel @Inject constructor(
                                 data
                             )
                             is Event -> eventRepository.updateEvent(
-                                data
+                                data,
+                                data.localPhotos
                             )
                         }
                         response
@@ -396,6 +416,7 @@ class AgendaItemViewModel @Inject constructor(
                                 )
                             }
                             EVENT -> {
+                                val compressPhoto = fileCompressor.compressLocalFiles((_state.value.details as EventDetails).localPhotos.map { it.toString() })
                                 Event(
                                     id = UUID.randomUUID().toString(),
                                     title = _state.value.title,
@@ -415,6 +436,7 @@ class AgendaItemViewModel @Inject constructor(
                                     host = (_state.value.details as EventDetails).host,
                                     isGoing = (_state.value.details as EventDetails).isGoingUser,
                                     isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    localPhotos = compressPhoto.listFiles
                                 )
                             }
                         }
@@ -427,7 +449,8 @@ class AgendaItemViewModel @Inject constructor(
                             )
 
                             is Event -> eventRepository.insertEvent(
-                                data
+                                data,
+                                data.localPhotos
                             )
                         }
                         response
@@ -628,9 +651,9 @@ class AgendaItemViewModel @Inject constructor(
                             isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                             isGoing = false
                         )
-                        eventRepository.updateEvent(event)
+                        eventRepository.updateEvent(event, emptyList())
                             .onSuccess {
-                                eventChannel.send(AgendaItemEvent.Left)
+                                eventChannel.send(Left)
                             }.onError {
                                 eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
                             }
@@ -663,9 +686,9 @@ class AgendaItemViewModel @Inject constructor(
                             isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                             isGoing = true
                         )
-                        eventRepository.updateEvent(event)
+                        eventRepository.updateEvent(event, emptyList())
                             .onSuccess {
-                                eventChannel.send(AgendaItemEvent.Joined)
+                                eventChannel.send(Joined)
                             }.onError {
                                 eventChannel.send(Error(StringResource(R.string.error_joining_event)))
                             }
@@ -673,6 +696,18 @@ class AgendaItemViewModel @Inject constructor(
                         eventChannel.send(Error(StringResource(R.string.error_joining_event)))
                     }
 
+                }
+
+                is AddPicture -> {
+                    updateState {
+                        it.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    localPhotos = d.localPhotos + action.uri
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -703,4 +738,5 @@ class AgendaItemViewModel @Inject constructor(
         }
         return newDateTime.withSecond(0)
     }
+
 }

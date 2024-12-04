@@ -87,7 +87,7 @@ class CreateAgendaItemWorker @AssistedInject constructor(
 
                     val createdEvent= updateEventSync?.event ?: createEventSync.event
 
-                    val response = eventRepository.insertEvent(createdEvent.toEvent())
+                    val response = eventRepository.insertEvent(createdEvent.toEvent(), emptyList())
                     return if (response is com.juandgaines.core.domain.util.Result.Error) {
                         response.error.toWorkerResult()
                     } else {
