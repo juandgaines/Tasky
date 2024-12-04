@@ -6,6 +6,10 @@ import android.graphics.BitmapFactory
 import androidx.core.net.toUri
 import com.juandgaines.agenda.domain.agenda.FileCompressionResult
 import com.juandgaines.agenda.domain.agenda.FileCompressor
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -18,7 +22,7 @@ class LocalImageFileCompressor @Inject constructor(
     override val maxValueCompression: Long
         get() =  1 * 1024 * 1024 // 1 MB
 
-    override suspend fun compressLocalFiles(files: List<String>): FileCompressionResult {
+    override suspend fun compressLocalFiles(files: List<String>): FileCompressionResult = withContext(Dispatchers.IO) {
         val compressedFiles = mutableListOf<File>()
         var failedFiles = 0
 
@@ -41,7 +45,7 @@ class LocalImageFileCompressor @Inject constructor(
                     outputStream.reset() // Reset the stream before each compression
                     bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
                     quality -= 10 // Decrease quality by 10% each iteration
-                } while (outputStream.size() > maxValueCompression && quality > 10)
+                } while (outputStream.size() > maxValueCompression && quality > 10 && isActive)
 
                 // If the file is small enough, save it
                 if (outputStream.size() <= maxValueCompression) {
@@ -56,11 +60,13 @@ class LocalImageFileCompressor @Inject constructor(
                 }
 
             } catch (e: Exception) {
+                if (e is CancellationException) throw e // If the coroutine was cancelled, rethrow the exception
+
                 e.printStackTrace() // Log the exception and skip this URI
                 failedFiles++
             }
-        }
 
-        return FileCompressionResult(failedFiles, compressedFiles)
+        }
+        FileCompressionResult(failedFiles, compressedFiles)
     }
 }
