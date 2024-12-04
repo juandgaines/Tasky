@@ -14,12 +14,15 @@ import com.juandgaines.core.domain.util.Result
 import com.juandgaines.core.domain.util.asEmptyDataResult
 import com.juandgaines.core.domain.util.map
 import com.juandgaines.core.domain.util.onError
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DefaultAttendeeRepository @Inject constructor(
     private val attendeeApi: AttendeeApi,
     private val eventDao: EventDao,
-    private val agendaItemScheduler: AgendaSyncScheduler
+    private val agendaItemScheduler: AgendaSyncScheduler,
+    private val applicationScope: CoroutineScope
 ):AttendeeRepository {
 
     override suspend fun getAttendeeByEmail(email: String): Result<AttendeeMinimal?, DataError> {
@@ -46,11 +49,13 @@ class DefaultAttendeeRepository @Inject constructor(
                 DataError.Network.SERVER_ERROR,
                 DataError.Network.REQUEST_TIMEOUT,
                 DataError.Network.NO_INTERNET ->
-                    agendaItemScheduler.scheduleSync(
-                        DeleteAgendaItem(
-                            agendaItem = agendaItem
+                    applicationScope.launch {
+                        agendaItemScheduler.scheduleSync(
+                            DeleteAgendaItem(
+                                agendaItem = agendaItem
+                            )
                         )
-                    )
+                    }
                 else -> Unit
             }
         }.asEmptyDataResult()
