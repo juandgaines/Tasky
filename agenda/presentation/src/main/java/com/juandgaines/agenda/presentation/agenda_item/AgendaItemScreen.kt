@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -441,6 +443,8 @@ fun AgendaItemScreen(
             if (state.details is AgendaItemDetailsUi.EventDetails) {
 
                     AttendeeSection(
+                        modifier = Modifier
+                            .weight(1f),
                         selectedFilter = state.attendeeFilter,
                         attendeesGoing = state.details.isGoing,
                         attendeesNotGoing = state.details.isNotGoing,
@@ -460,8 +464,6 @@ fun AgendaItemScreen(
                         },
                     )
                 }
-
-            Spacer(modifier = Modifier.weight(1f))
 
             if(!state.isNew){
                 when (state.details){
