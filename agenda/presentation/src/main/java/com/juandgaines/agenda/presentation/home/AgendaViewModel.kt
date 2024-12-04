@@ -13,6 +13,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
 import com.juandgaines.agenda.domain.agenda.AlarmProvider
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.agenda.InitialsCalculator
+import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
 import com.juandgaines.agenda.domain.task.TaskRepository
@@ -82,6 +83,7 @@ class AgendaViewModel @Inject constructor(
     private val agendaSyncScheduler: AgendaSyncScheduler,
     private val alarmProvider: AlarmProvider,
     private val alarmScheduler: AlarmScheduler,
+    private val attendeeRepository: AttendeeRepository
 ):ViewModel() {
 
     private val _state = MutableStateFlow(AgendaState())
@@ -271,14 +273,28 @@ class AgendaViewModel @Inject constructor(
                                         }
                                 }
                                 is Event -> {
-                                    eventRepository.deleteEvent(agendaItem).onSuccess {
-                                        eventChannel.send(
-                                            AgendaEvents.Success(
-                                                StringResource(R.string.event_deleted)
+                                    if(agendaItem.isUserEventCreator) {
+                                        eventRepository.deleteEvent(agendaItem).onSuccess {
+                                            eventChannel.send(
+                                                AgendaEvents.Success(
+                                                    StringResource(R.string.event_deleted)
+                                                )
                                             )
-                                        )
-                                    }.onError {
-                                        eventChannel.send(AgendaEvents.Error(it.asUiText()))
+                                        }.onError {
+                                            eventChannel.send(AgendaEvents.Error(it.asUiText()))
+                                        }
+                                    }
+                                    else {
+                                        attendeeRepository.deleteAttendee(agendaItem)
+                                            .onSuccess {
+                                                eventChannel.send(
+                                                    AgendaEvents.Success(
+                                                        StringResource(R.string.event_deleted)
+                                                    )
+                                                )
+                                            }.onError {
+                                                eventChannel.send(AgendaEvents.Error(it.asUiText()))
+                                            }
                                     }
                                 }
                             }

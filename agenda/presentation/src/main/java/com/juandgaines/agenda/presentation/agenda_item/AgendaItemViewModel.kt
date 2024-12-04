@@ -637,16 +637,6 @@ class AgendaItemViewModel @Inject constructor(
                     }?:run {
                         eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
                     }
-
-                    /*
-                    attendeeRepository.deleteAttendee(_navParameters.id!!)
-                        .onSuccess {
-                            eventChannel.send(AgendaItemEvent.Left)
-                        }.onError {
-                            eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
-                        }
-
-                     */
                 }
 
                 Join -> {

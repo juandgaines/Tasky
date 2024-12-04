@@ -46,9 +46,13 @@ class EventModule {
     @Singleton
     fun provideAttendee(
         attendeeApi: AttendeeApi,
+        eventDao: EventDao,
+        agendaItemScheduler: AgendaSyncScheduler
     ):AttendeeRepository {
         return DefaultAttendeeRepository(
             attendeeApi,
+            eventDao,
+            agendaItemScheduler
         )
     }
 }
