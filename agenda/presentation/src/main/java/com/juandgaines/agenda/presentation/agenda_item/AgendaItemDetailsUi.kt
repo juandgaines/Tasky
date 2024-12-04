@@ -1,8 +1,10 @@
 package com.juandgaines.agenda.presentation.agenda_item
 
+import android.net.Uri
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
 import com.juandgaines.agenda.domain.agenda.AgendaItemDetails
+import com.juandgaines.agenda.domain.agenda.Photo
 import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeUi
 import com.juandgaines.agenda.presentation.agenda_item.components.attendee.toAttendeeUi
 import com.juandgaines.core.domain.auth.PatternValidator
@@ -15,6 +17,8 @@ sealed interface AgendaItemDetailsUi {
         val host : String = "",
         val isUserCreator:Boolean = false,
         val attendees:List<AttendeeUi> = emptyList(),
+        val photos:List<Photo> = emptyList(),
+        val localPhotos:List<Uri> = emptyList(),
         val attendeeEmailBuffer: TextFieldState = TextFieldState(),
         val isAddingVisitor: Boolean = false,
         val doesEmailExist: Boolean = false,
@@ -44,6 +48,7 @@ fun AgendaItemDetails.toAgendaItemDetailsUi(emailPatterValidator: PatternValidat
         attendees = attendees.map {
             it.toAttendeeUi()
         },
+        photos = photos,
         isGoingUser = isGoingUser,
         emailPatterValidator = emailPatterValidator
     )

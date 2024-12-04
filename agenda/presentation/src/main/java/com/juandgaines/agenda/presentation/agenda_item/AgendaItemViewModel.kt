@@ -12,6 +12,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems.Reminder
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Task
 import com.juandgaines.agenda.domain.agenda.AlarmScheduler
 import com.juandgaines.agenda.domain.agenda.AttendeeMinimal
+import com.juandgaines.agenda.domain.agenda.FileCompressor
 import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.agenda.domain.reminder.ReminderRepository
@@ -21,6 +22,7 @@ import com.juandgaines.agenda.domain.utils.toUtcLocalDateTime
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
 import com.juandgaines.agenda.presentation.R
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddEmailAsAttendee
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddPicture
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissAttendeeDialog
@@ -46,7 +48,11 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetailsUi.Event
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemDetailsUi.TaskDetails
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Created
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.CreationScheduled
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Deleted
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.DeletionScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Error
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Joined
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Left
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UpdateScheduled
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.Updated
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemEvent.UserAdded
@@ -94,7 +100,8 @@ class AgendaItemViewModel @Inject constructor(
     private val alarmScheduler: AlarmScheduler,
     private val emailPatterValidator: PatternValidator,
     private val attendeeRepository: AttendeeRepository,
-    private val connectivityObserver: ConnectivityObserver
+    private val connectivityObserver: ConnectivityObserver,
+    private val fileCompressor: FileCompressor
 ):ViewModel() {
 
     private var eventChannel = Channel<AgendaItemEvent>()
@@ -154,7 +161,7 @@ class AgendaItemViewModel @Inject constructor(
                         title = item.title,
                         description = item.description,
                         details = item.agendaItemDetails.toAgendaItemDetailsUi(
-                            emailPatterValidator
+                            emailPatterValidator,
                         ),
                         startDateTime = item.date
                     )
@@ -293,10 +300,10 @@ class AgendaItemViewModel @Inject constructor(
 
                         response
                             .onSuccess {
-                                eventChannel.send(AgendaItemEvent.Deleted)
+                                eventChannel.send(Deleted)
                             }.onError {
                                 eventChannel.send(
-                                    AgendaItemEvent.DeletionScheduled
+                                    DeletionScheduled
                                 )
                             }
                     }
@@ -396,6 +403,7 @@ class AgendaItemViewModel @Inject constructor(
                                 )
                             }
                             EVENT -> {
+                                val compressPhoto = fileCompressor.compressLocalFiles((_state.value.details as EventDetails).photos.map { it.toString() })
                                 Event(
                                     id = UUID.randomUUID().toString(),
                                     title = _state.value.title,
@@ -415,6 +423,7 @@ class AgendaItemViewModel @Inject constructor(
                                     host = (_state.value.details as EventDetails).host,
                                     isGoing = (_state.value.details as EventDetails).isGoingUser,
                                     isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
+                                    localPhotos = compressPhoto.listFiles
                                 )
                             }
                         }
@@ -427,7 +436,8 @@ class AgendaItemViewModel @Inject constructor(
                             )
 
                             is Event -> eventRepository.insertEvent(
-                                data
+                                data,
+                                data.localPhotos
                             )
                         }
                         response
@@ -630,7 +640,7 @@ class AgendaItemViewModel @Inject constructor(
                         )
                         eventRepository.updateEvent(event)
                             .onSuccess {
-                                eventChannel.send(AgendaItemEvent.Left)
+                                eventChannel.send(Left)
                             }.onError {
                                 eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
                             }
@@ -675,7 +685,7 @@ class AgendaItemViewModel @Inject constructor(
                         )
                         eventRepository.updateEvent(event)
                             .onSuccess {
-                                eventChannel.send(AgendaItemEvent.Joined)
+                                eventChannel.send(Joined)
                             }.onError {
                                 eventChannel.send(Error(StringResource(R.string.error_joining_event)))
                             }
@@ -683,6 +693,18 @@ class AgendaItemViewModel @Inject constructor(
                         eventChannel.send(Error(StringResource(R.string.error_joining_event)))
                     }
 
+                }
+
+                is AddPicture -> {
+                    updateState {
+                        it.copy(
+                            details = updateDetailsIfEvent { d->
+                                d.copy(
+                                    localPhotos = d.localPhotos + action.uri
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -713,4 +735,5 @@ class AgendaItemViewModel @Inject constructor(
         }
         return newDateTime.withSecond(0)
     }
+
 }

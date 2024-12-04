@@ -1,5 +1,7 @@
 package com.juandgaines.agenda.presentation.agenda_item
 
+import android.net.Uri
+
 sealed interface AgendaItemAction{
     data class EditField(val key:String, val value :String): AgendaItemAction
     data class UpdateField(val key: String, val value: String): AgendaItemAction
@@ -17,6 +19,7 @@ sealed interface AgendaItemAction{
     data object DismissAttendeeDialog : AgendaItemAction
     data class AddEmailAsAttendee(val email: String) : AgendaItemAction
     data class RemoveAttendee(val attendeeId: String) : AgendaItemAction
+    data class AddPicture(val uri: Uri) : AgendaItemAction
     data object Edit: AgendaItemAction
     data object Save: AgendaItemAction
     data object Close: AgendaItemAction

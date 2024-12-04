@@ -15,3 +15,15 @@ class EventConverters {
         return Json.decodeFromString(attendeesJson)
     }
 }
+
+class PhotoConverters {
+    @TypeConverter
+    fun fromAttendeeList(photoJson: List<PhotoEntity>): String {
+        return Json.encodeToString(photoJson)
+    }
+
+    @TypeConverter
+    fun toAttendeeList(photoJson: String): List<PhotoEntity> {
+        return Json.decodeFromString(photoJson)
+    }
+}

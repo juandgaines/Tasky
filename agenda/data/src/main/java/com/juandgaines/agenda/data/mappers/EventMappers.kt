@@ -4,14 +4,17 @@ import com.juandgaines.agenda.data.event.remote.AttendeeDto
 import com.juandgaines.agenda.data.event.remote.AttendeeMinimalDto
 import com.juandgaines.agenda.data.event.remote.CreateEventRequest
 import com.juandgaines.agenda.data.event.remote.EventResponse
+import com.juandgaines.agenda.data.event.remote.PhotoDto
 import com.juandgaines.agenda.data.event.remote.UpdateEventRequest
 import com.juandgaines.agenda.domain.agenda.AgendaItems.Event
 import com.juandgaines.agenda.domain.agenda.Attendee
 import com.juandgaines.agenda.domain.agenda.AttendeeMinimal
 import com.juandgaines.agenda.domain.agenda.IAttendee
+import com.juandgaines.agenda.domain.agenda.Photo
 import com.juandgaines.agenda.domain.utils.toZonedDateTime
 import com.juandgaines.core.data.database.event.AttendeeEntity
 import com.juandgaines.core.data.database.event.EventEntity
+import com.juandgaines.core.data.database.event.PhotoEntity
 import java.time.ZonedDateTime
 
 fun EventResponse.toEvent( userId:String?) = Event(
@@ -24,6 +27,7 @@ fun EventResponse.toEvent( userId:String?) = Event(
     host = host,
     isUserEventCreator = isUserEventCreator,
     attendee = attendees.map { it.toAttendee(host) },
+    photos = photos?.map { it.toPhoto() }?: emptyList(),
     isGoing = attendees.find { it.userId == userId }?.isGoing?:true
 )
 
@@ -35,6 +39,11 @@ fun AttendeeDto.toAttendee(id:String) = Attendee(
     isGoing = isGoing,
     remindAt = remindAt.toZonedDateTime(),
     isUserCreator = id == userId,
+)
+
+fun PhotoDto.toPhoto() = Photo(
+    key = key,
+    url = url
 )
 
 fun Event.toEventRequest() = CreateEventRequest(
@@ -69,7 +78,8 @@ fun Event.toEventEntity() = EventEntity(
     host = host,
     isGoing = isGoing,
     isUserEventCreator = isUserEventCreator,
-    attendees = attendee.map { it.toAttendeeEntity() }
+    attendees = attendee.map { it.toAttendeeEntity() },
+    photos = photos.map { it.toPhotoEntity()}
 )
 
 fun EventEntity.toEvent() = Event(
@@ -82,7 +92,8 @@ fun EventEntity.toEvent() = Event(
     host = host,
     isGoing = isGoing,
     isUserEventCreator = isUserEventCreator,
-    attendee = attendees.map { it.toAttendee() }
+    attendee = attendees.map { it.toAttendee() },
+    photos = photos.map { it.toPhoto() }
 )
 
 fun AttendeeEntity.toAttendee() = Attendee(
@@ -93,6 +104,16 @@ fun AttendeeEntity.toAttendee() = Attendee(
     isGoing = isGoing,
     remindAt = remindAt.toZonedDateTime(),
     isUserCreator = isUserCreator,
+)
+
+fun PhotoEntity.toPhoto() = Photo(
+    key = key,
+    url = url
+)
+
+fun Photo.toPhotoEntity() = PhotoEntity(
+    key = key,
+    url = url
 )
 
 fun Attendee.toAttendeeEntity() = AttendeeEntity(

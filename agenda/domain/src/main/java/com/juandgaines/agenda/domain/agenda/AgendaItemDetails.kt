@@ -10,6 +10,7 @@ sealed interface AgendaItemDetails {
         val isUserCreator:Boolean = false,
         val isGoingUser : Boolean,
         val attendees:List<IAttendee> = emptyList(),
+        val photos:List<Photo> = emptyList(),
     ): AgendaItemDetails{
         val isGoing:List<IAttendee> = attendees.filter { it.isGoing }
         val isNotGoing:List<IAttendee> = attendees.filter { !it.isGoing }

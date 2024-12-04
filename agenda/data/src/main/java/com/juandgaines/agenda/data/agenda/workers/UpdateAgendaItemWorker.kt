@@ -87,7 +87,7 @@ class UpdateAgendaItemWorker @AssistedInject constructor(
                     val eventCreated = agendaSyncDao.getCreateEventSync(agendaId) ?: return Result.failure()
                     val updateEvent = agendaSyncDao.getUpdateEventSync(agendaId) ?: return Result.failure()
                     val event = updateEvent.event
-                    val response = eventRepository.insertEvent(event.toEvent())
+                    val response = eventRepository.insertEvent(event.toEvent(), emptyList())
 
                     return if (response is Error) {
                         response.error.toWorkerResult()

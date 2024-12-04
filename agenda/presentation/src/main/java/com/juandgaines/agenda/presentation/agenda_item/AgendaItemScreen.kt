@@ -49,6 +49,7 @@ import com.juandgaines.agenda.presentation.agenda_item.components.AgendaItemType
 import com.juandgaines.agenda.presentation.agenda_item.components.AlarmSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DateSection
 import com.juandgaines.agenda.presentation.agenda_item.components.DescriptionSection
+import com.juandgaines.agenda.presentation.agenda_item.components.PhotosSection
 import com.juandgaines.agenda.presentation.agenda_item.components.TitleSection
 import com.juandgaines.agenda.presentation.agenda_item.components.attendee.AttendeeSection
 import com.juandgaines.agenda.presentation.components.AgendaDatePicker
@@ -379,6 +380,18 @@ fun AgendaItemScreen(
                     onAction(AgendaItemAction.EditField(AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION, state.description))
                 }
             )
+            if (state.details is AgendaItemDetailsUi.EventDetails) {
+                PhotosSection(
+                    isEditing = state.isEditing,
+                    canEditField = canEditField,
+                    photos = state.details.photos,
+                    local = state.details.localPhotos,
+                    isInternetConnected = state.details.isConnectedToInternet,
+                    onAddPhoto = { uri ->
+                        onAction(AgendaItemAction.AddPicture(uri))
+                    }
+                )
+            }
 
             HorizontalDivider(
                 modifier = Modifier

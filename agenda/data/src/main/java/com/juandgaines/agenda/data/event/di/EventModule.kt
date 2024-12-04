@@ -1,16 +1,20 @@
 package com.juandgaines.agenda.data.event.di
 
+import android.content.Context
+import com.juandgaines.agenda.data.agenda.LocalImageFileCompressor
 import com.juandgaines.agenda.data.event.DefaultAttendeeRepository
 import com.juandgaines.agenda.data.event.DefaultEventRepository
 import com.juandgaines.agenda.data.event.remote.AttendeeApi
 import com.juandgaines.agenda.data.event.remote.EventApi
 import com.juandgaines.agenda.domain.agenda.AgendaSyncScheduler
+import com.juandgaines.agenda.domain.agenda.FileCompressor
 import com.juandgaines.agenda.domain.event.AttendeeRepository
 import com.juandgaines.agenda.domain.event.EventRepository
 import com.juandgaines.core.data.database.event.EventDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
@@ -50,5 +54,14 @@ class EventModule {
         return DefaultAttendeeRepository(
             attendeeApi,
         )
+    }
+
+    @Provides
+    @Singleton
+    fun providesFileCompressor(
+        @ApplicationContext
+        context: Context
+    ): FileCompressor {
+        return LocalImageFileCompressor(context)
     }
 }

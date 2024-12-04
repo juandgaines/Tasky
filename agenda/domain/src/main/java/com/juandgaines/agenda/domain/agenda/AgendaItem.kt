@@ -1,6 +1,7 @@
 package com.juandgaines.agenda.domain.agenda
 
 import com.juandgaines.core.domain.agenda.AgendaItemOption
+import java.io.File
 import java.time.ZonedDateTime
 
 sealed interface AgendaItems{
@@ -52,7 +53,9 @@ sealed interface AgendaItems{
         val host:String,
         val isUserEventCreator:Boolean,
         val isGoing:Boolean,
-        val attendee: List<IAttendee> = emptyList()
+        val attendee: List<IAttendee> = emptyList(),
+        val photos:List<Photo> = emptyList(),
+        val localPhotos:List<File> = emptyList()
     ):AgendaItems{
         override val date = time
         override val dateEnd = endTime
@@ -63,6 +66,7 @@ sealed interface AgendaItems{
             host = host,
             isUserCreator =  isUserEventCreator,
             attendees = attendee,
+            photos = photos,
             isGoingUser = isGoing
         )
 
