@@ -1,6 +1,5 @@
 package com.juandgaines.core.presentation.navigation
 
-import com.juandgaines.core.domain.agenda.AgendaItemOption
 import kotlinx.serialization.Serializable
 
 sealed interface ScreenNav {
@@ -27,5 +26,10 @@ sealed interface ScreenNav {
     data class EditField(
         val fieldName:String,
         val fieldValue:String
+    ):ScreenNav
+
+    @Serializable
+    data class PhotoDetail(
+        val photoUrl:String
     ):ScreenNav
 }

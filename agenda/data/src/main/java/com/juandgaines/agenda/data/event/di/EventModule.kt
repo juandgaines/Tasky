@@ -53,12 +53,14 @@ class EventModule {
     fun provideAttendee(
         attendeeApi: AttendeeApi,
         eventDao: EventDao,
-        agendaItemScheduler: AgendaSyncScheduler
+        agendaItemScheduler: AgendaSyncScheduler,
+        applicationScope: CoroutineScope
     ):AttendeeRepository {
         return DefaultAttendeeRepository(
             attendeeApi,
             eventDao,
-            agendaItemScheduler
+            agendaItemScheduler,
+            applicationScope
         )
     }
 

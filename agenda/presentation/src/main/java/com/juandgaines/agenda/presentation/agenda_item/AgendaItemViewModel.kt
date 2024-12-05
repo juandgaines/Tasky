@@ -26,6 +26,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddEmail
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.AddPicture
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Close
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Delete
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DeletePicture
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissAttendeeDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissDateDialog
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.DismissTimeDialog
@@ -33,6 +34,7 @@ import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Edit
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.EditField
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Join
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Leave
+import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.NavigateToPicture
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.RemoveAttendee
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.Save
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemAction.SelectAlarm
@@ -89,7 +91,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalTime
-import java.time.Period
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -111,23 +112,23 @@ class AgendaItemViewModel @Inject constructor(
     val events = eventChannel.receiveAsFlow()
 
     private val _state = MutableStateFlow(AgendaItemState())
-    private var _isEditing:MutableStateFlow<Boolean> = MutableStateFlow(false)
-    private var _navParameters=savedStateHandle.toRoute<AgendaItem>()
+    private var _isEditing: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private var _navParameters = savedStateHandle.toRoute<AgendaItem>()
     private var _isInit: Boolean = false
-    private val _type = AgendaItemOption.fromOrdinal( _navParameters.type)
+    private val _type = AgendaItemOption.fromOrdinal(_navParameters.type)
 
-    val state:StateFlow<AgendaItemState> = _state
+    val state: StateFlow<AgendaItemState> = _state
         .onStart {
-            if (!_isInit){
+            if (!_isInit) {
                 initState()
                 _isInit = true
             }
         }
         .combine(
             connectivityObserver.isConnected
-        ){ state, isConnected->
+        ) { state, isConnected ->
             state.copy(
-                details = updateDetailsIfEvent(state.details) { det->
+                details = updateDetailsIfEvent(state.details) { det ->
                     det.copy(
                         isConnectedToInternet = isConnected
                     )
@@ -136,7 +137,7 @@ class AgendaItemViewModel @Inject constructor(
         }
         .combine(
             _isEditing
-        ){ state, isEditing->
+        ) { state, isEditing ->
             state.copy(
                 isEditing = isEditing
             )
@@ -158,7 +159,7 @@ class AgendaItemViewModel @Inject constructor(
                 EVENT -> eventRepository.getEventById(idItem)
             }.onSuccess { item ->
 
-                updateState { event->
+                updateState { event ->
                     event.copy(
                         isNew = false,
                         title = item.title,
@@ -166,9 +167,13 @@ class AgendaItemViewModel @Inject constructor(
                         details = item.agendaItemDetails.toAgendaItemDetailsUi(
                             emailPatterValidator,
                         ),
-                        alarm = when  {
-                            Duration.between(item.alarmDate, item.date).toMinutes() <= 10L -> MINUTES_TEN
-                            Duration.between(item.alarmDate, item.date).toMinutes() in 11..30L -> MINUTES_THIRTY
+                        alarm = when {
+                            Duration.between(item.alarmDate, item.date)
+                                .toMinutes() <= 10L -> MINUTES_TEN
+
+                            Duration.between(item.alarmDate, item.date)
+                                .toMinutes() in 11..30L -> MINUTES_THIRTY
+
                             Duration.between(item.alarmDate, item.date).toHours() == 1L -> HOUR_ONE
                             Duration.between(item.alarmDate, item.date).toHours() == 6L -> HOUR_SIX
                             else -> DAY_ONE
@@ -191,7 +196,7 @@ class AgendaItemViewModel @Inject constructor(
                 }
                 it.copy(
                     isNew = true,
-                    startDateTime =initialDate ?: ZonedDateTime.now(),
+                    startDateTime = initialDate ?: ZonedDateTime.now(),
                     details = when (_type) {
                         REMINDER -> AgendaItemDetailsUi.ReminderDetails
                         TASK -> AgendaItemDetailsUi.TaskDetails()
@@ -205,10 +210,10 @@ class AgendaItemViewModel @Inject constructor(
         }
     }
 
-    fun onAction(action: AgendaItemAction){
+    fun onAction(action: AgendaItemAction) {
         viewModelScope.launch {
-            when (action){
-                is EditField ->  Unit
+            when (action) {
+                is EditField -> Unit
                 is SelectDateStart -> {
                     val zonedDate = action.dateMillis
                         .toUtcLocalDateTime()
@@ -224,9 +229,9 @@ class AgendaItemViewModel @Inject constructor(
                             isSelectDateDialog = false
                         )
                     }
-
                 }
-                is SelectTimeStart ->{
+
+                is SelectTimeStart -> {
                     updateState {
                         it.copy(
                             startDateTime = it.startDateTime
@@ -236,11 +241,12 @@ class AgendaItemViewModel @Inject constructor(
                         )
                     }
                 }
+
                 is SelectDateFinish -> {
 
                     updateState {
                         it.copy(
-                            details = updateDetailsIfEvent { details->
+                            details = updateDetailsIfEvent { details ->
                                 details.copy(
                                     finishDate = action.dateMillis
                                         .toUtcLocalDateTime()
@@ -251,11 +257,12 @@ class AgendaItemViewModel @Inject constructor(
                                             )
                                         ),
                                 )
-                            } ,
+                            },
                             isSelectDateDialog = false
                         )
                     }
                 }
+
                 is SelectTimeFinish -> {
                     val details = _state.value.details as EventDetails
                     updateState {
@@ -269,6 +276,7 @@ class AgendaItemViewModel @Inject constructor(
                         )
                     }
                 }
+
                 Delete -> {
                     val agendaItemId = _navParameters.id
                     if (agendaItemId != null) {
@@ -283,6 +291,7 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = _state.value.startDateTime
                                 )
                             )
+
                             TASK -> taskRepository.deleteTask(
                                 Task(
                                     id = agendaItemId,
@@ -293,6 +302,7 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = _state.value.startDateTime
                                 )
                             )
+
                             EVENT -> eventRepository.deleteEvent(
                                 Event(
                                     id = agendaItemId,
@@ -318,9 +328,11 @@ class AgendaItemViewModel @Inject constructor(
                             }
                     }
                 }
+
                 Edit -> {
                     _isEditing.value = true
                 }
+
                 Save -> {
                     val agendaItemId = _navParameters.id
                     val desiredAlarmDate = calculateTimeAlarm()
@@ -337,6 +349,7 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = desiredAlarmDate
                                 )
                             }
+
                             TASK -> {
                                 Task(
                                     id = agendaItemId,
@@ -347,8 +360,10 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = desiredAlarmDate
                                 )
                             }
+
                             EVENT -> {
-                                val compressedPhotos = fileCompressor.compressLocalFiles((_state.value.details as EventDetails).localPhotos.map { it.toString() })
+                                val compressedPhotos = fileCompressor.compressLocalFiles(
+                                    (_state.value.details as EventDetails).localPhotos.map { it.toString() })
                                 Event(
                                     id = agendaItemId,
                                     title = _state.value.title,
@@ -368,7 +383,8 @@ class AgendaItemViewModel @Inject constructor(
                                     host = (_state.value.details as EventDetails).host,
                                     isUserEventCreator = (_state.value.details as EventDetails).isUserCreator,
                                     isGoing = (_state.value.details as EventDetails).isGoingUser,
-                                    localPhotos = compressedPhotos.listFiles
+                                    localPhotos = compressedPhotos.listFiles,
+                                    deletedPhotos = (_state.value.details as EventDetails).photosToBeDeleted
                                 )
                             }
                         }
@@ -377,9 +393,11 @@ class AgendaItemViewModel @Inject constructor(
                             is Reminder -> reminderRepository.updateReminder(
                                 data
                             )
+
                             is Task -> taskRepository.updateTask(
                                 data
                             )
+
                             is Event -> eventRepository.updateEvent(
                                 data,
                                 data.localPhotos
@@ -405,6 +423,7 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = desiredAlarmDate
                                 )
                             }
+
                             TASK -> {
                                 Task(
                                     id = UUID.randomUUID().toString(),
@@ -415,8 +434,10 @@ class AgendaItemViewModel @Inject constructor(
                                     remindAt = desiredAlarmDate
                                 )
                             }
+
                             EVENT -> {
-                                val compressPhoto = fileCompressor.compressLocalFiles((_state.value.details as EventDetails).localPhotos.map { it.toString() })
+                                val compressPhoto = fileCompressor.compressLocalFiles(
+                                    (_state.value.details as EventDetails).localPhotos.map { it.toString() })
                                 Event(
                                     id = UUID.randomUUID().toString(),
                                     title = _state.value.title,
@@ -444,6 +465,7 @@ class AgendaItemViewModel @Inject constructor(
                             is Reminder -> reminderRepository.insertReminder(
                                 data
                             )
+
                             is Task -> taskRepository.insertTask(
                                 data
                             )
@@ -462,6 +484,7 @@ class AgendaItemViewModel @Inject constructor(
                             }
                     }
                 }
+
                 Close -> Unit
                 DismissDateDialog -> {
                     updateState {
@@ -470,6 +493,7 @@ class AgendaItemViewModel @Inject constructor(
                         )
                     }
                 }
+
                 DismissTimeDialog -> {
 
                     updateState {
@@ -478,6 +502,7 @@ class AgendaItemViewModel @Inject constructor(
                         )
                     }
                 }
+
                 is ShowDateDialog -> {
                     updateState {
                         it.copy(
@@ -486,6 +511,7 @@ class AgendaItemViewModel @Inject constructor(
                         )
                     }
                 }
+
                 is ShowTimeDialog -> {
                     updateState {
                         it.copy(
@@ -527,73 +553,74 @@ class AgendaItemViewModel @Inject constructor(
                     }
                 }
 
-                is AddEmailAsAttendee ->{
+                is AddEmailAsAttendee -> {
 
-                    updateState { state->
+                    updateState { state ->
                         state.copy(
-                            details = updateDetailsIfEvent { d->
+                            details = updateDetailsIfEvent { d ->
                                 d.copy(
                                     isAddingVisitor = true
                                 )
                             }
                         )
                     }
-                        attendeeRepository.getAttendeeByEmail(action.email)
-                            .onSuccess { attendee->
-                                if (attendee != null){
-                                    updateState { state->
-                                        state.copy(
-                                            details = updateDetailsIfEvent { d->
-                                                d.copy(
-                                                    attendees = d.attendees + AttendeeUi(
-                                                        email = attendee.email,
-                                                        fullName = attendee.fullName,
-                                                        isGoing = true,
-                                                        isUserCreator = false,
-                                                        initials = UserInitialsFormatter.format(attendee.fullName ),
-                                                        userId = attendee.userId,
-                                                        eventId = _navParameters.id ?: "",
-                                                        isCreator = false
+                    attendeeRepository.getAttendeeByEmail(action.email)
+                        .onSuccess { attendee ->
+                            if (attendee != null) {
+                                updateState { state ->
+                                    state.copy(
+                                        details = updateDetailsIfEvent { d ->
+                                            d.copy(
+                                                attendees = d.attendees + AttendeeUi(
+                                                    email = attendee.email,
+                                                    fullName = attendee.fullName,
+                                                    isGoing = true,
+                                                    isUserCreator = false,
+                                                    initials = UserInitialsFormatter.format(
+                                                        attendee.fullName
                                                     ),
-                                                    isAddAttendeeDialogVisible = false,
-                                                    isAddingVisitor = false,
-                                                    doesEmailExist = false
-                                                )
-                                            }
-                                        )
-                                    }
+                                                    userId = attendee.userId,
+                                                    eventId = _navParameters.id ?: "",
+                                                    isCreator = false
+                                                ),
+                                                isAddAttendeeDialogVisible = false,
+                                                isAddingVisitor = false,
+                                                doesEmailExist = false
+                                            )
+                                        }
+                                    )
+                                }
 
-                                    eventChannel.send(
-                                        UserAdded(
+                                eventChannel.send(
+                                    UserAdded(
                                         DynamicString(action.email)
                                     )
-                                    )
-                                }
-                                else{
-                                    eventChannel.send(
-                                        Error(
+                                )
+                            } else {
+                                eventChannel.send(
+                                    Error(
                                         StringResource(R.string.user_not_found)
                                     )
+                                )
+                                updateState { s ->
+                                    s.copy(
+                                        details = updateDetailsIfEvent { d ->
+                                            d.copy(
+                                                doesEmailExist = true,
+                                                isAddingVisitor = false
+                                            )
+                                        }
                                     )
-                                    updateState {s ->
-                                        s.copy(
-                                            details = updateDetailsIfEvent { d->
-                                                d.copy(
-                                                    doesEmailExist = true,
-                                                    isAddingVisitor = false
-                                                )
-                                            }
-                                        )
-                                    }
                                 }
-
                             }
 
+                        }
                 }
+
                 is RemoveAttendee -> {
-                    updateState { state->
+                    updateState { state ->
                         state.copy(
-                            details = updateDetailsIfEvent { d->
+                            details = updateDetailsIfEvent { d ->
                                 d.copy(
                                     attendees = d.attendees.filter { it.userId != action.attendeeId }
                                 )
@@ -601,24 +628,24 @@ class AgendaItemViewModel @Inject constructor(
                         )
                     }
                 }
+
                 ShowAttendeeDialog -> {
 
-                    updateState {s->
+                    updateState { s ->
                         s.copy(
-                            details = updateDetailsIfEvent { d->
+                            details = updateDetailsIfEvent { d ->
                                 d.copy(
                                     isAddAttendeeDialogVisible = true
                                 )
                             }
                         )
                     }
-
                 }
 
                 DismissAttendeeDialog -> {
-                    updateState {s->
+                    updateState { s ->
                         s.copy(
-                            details = updateDetailsIfEvent { d->
+                            details = updateDetailsIfEvent { d ->
                                 d.copy(
                                     isAddAttendeeDialogVisible = false
                                 )
@@ -655,9 +682,11 @@ class AgendaItemViewModel @Inject constructor(
                             .onSuccess {
                                 eventChannel.send(Left)
                             }.onError {
-                                eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
+                                eventChannel.send(
+                                    Error(StringResource(R.string.error_leaving_event))
+                                )
                             }
-                    }?:run {
+                    } ?: run {
                         eventChannel.send(Error(StringResource(R.string.error_leaving_event)))
                     }
                 }
@@ -690,18 +719,19 @@ class AgendaItemViewModel @Inject constructor(
                             .onSuccess {
                                 eventChannel.send(Joined)
                             }.onError {
-                                eventChannel.send(Error(StringResource(R.string.error_joining_event)))
+                                eventChannel.send(
+                                    Error(StringResource(R.string.error_joining_event))
+                                )
                             }
-                    }?:run {
+                    } ?: run {
                         eventChannel.send(Error(StringResource(R.string.error_joining_event)))
                     }
-
                 }
 
                 is AddPicture -> {
                     updateState {
                         it.copy(
-                            details = updateDetailsIfEvent { d->
+                            details = updateDetailsIfEvent { d ->
                                 d.copy(
                                     localPhotos = d.localPhotos + action.uri
                                 )
@@ -709,9 +739,35 @@ class AgendaItemViewModel @Inject constructor(
                         )
                     }
                 }
+
+                is DeletePicture -> {
+                    updateState {
+                        it.copy(
+                            details = updateDetailsIfEvent { d ->
+                                d.localPhotos.find { uri -> uri.toString() == action.photoToDelete }
+                                    ?.let { file ->
+                                        viewModelScope.launch {
+                                            fileCompressor.deleteFileFromCache(file.toString())
+                                        }
+                                        d.copy(
+                                            localPhotos = d.localPhotos.filter { uri -> uri.toString() != action.photoToDelete }
+                                        )
+                                    } ?: d.copy(
+                                    photos = d.photos.filter { photo -> photo.url != action.photoToDelete },
+                                    photosToBeDeleted = d.photosToBeDeleted.plus(
+                                        d.photos.find { photo -> photo.url == action.photoToDelete }?.key
+                                            ?: ""
+                                    ).filter { key -> key.isNotEmpty() }
+                                )
+                            }
+                        )
+
+                    }
+                }
+
+                is NavigateToPicture -> Unit
             }
         }
-
     }
 
     private fun updateState(update: (AgendaItemState) -> AgendaItemState) {

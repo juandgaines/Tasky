@@ -55,7 +55,8 @@ sealed interface AgendaItems{
         val isGoing:Boolean,
         val attendee: List<IAttendee> = emptyList(),
         val photos:List<Photo> = emptyList(),
-        val localPhotos:List<File> = emptyList()
+        val localPhotos:List<File> = emptyList(),
+        val deletedPhotos:List<String> = emptyList()
     ):AgendaItems{
         override val date = time
         override val dateEnd = endTime
@@ -75,6 +76,7 @@ sealed interface AgendaItems{
     companion object{
         const val EDIT_FIELD_TITLE_KEY = "title"
         const val EDIT_FIELD_TITLE_DESCRIPTION = "description"
+        const val EDIT_FIELD_TITLE_PHOTO = "photo"
     }
 }
 
