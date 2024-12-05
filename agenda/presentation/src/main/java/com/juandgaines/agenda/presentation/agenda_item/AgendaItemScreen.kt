@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -73,6 +71,8 @@ fun AgendaItemScreenRoot(
     viewModel: AgendaItemViewModel,
     navigateBack: () -> Unit,
     navigateEditField: (String, String) -> Unit,
+    navigateToPicture: (String) -> Unit,
+    photoToDelete: String?,
     title: String?,
     description: String?,
 ) {
@@ -167,7 +167,7 @@ fun AgendaItemScreenRoot(
         }
     }
 
-    LaunchedEffect(title , description) {
+    LaunchedEffect(title , description, photoToDelete) {
         title?.let {
             viewModel.onAction(
                 AgendaItemAction.UpdateField(
@@ -178,8 +178,13 @@ fun AgendaItemScreenRoot(
         description?.let {
             viewModel.onAction(
                 AgendaItemAction.UpdateField(
-                    AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION,description
+                    AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION, description
                 )
+            )
+        }
+        photoToDelete?.let {
+            viewModel.onAction(
+                AgendaItemAction.DeletePicture(photoToDelete)
             )
         }
     }
@@ -194,12 +199,14 @@ fun AgendaItemScreenRoot(
                 is AgendaItemAction.Close -> {
                     navigateBack()
                 }
+                is AgendaItemAction.NavigateToPicture -> {
+                    navigateToPicture(action.picture)
+                }
                 else -> viewModel.onAction(action)
             }
 
         }
     )
-
 }
 
 @Composable
@@ -391,6 +398,9 @@ fun AgendaItemScreen(
                     isInternetConnected = state.details.isConnectedToInternet,
                     onAddPhoto = { uri ->
                         onAction(AgendaItemAction.AddPicture(uri))
+                    },
+                    navigateToPhoto = {
+                        onAction(AgendaItemAction.NavigateToPicture(it))
                     }
                 )
             }

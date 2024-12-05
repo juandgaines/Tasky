@@ -47,16 +47,13 @@ fun PhotosSection(
     photos: List<Photo> = emptyList(),
     local: List<Uri> = emptyList(),
     onAddPhoto: (Uri) -> Unit,
+    navigateToPhoto: (String) -> Unit = {}
 ){
     val pickMedia = rememberLauncherForActivityResult (
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri: Uri? ->
             if (uri != null) {
-                Log.d("PhotosSection", "Selected photo: $uri")
                 onAddPhoto(uri)
-            }
-            else {
-                Log.d("PhotosSection", "No photo selected")
             }
         }
     )
@@ -93,7 +90,9 @@ fun PhotosSection(
                             shape = RoundedCornerShape(
                                 8.dp
                             )
-                        ),
+                        ).clickable {
+                            navigateToPhoto(it.url)
+                        },
                 )
             }
             local.forEach {
@@ -108,7 +107,11 @@ fun PhotosSection(
                             shape = RoundedCornerShape(
                                 8.dp
                             )
-                        ),
+                        ).clickable {
+                            navigateToPhoto(
+                                it.toString()
+                            )
+                        },
                 )
             }
             if (isEditing && canEditField) {

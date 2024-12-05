@@ -19,6 +19,7 @@ sealed interface AgendaItemDetailsUi {
         val attendees:List<AttendeeUi> = emptyList(),
         val photos:List<Photo> = emptyList(),
         val localPhotos:List<Uri> = emptyList(),
+        val photosToBeDeleted:List<String> = emptyList(),
         val attendeeEmailBuffer: TextFieldState = TextFieldState(),
         val isAddingVisitor: Boolean = false,
         val doesEmailExist: Boolean = false,
