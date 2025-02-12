@@ -21,6 +21,7 @@ import com.juandgaines.agenda.domain.agenda.AgendaItems
 import com.juandgaines.agenda.presentation.agenda_item.AgendaItemScreenRoot
 import com.juandgaines.agenda.presentation.edit_field.EditFieldScreenRoot
 import com.juandgaines.agenda.presentation.home.AgendaScreenRoot
+import com.juandgaines.agenda.presentation.photo_detail.PhotoDetailScreenRoot
 import com.juandgaines.auth.presentation.login.LoginScreenRoot
 import com.juandgaines.auth.presentation.login.LoginViewModel
 import com.juandgaines.auth.presentation.register.RegisterScreenRoot
@@ -147,10 +148,15 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                 .savedStateHandle
                 .get<String>(AgendaItems.EDIT_FIELD_TITLE_DESCRIPTION)
 
+            val photoToDelete = entry
+                .savedStateHandle
+                .get<String>(AgendaItems.EDIT_FIELD_TITLE_PHOTO)
+
             AgendaItemScreenRoot(
                 viewModel = hiltViewModel(),
                 title = textTitle,
                 description = textDescription,
+                photoToDelete = photoToDelete,
                 navigateEditField = { fieldName, fieldValue ->
                     navController.navigate(
                         ScreenNav.EditField(
@@ -161,6 +167,13 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                 },
                 navigateBack = {
                     navController.navigateUp()
+                },
+                navigateToPicture = { url ->
+                    navController.navigate(
+                        ScreenNav.PhotoDetail(
+                            photoUrl = url
+                        )
+                    )
                 }
             )
         }
@@ -173,6 +186,22 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set(fieldName, fieldValue)
+                    navController.popBackStack()
+                },
+                navigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable<ScreenNav.PhotoDetail> {
+
+            PhotoDetailScreenRoot (
+                viewModel = hiltViewModel(),
+                onDelete = { url ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(AgendaItems.EDIT_FIELD_TITLE_PHOTO, url)
                     navController.popBackStack()
                 },
                 navigateBack = {

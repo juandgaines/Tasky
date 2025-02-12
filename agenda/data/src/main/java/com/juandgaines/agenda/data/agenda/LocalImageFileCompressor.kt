@@ -69,4 +69,10 @@ class LocalImageFileCompressor @Inject constructor(
         }
         FileCompressionResult(failedFiles, compressedFiles)
     }
+
+    override suspend fun deleteFileFromCache(file: String) {
+        withContext(Dispatchers.IO) {
+            File(file).delete()
+        }
+    }
 }

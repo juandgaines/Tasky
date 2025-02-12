@@ -5,6 +5,7 @@ import java.io.File
 interface FileCompressor {
     val maxValueCompression:Long
     suspend fun compressLocalFiles(files: List<String>): FileCompressionResult
+    suspend fun deleteFileFromCache(file:String)
 }
 
 data class FileCompressionResult(

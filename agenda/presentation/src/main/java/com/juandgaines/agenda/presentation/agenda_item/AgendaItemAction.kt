@@ -20,6 +20,9 @@ sealed interface AgendaItemAction{
     data class AddEmailAsAttendee(val email: String) : AgendaItemAction
     data class RemoveAttendee(val attendeeId: String) : AgendaItemAction
     data class AddPicture(val uri: Uri) : AgendaItemAction
+    data class DeletePicture(val photoToDelete: String) : AgendaItemAction
+    data class NavigateToPicture(val picture: String) : AgendaItemAction
+
     data object Edit: AgendaItemAction
     data object Save: AgendaItemAction
     data object Close: AgendaItemAction
